@@ -1,0 +1,51 @@
+/* ─── BottomNav.css ──────────────────────────────────────────── */
+
+.bn-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 64px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background-color: #0e1510;
+  background-image: linear-gradient(
+    135deg,
+    rgba(0, 168, 107, 0.2) 0%,
+    rgba(14, 21, 16, 0.98) 100%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(89, 222, 155, 0.15);
+  box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.6);
+}
+
+.bn-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex: 1;
+  height: 100%;
+  text-decoration: none;
+  color: var(--on-surface-variant);
+  transition: color 0.2s;
+}
+
+.bn-icon {
+  font-size: 24px;
+}
+
+.bn-label {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.bn-item.active {
+  color: var(--primary);
+}

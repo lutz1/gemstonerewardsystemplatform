@@ -1,9 +1,7 @@
 import { useState } from "react";
 import "./PurchaseCodesPage.css";
-import MenuDrawer from "../../components/MenuDrawer/MenuDrawer";
-
-const AVATAR_URL =
-  "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=80&q=80";
+import BottomNav from "../../components/BottomNavigationBar/BottomNav";
+import TopBar from "../../components/TopBar/TopBar";
 
 const codes = [
   {
@@ -37,7 +35,6 @@ const codes = [
 ];
 
 export default function PurchaseCodesPage() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const filtered = codes.filter(
@@ -53,40 +50,7 @@ export default function PurchaseCodesPage() {
       <div className="pc-glow pc-glow-bl" />
 
       {/* ── Top App Bar ──────────────────────────────────────── */}
-      <header className="pc-topbar">
-        <div className="pc-topbar-inner">
-          <div className="pc-topbar-left">
-            <button
-              className="pc-hamburger"
-              aria-label="Open menu"
-              onClick={() => setDrawerOpen(true)}
-            >
-              <span className="material-symbols-outlined">menu</span>
-            </button>
-            <span className="pc-logo">Gemstone Code</span>
-          </div>
-
-          <div className="pc-topbar-right">
-            <div className="pc-user-info">
-              <p className="pc-user-role">Executive Member</p>
-              <p className="pc-user-name">Alex Sterling</p>
-            </div>
-            <button className="pc-notif-btn" aria-label="Notifications">
-              <span className="material-symbols-outlined">notifications</span>
-            </button>
-            <div className="pc-topbar-avatar">
-              <img src={AVATAR_URL} alt="Alex Sterling" />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* ── Menu Drawer ──────────────────────────────────────── */}
-      <MenuDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        activeItem="codes"
-      />
+      <TopBar />
 
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="pc-main">
@@ -245,6 +209,7 @@ export default function PurchaseCodesPage() {
           </div>
         </footer>
       </main>
+      <BottomNav activeItem="codes" />
     </div>
   );
 }

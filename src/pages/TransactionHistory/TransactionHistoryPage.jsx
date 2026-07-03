@@ -1,10 +1,7 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./TransactionHistoryPage.css";
-import MenuDrawer from "../../components/MenuDrawer/MenuDrawer";
-
-const AVATAR_URL =
-  "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=80&q=80";
+import BottomNav from "../../components/BottomNavigationBar/BottomNav";
+import TopBar from "../../components/TopBar/TopBar";
 
 const transactions = [
   {
@@ -85,8 +82,6 @@ const stats = [
 ];
 
 export default function TransactionHistoryPage() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
   return (
     <div className="th-root">
       {/* ── Atmosphere glows ─────────────────────────────────── */}
@@ -94,44 +89,7 @@ export default function TransactionHistoryPage() {
       <div className="th-glow th-glow-bl" />
 
       {/* ── Top App Bar ──────────────────────────────────────── */}
-      <header className="th-topbar">
-        <div className="th-topbar-inner">
-          <div className="th-topbar-left">
-            <button
-              className="th-hamburger"
-              aria-label="Open menu"
-              onClick={() => setDrawerOpen(true)}
-            >
-              <span className="material-symbols-outlined">menu</span>
-            </button>
-            <span className="th-logo">Gemstone Code</span>
-          </div>
-
-          <div className="th-topbar-right">
-            <div className="th-user-info">
-              <p className="th-user-role">Executive Member</p>
-              <p className="th-user-name">Alex Sterling</p>
-            </div>
-            <button className="th-notif-btn" aria-label="Notifications">
-              <span className="material-symbols-outlined">notifications</span>
-            </button>
-            <div className="th-topbar-avatar">
-              <img src={AVATAR_URL} alt="Alex Sterling" />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* ── Menu Drawer ──────────────────────────────────────── */}
-      <MenuDrawer
-        variant="drawer"
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        activeItem="history"
-        avatarUrl={AVATAR_URL}
-        userName="Alex Sterling"
-        userRole="Executive Member"
-      />
+      <TopBar />
 
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="th-main">
@@ -252,6 +210,7 @@ export default function TransactionHistoryPage() {
           </div>
         </footer>
       </main>
+      <BottomNav activeItem="history" />
     </div>
   );
 }

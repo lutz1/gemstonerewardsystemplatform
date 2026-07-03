@@ -1,9 +1,7 @@
-import { useState } from "react";
 import "./DashboardPage.css";
-import MenuDrawer from "../../components/MenuDrawer/MenuDrawer";
+import BottomNav from "../../components/BottomNavigationBar/BottomNav";
+import TopBar from "../../components/TopBar/TopBar";
 
-const AVATAR_URL =
-  "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=80&q=80";
 const GEM_IMG_URL =
   "https://images.unsplash.com/photo-1551893665-f843f600794e?auto=format&fit=crop&w=80&q=80";
 const GUIDE_IMG_URL =
@@ -40,47 +38,11 @@ const transactions = [
 ];
 
 export default function DashboardPage() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
   return (
     <div className="db-root">
 
-      {/* ── Menu Drawer (extracted component) ────────────────── */}
-      <MenuDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        activeItem="dashboard"
-        avatarUrl={AVATAR_URL}
-        userName="Marcus"
-        userRole="Executive"
-      />
-
       {/* ── Top App Bar ──────────────────────────────────────── */}
-      <header className="db-topbar">
-        <div className="db-topbar-left">
-          <button
-            className="db-hamburger"
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open menu"
-          >
-            <span className="material-symbols-outlined">menu</span>
-          </button>
-          <span className="db-logo">Gemstone Code</span>
-        </div>
-        <div className="db-topbar-right">
-          <div className="db-user-info">
-            <p className="db-user-role">Executive Member</p>
-            <p className="db-user-name">Marcus</p>
-          </div>
-          <button className="db-notif-btn" aria-label="Notifications">
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="db-notif-dot" />
-          </button>
-          <div className="db-topbar-avatar">
-            <img src={AVATAR_URL} alt="Marcus" />
-          </div>
-        </div>
-      </header>
+      <TopBar userName="Marcus" showNotifDot />
 
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="db-main">
@@ -274,6 +236,7 @@ export default function DashboardPage() {
 
         </div>
       </main>
+      <BottomNav activeItem="dashboard" />
     </div>
   );
 }

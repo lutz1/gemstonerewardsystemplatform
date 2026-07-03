@@ -1,10 +1,7 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./DirectReferralsPage.css";
-import MenuDrawer from "../../components/MenuDrawer/MenuDrawer";
-
-const AVATAR_URL =
-  "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=80&q=80";
+import BottomNav from "../../components/BottomNavigationBar/BottomNav";
+import TopBar from "../../components/TopBar/TopBar";
 
 // Placeholder avatars — swap for real member photos before production
 const referrals = [
@@ -47,54 +44,12 @@ const referrals = [
 ];
 
 export default function DirectReferralsPage() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
   return (
     <div className="dr-root">
       {/* ── Top App Bar ──────────────────────────────────────── */}
-      <header className="dr-topbar">
-        <div className="dr-topbar-inner">
-          <div className="dr-topbar-left">
-            <button
-              className="dr-hamburger"
-              aria-label="Open menu"
-              onClick={() => setDrawerOpen(true)}
-            >
-              <span className="material-symbols-outlined">menu</span>
-            </button>
-            <span className="dr-logo">Gemstone Code</span>
-          </div>
-
-          <div className="dr-topbar-right">
-            <div className="dr-user-info">
-              <p className="dr-user-role">Executive Member</p>
-              <p className="dr-user-name">Alex Sterling</p>
-            </div>
-            <button className="dr-notif-btn" aria-label="Notifications">
-              <span className="material-symbols-outlined">notifications</span>
-            </button>
-            <div className="dr-topbar-avatar">
-              <img src={AVATAR_URL} alt="Alex Sterling" />
-            </div>
-          </div>
-        </div>
-      </header>
+      <TopBar />
 
       <div className="dr-shell">
-        {/* ── Slide-out drawer (MenuDrawer in default "drawer" mode) ──
-            Opens via the hamburger button above, works at every
-            screen size, independent of the always-visible rail below. */}
-        <MenuDrawer
-          variant="drawer"
-          isOpen={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          activeItem="referrals"
-          avatarUrl={AVATAR_URL}
-          userName="Executive Member"
-          userRole="Gemstone Tier"
-        />
-
-        {/* ── Main content ─────────────────────────────────────── */}
         <main className="dr-main">
           <div className="dr-content">
 
@@ -245,6 +200,7 @@ export default function DirectReferralsPage() {
           </footer>
         </main>
       </div>
+      <BottomNav activeItem="referrals" />
     </div>
   );
 }

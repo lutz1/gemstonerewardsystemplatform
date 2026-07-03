@@ -6,7 +6,7 @@
   color: var(--on-surface);
   font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
-  padding-bottom: 48px;
+  padding-bottom: 96px;
   background-image: radial-gradient(circle at 2px 2px, rgba(89,222,155,0.05) 1px, transparent 0);
   background-size: 48px 48px;
 }
@@ -43,149 +43,6 @@
 
 .glass-card-emerald:hover {
   box-shadow: 0 0 32px rgba(0, 168, 107, 0.22), 0 4px 30px rgba(0, 0, 0, 0.15);
-}
-
-/* ─── Top app bar ────────────────────────────────────────────── */
-
-.db-topbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 50;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  background: rgba(14, 21, 16, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(61, 74, 65, 0.3);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-
-.db-topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-/* ─── Hamburger menu button ──────────────────────────────────── */
-
-.db-hamburger {
-  padding: 8px;
-  border-radius: 50%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  transition: background 0.15s, transform 0.15s;
-  margin-left: -8px;
-}
-
-.db-hamburger:hover { background: rgba(47, 54, 49, 0.5); }
-.db-hamburger:active { transform: scale(0.9); }
-
-
-.db-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid rgba(89, 222, 155, 0.3);
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.15s;
-}
-
-.db-avatar:active { transform: scale(0.9); }
-
-.db-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.db-logo {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--primary);
-}
-
-
-.db-topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.db-user-info {
-  text-align: right;
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .db-user-info { display: block; }
-}
-
-.db-user-role {
-  font-family: 'Hanken Grotesk', sans-serif;
-  font-size: 10px;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.db-user-name {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.db-topbar-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid rgba(89, 222, 155, 0.3);
-  overflow: hidden;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.db-topbar-avatar:active { opacity: 0.7; }
-
-.db-topbar-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.db-notif-btn {
-  position: relative;
-  padding: 8px;
-  border-radius: 50%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--primary);
-  transition: background 0.15s, transform 0.15s;
-  display: flex;
-  align-items: center;
-}
-
-.db-notif-btn:hover { background: rgba(47, 54, 49, 0.5); }
-.db-notif-btn:active { transform: scale(0.9); }
-
-.db-notif-dot {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 10px;
-  height: 10px;
-  background: var(--primary);
-  border-radius: 50%;
-  border: 2px solid var(--surface);
 }
 
 /* ─── Main content ───────────────────────────────────────────── */
@@ -729,8 +586,6 @@
   font-weight: 600;
   color: #ffffff;
 }
-
-/* ─── Hamburger button ───────────────────────────────────────── */
 
 /* ─── Animations ─────────────────────────────────────────────── */
 
