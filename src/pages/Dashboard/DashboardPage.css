@@ -1,0 +1,760 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.db-root {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--on-surface);
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+  padding-bottom: 48px;
+  background-image: radial-gradient(circle at 2px 2px, rgba(89,222,155,0.05) 1px, transparent 0);
+  background-size: 48px 48px;
+}
+
+/* ─── Glass utilities ────────────────────────────────────────── */
+
+.glass-card {
+  background: rgba(26, 33, 28, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(198, 198, 198, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  transition: box-shadow 0.25s ease, background 0.2s;
+  /* no transform — prevents any tilt */
+  transform: none !important;
+}
+
+.glass-card:hover {
+  background: rgba(47, 54, 49, 0.5);
+  box-shadow: 0 0 24px rgba(0, 168, 107, 0.18), 0 4px 30px rgba(0, 0, 0, 0.15);
+}
+
+.glass-card-emerald {
+  background: linear-gradient(135deg, rgba(0,168,107,0.15) 0%, rgba(14,21,16,0.8) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(198, 198, 198, 0.3);
+  border-left: 1px solid rgba(198, 198, 198, 0.1);
+  border-radius: 8px;
+  transition: box-shadow 0.25s ease;
+  transform: none !important;
+}
+
+.glass-card-emerald:hover {
+  box-shadow: 0 0 32px rgba(0, 168, 107, 0.22), 0 4px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* ─── Top app bar ────────────────────────────────────────────── */
+
+.db-topbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(14, 21, 16, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(61, 74, 65, 0.3);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.db-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ─── Hamburger menu button ──────────────────────────────────── */
+
+.db-hamburger {
+  padding: 8px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  transition: background 0.15s, transform 0.15s;
+  margin-left: -8px;
+}
+
+.db-hamburger:hover { background: rgba(47, 54, 49, 0.5); }
+.db-hamburger:active { transform: scale(0.9); }
+
+
+.db-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(89, 222, 155, 0.3);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.db-avatar:active { transform: scale(0.9); }
+
+.db-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.db-logo {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+}
+
+
+.db-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.db-user-info {
+  text-align: right;
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .db-user-info { display: block; }
+}
+
+.db-user-role {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 10px;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.db-user-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.db-topbar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(89, 222, 155, 0.3);
+  overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.db-topbar-avatar:active { opacity: 0.7; }
+
+.db-topbar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.db-notif-btn {
+  position: relative;
+  padding: 8px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  transition: background 0.15s, transform 0.15s;
+  display: flex;
+  align-items: center;
+}
+
+.db-notif-btn:hover { background: rgba(47, 54, 49, 0.5); }
+.db-notif-btn:active { transform: scale(0.9); }
+
+.db-notif-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+}
+
+/* ─── Main content ───────────────────────────────────────────── */
+
+.db-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 96px 24px 0;
+}
+
+@media (min-width: 768px) {
+  .db-main { padding-top: 128px; }
+}
+
+/* ─── Welcome section ────────────────────────────────────────── */
+
+.db-welcome {
+  margin-bottom: 48px;
+  animation: fadeSlideUp 0.7s ease both;
+}
+
+.db-welcome-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .db-welcome-inner {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.db-eyebrow {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.db-hello {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(32px, 6vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
+  line-height: 1.1;
+}
+
+.db-welcome-sub {
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  max-width: 28rem;
+  margin-top: 4px;
+}
+
+
+
+/* ─── Bento grid ─────────────────────────────────────────────── */
+
+.db-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .db-grid { grid-template-columns: repeat(12, 1fr); }
+  .db-col-7 { grid-column: span 7; }
+  .db-col-5 { grid-column: span 5; }
+  .db-col-8 { grid-column: span 8; }
+  .db-col-4 { grid-column: span 4; }
+}
+
+/* ─── Gems wallet card ───────────────────────────────────────── */
+
+.db-wallet {
+  padding: 24px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+.db-wallet-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.db-wallet-icon-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.db-wallet-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(89, 222, 155, 0.2);
+  border: 1px solid rgba(89, 222, 155, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.db-wallet-label {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+.db-wallet-amount {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
+  margin-top: 16px;
+  line-height: 1;
+}
+
+.db-gems-unit {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--primary);
+  margin-left: 4px;
+}
+
+.db-wallet-est-label {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+}
+
+.db-wallet-est-val {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--on-surface);
+  text-align: right;
+}
+
+.db-wallet-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.db-avatar-stack {
+  display: flex;
+}
+
+.db-avatar-stack-item {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  overflow: hidden;
+  margin-left: -12px;
+}
+
+.db-avatar-stack-item:first-child { margin-left: 0; }
+
+.db-avatar-stack-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.8;
+}
+
+.db-avatar-stack-icon {
+  background: rgba(0, 168, 107, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.db-exchange-btn {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border: none;
+  border-radius: 8px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Hanken Grotesk', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 0 20px rgba(0, 168, 107, 0.15);
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.db-exchange-btn:hover { filter: brightness(1.1); }
+.db-exchange-btn:active { transform: scale(0.95); }
+
+.db-exchange-btn .material-symbols-outlined { font-size: 20px; }
+
+/* ─── Quick stat cards ───────────────────────────────────────── */
+
+.db-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.db-stat-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.db-stat-icon {
+  font-size: 24px;
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.db-stat-sublabel {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+}
+
+.db-stat-num {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--on-surface);
+  margin-top: 16px;
+}
+
+.db-stat-caption {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+}
+
+.db-stat-caption.muted { color: var(--secondary); }
+
+.db-referral-card {
+  grid-column: span 2;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+}
+
+.db-referral-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.db-referral-icon-wrap {
+  padding: 8px;
+  background: rgba(89, 222, 155, 0.1);
+  border-radius: 8px;
+}
+
+.db-referral-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.db-referral-sub {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  letter-spacing: 0.05em;
+}
+
+.db-chevron-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.db-chevron-btn:hover { color: var(--primary-fixed-dim); }
+
+/* ─── Transaction history ────────────────────────────────────── */
+
+.db-tx-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+  margin-bottom: 16px;
+}
+
+.db-tx-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.db-tx-view-all {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: text-decoration 0.15s;
+}
+
+.db-tx-view-all:hover { text-decoration: underline; }
+
+.db-tx-list {
+  overflow: hidden;
+}
+
+.db-tx-row {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(61, 74, 65, 0.1);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.db-tx-row:last-child { border-bottom: none; }
+.db-tx-row:hover { background: rgba(255, 255, 255, 0.05); }
+
+.db-tx-row:hover .db-tx-icon-wrap {
+  border-color: rgba(89, 222, 155, 0.4);
+}
+
+.db-tx-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.db-tx-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--surface-container-highest);
+  border: 1px solid rgba(61, 74, 65, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.db-tx-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.db-tx-date {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.db-tx-right { text-align: right; }
+
+.db-tx-amount {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.db-tx-amount.negative { color: var(--on-surface); }
+
+.db-tx-status {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* ─── Insights sidebar ───────────────────────────────────────── */
+
+.db-insights-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--on-surface);
+  padding: 0 4px;
+  margin-bottom: 16px;
+}
+
+.db-insights-card {
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.db-insights-glow {
+  position: absolute;
+  top: -64px;
+  right: -64px;
+  width: 128px;
+  height: 128px;
+  background: rgba(89, 222, 155, 0.05);
+  border-radius: 50%;
+  filter: blur(24px);
+  pointer-events: none;
+}
+
+.db-insights-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.db-insight-row {
+  display: flex;
+  gap: 16px;
+}
+
+.db-insight-row + .db-insight-row {
+  padding-top: 24px;
+  border-top: 1px solid rgba(61, 74, 65, 0.1);
+}
+
+.db-insight-icon { margin-top: 2px; font-size: 24px; }
+.db-insight-icon.warn { color: var(--tertiary-container); }
+.db-insight-icon.info { color: var(--primary); }
+
+.db-insight-heading {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--on-surface);
+  line-height: 1.3;
+}
+
+.db-insight-text {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin-top: 4px;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+
+.db-renew-btn {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 16px;
+  transition: color 0.15s;
+}
+
+.db-renew-btn:hover { color: var(--primary-fixed-dim); }
+
+/* ─── Image card ─────────────────────────────────────────────── */
+
+.db-img-card {
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  cursor: pointer;
+}
+
+.db-img-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.db-img-card:hover img { transform: scale(1.1); }
+
+.db-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--surface), transparent);
+  opacity: 0.8;
+}
+
+.db-img-text {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+}
+
+.db-img-eyebrow {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.db-img-heading {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ─── Hamburger button ───────────────────────────────────────── */
+
+/* ─── Animations ─────────────────────────────────────────────── */
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.db-animate {
+  opacity: 0;
+  animation: fadeIn 0.7s ease forwards;
+}
+
+.db-animate-delay-1 { animation-delay: 0.1s; }
+.db-animate-delay-2 { animation-delay: 0.2s; }
+.db-animate-delay-3 { animation-delay: 0.3s; }
+.db-animate-delay-4 { animation-delay: 0.4s; }
