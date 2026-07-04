@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import "./TopBar.css";
 
 const DEFAULT_AVATAR_URL =
@@ -12,7 +13,8 @@ const DEFAULT_AVATAR_URL =
  * - userRole:   member tier/role label                (default "Executive Member")
  * - avatarUrl:  avatar image src                      (default sample avatar)
  * - onNotifClick: handler for the notification bell   (optional)
- * - onAvatarClick: handler for the avatar             (optional)
+ * - onAvatarClick: handler for the avatar. If not provided, clicking the
+ *                   avatar navigates to /profile by default.
  */
 export default function TopBar({
   logoText = "Gemstone Code",
@@ -23,6 +25,16 @@ export default function TopBar({
   onNotifClick,
   onAvatarClick,
 }) {
+  const navigate = useNavigate();
+
+  const handleAvatarClick = () => {
+    if (onAvatarClick) {
+      onAvatarClick();
+    } else {
+      navigate("/profile");
+    }
+  };
+
   return (
     <header className="tb-topbar">
       <div className="tb-topbar-inner">
@@ -43,7 +55,13 @@ export default function TopBar({
             <span className="material-symbols-outlined">notifications</span>
             {showNotifDot && <span className="tb-notif-dot" />}
           </button>
-          <div className="tb-topbar-avatar" onClick={onAvatarClick}>
+          <div
+            className="tb-topbar-avatar"
+            onClick={handleAvatarClick}
+            role="button"
+            tabIndex={0}
+            aria-label="View profile"
+          >
             <img src={avatarUrl} alt={userName} />
           </div>
         </div>
