@@ -3,9 +3,9 @@ import "./BottomNav.css";
 
 const navItems = [
   { key: "dashboard", icon: "dashboard",    label: "Dashboard",  to: "/dashboard" },
-  { key: "referrals", icon: "group",        label: "Referrals",  to: "/direct-referrals" },
+  { key: "products", icon: "inventory_2",  label: "Products",  to: "/products" },
   { key: "codes",     icon: "qr_code_2",    label: "Codes",      to: "/purchase-codes" },
-  { key: "history",   icon: "receipt_long", label: "History",    to: "/transactions" },
+  { key: "profile",   icon: "person",       label: "Profile",    to: "/profile" },
 ];
 
 export default function BottomNav({ activeItem }) {
