@@ -1,43 +1,49 @@
 import "./DashboardPage.css";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
 
-const GEM_IMG_URL =
-  "https://images.unsplash.com/photo-1551893665-f843f600794e?auto=format&fit=crop&w=80&q=80";
 const GUIDE_IMG_URL =
   "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80";
 
-const transactions = [
-  {
-    id: 1,
-    icon: "redeem",
-    name: "Referral Bonus: Sarah J.",
-    date: "Oct 24, 2023 • 14:20",
-    amount: "+500 GEMS",
-    status: "Completed",
-    positive: true,
-  },
-  {
-    id: 2,
-    icon: "shopping_cart",
-    name: "Code Purchase: Platinum Tier",
-    date: "Oct 22, 2023 • 09:12",
-    amount: "-1,200 GEMS",
-    status: "Success",
-    positive: false,
-  },
-  {
-    id: 3,
-    icon: "bolt",
-    name: "Weekly Staking Earned",
-    date: "Oct 20, 2023 • 23:59",
-    amount: "+145 GEMS",
-    status: "Auto-credit",
-    positive: true,
-  },
-];
+// Placeholder trend data — swap for real gem points history when available.
+const gemPointsTrend = [38, 52, 34, 68, 48, 76, 58];
+
+// Builds SVG coordinates for a smooth-ish line chart from an array of values.
+const CHART_W = 700;
+const CHART_H = 140;
+const CHART_PAD_Y = 12;
+
+function buildChartGeometry(data) {
+  const max = Math.max(...data);
+  const min = Math.min(...data, 0);
+  const range = max - min || 1;
+  const stepX = CHART_W / (data.length - 1);
+
+  const points = data.map((v, i) => {
+    const x = i * stepX;
+    const y =
+      CHART_H -
+      CHART_PAD_Y -
+      ((v - min) / range) * (CHART_H - CHART_PAD_Y * 2);
+    return { x, y };
+  });
+
+  const linePath = points
+    .map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+    .join(" ");
+
+  const areaPath =
+    `M${points[0].x.toFixed(1)},${CHART_H} ` +
+    points.map((p) => `L${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ") +
+    ` L${points[points.length - 1].x.toFixed(1)},${CHART_H} Z`;
+
+  return { points, linePath, areaPath };
+}
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="db-root">
 
@@ -64,10 +70,10 @@ export default function DashboardPage() {
         {/* Bento grid */}
         <div className="db-grid">
 
-          {/* ── Gems Wallet ──────────────────────────────────── */}
+          {/* ── Wallet & Gem Points ──────────────────────────── */}
           <div className="db-col-7 glass-card-emerald db-wallet db-animate">
             <div className="db-wallet-top">
-              <div>
+              <div className="db-wallet-main">
                 <div className="db-wallet-icon-row">
                   <div className="db-wallet-icon-wrap">
                     <span
@@ -77,64 +83,54 @@ export default function DashboardPage() {
                       account_balance_wallet
                     </span>
                   </div>
-                  <span className="db-wallet-label">Executive Gems Wallet</span>
+                  <span className="db-wallet-label">Wallet &amp; Gem Points</span>
                 </div>
-                <p className="db-wallet-amount">
-                  12,450 <span className="db-gems-unit">GEMS</span>
-                </p>
+                <div className="db-wallet-values">
+                  <div className="db-wallet-value-block">
+                    <p className="db-wallet-sublabel">Wallet Balance</p>
+                    <p className="db-wallet-amount">12,450</p>
+                  </div>
+                  <div className="db-wallet-value-block">
+                    <p className="db-wallet-sublabel">Gem Points</p>
+                    <p className="db-wallet-amount">8,320</p>
+                  </div>
+                </div>
               </div>
-              <div>
+              <div className="db-wallet-side">
                 <p className="db-wallet-est-label">ESTIMATED VALUE</p>
                 <p className="db-wallet-est-val">$1,245.00</p>
+                <button className="db-exchange-btn">
+                  Manage
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
               </div>
-            </div>
-            <div className="db-wallet-bottom">
-              <div className="db-avatar-stack">
-                <div className="db-avatar-stack-item">
-                  <img src={GEM_IMG_URL} alt="" />
-                </div>
-                <div className="db-avatar-stack-item db-avatar-stack-icon">
-                  <span
-                    className="material-symbols-outlined"
-                    style={{ color: "var(--on-primary-container)", fontSize: 16 }}
-                  >
-                    trending_up
-                  </span>
-                </div>
-              </div>
-              <button className="db-exchange-btn">
-                Exchange Gems
-                <span className="material-symbols-outlined">arrow_forward</span>
-              </button>
             </div>
           </div>
 
-          {/* ── Quick Stats ───────────────────────────────────── */}
+          {/* ── Quick Stats (compact) ─────────────────────────── */}
           <div className="db-col-5 db-animate db-animate-delay-1">
             <div className="db-stats-grid">
-              <div className="glass-card db-stat-card">
-                <div>
+              <div className="glass-card db-stat-mini">
+                <div className="db-stat-mini-icon-wrap">
                   <span
-                    className="material-symbols-outlined db-stat-icon"
+                    className="material-symbols-outlined"
                     style={{ fontVariationSettings: "'FILL' 1" }}
                   >
                     group
                   </span>
-                  <p className="db-stat-sublabel">Direct Referrals</p>
                 </div>
                 <div>
-                  <p className="db-stat-num">24</p>
-                  <p className="db-stat-caption">Active Members</p>
+                  <p className="db-stat-mini-label">Direct Referrals</p>
+                  <p className="db-stat-mini-value">24</p>
                 </div>
               </div>
-              <div className="glass-card db-stat-card">
-                <div>
-                  <span className="material-symbols-outlined db-stat-icon">qr_code_2</span>
-                  <p className="db-stat-sublabel">Purchase Codes</p>
+              <div className="glass-card db-stat-mini">
+                <div className="db-stat-mini-icon-wrap muted">
+                  <span className="material-symbols-outlined">qr_code_2</span>
                 </div>
                 <div>
-                  <p className="db-stat-num">05</p>
-                  <p className="db-stat-caption muted">Available now</p>
+                  <p className="db-stat-mini-label">Purchase Codes</p>
+                  <p className="db-stat-mini-value">05</p>
                 </div>
               </div>
               <div className="glass-card db-referral-card">
@@ -159,42 +155,58 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* ── Transaction History ───────────────────────────── */}
-          <div className="db-col-8 db-animate db-animate-delay-2">
-            <div className="db-tx-header">
-              <h3 className="db-tx-title">Transaction Activity</h3>
-              <button className="db-tx-view-all">View All Ledger</button>
+          {/* ── Gem Points Graph + Transaction Logs ───────────── */}
+          <div className="db-col-7 db-animate db-animate-delay-2">
+            <div className="glass-card db-graph-card">
+              <div className="db-graph-header">
+                <h3 className="db-graph-title">Gem Points Trend</h3>
+                <span className="db-graph-period">Last 7 Days</span>
+              </div>
+              <div className="db-graph-placeholder">
+                <svg
+                  className="db-graph-svg"
+                  viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient id="gemLineAreaFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="rgba(89, 222, 155, 0.35)" />
+                      <stop offset="100%" stopColor="rgba(89, 222, 155, 0)" />
+                    </linearGradient>
+                  </defs>
+                  {(() => {
+                    const { points, linePath, areaPath } = buildChartGeometry(gemPointsTrend);
+                    return (
+                      <>
+                        <path className="db-graph-area" d={areaPath} fill="url(#gemLineAreaFill)" />
+                        <path className="db-graph-line" d={linePath} fill="none" />
+                        {points.map((p, i) => (
+                          <circle
+                            key={i}
+                            className="db-graph-dot"
+                            cx={p.x}
+                            cy={p.y}
+                            r="4"
+                          />
+                        ))}
+                      </>
+                    );
+                  })()}
+                </svg>
+              </div>
             </div>
-            <div className="glass-card db-tx-list">
-              {transactions.map((tx) => (
-                <div className="db-tx-row" key={tx.id}>
-                  <div className="db-tx-left">
-                    <div className="db-tx-icon-wrap">
-                      <span
-                        className="material-symbols-outlined"
-                        style={{ color: "var(--primary)" }}
-                      >
-                        {tx.icon}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="db-tx-name">{tx.name}</p>
-                      <p className="db-tx-date">{tx.date}</p>
-                    </div>
-                  </div>
-                  <div className="db-tx-right">
-                    <p className={`db-tx-amount${tx.positive ? "" : " negative"}`}>
-                      {tx.amount}
-                    </p>
-                    <p className="db-tx-status">{tx.status}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <button
+              className="db-tx-logs-btn"
+              onClick={() => navigate("/purchase-codes")}
+            >
+              <span className="material-symbols-outlined">receipt_long</span>
+              View Transaction Logs
+              <span className="material-symbols-outlined">arrow_forward</span>
+            </button>
           </div>
 
           {/* ── Insights & Alerts ─────────────────────────────── */}
-          <div className="db-col-4 db-animate db-animate-delay-3">
+          <div className="db-col-5 db-animate db-animate-delay-3">
             <h3 className="db-insights-title">Insights &amp; Alerts</h3>
             <div className="glass-card db-insights-card" style={{ marginBottom: 24 }}>
               <div className="db-insights-glow" />
