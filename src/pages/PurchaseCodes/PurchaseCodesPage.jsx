@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./PurchaseCodesPage.css";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
+import { getTransactions } from "../../utils/TransactionsData";
 
 const codes = [
   {
@@ -34,8 +35,36 @@ const codes = [
   },
 ];
 
+const ledgerStats = [
+  {
+    key: "referral",
+    icon: "trending_up",
+    label: "Referral Bonuses",
+    value: "+ 4,200 GEMS",
+    caption: "↑ 12% from last month",
+    captionClass: "pcl-stat-caption-primary",
+  },
+  {
+    key: "purchase",
+    icon: "account_balance_wallet",
+    label: "Code Purchases",
+    value: "- $1,500.00",
+    caption: "3 Active License Blocks",
+    captionClass: "pcl-stat-caption-muted",
+  },
+  {
+    key: "staking",
+    icon: "token",
+    label: "Staking Earnings",
+    value: "8,250 GEMS",
+    caption: "Auto-compounding enabled",
+    captionClass: "pcl-stat-caption-primary",
+  },
+];
+
 export default function PurchaseCodesPage() {
   const [search, setSearch] = useState("");
+  const [transactions] = useState(() => getTransactions());
 
   const filtered = codes.filter(
     (c) =>
@@ -69,7 +98,7 @@ export default function PurchaseCodesPage() {
               </div>
               <div className="pc-balance-bottom">
                 <div className="pc-balance-gems">
-                  <span className="pc-gems-label">Current Gems Balance</span>
+                  <span className="pc-gems-label">Current Wallet Balance</span>
                   <div className="pc-gems-row">
                     <span
                       className="material-symbols-outlined pc-diamond-icon"
@@ -82,7 +111,7 @@ export default function PurchaseCodesPage() {
                 </div>
                 <button className="pc-generate-btn">
                   <span className="material-symbols-outlined">add_circle</span>
-                  Generate New Code
+                  Purchased Codes
                 </button>
               </div>
             </div>
@@ -191,6 +220,161 @@ export default function PurchaseCodesPage() {
               <div className="pc-pagination-buttons">
                 <button className="pc-page-btn" disabled>Previous</button>
                 <button className="pc-page-btn active">Next Page</button>
+              </div>
+            </div>
+          </section>
+
+          {/* ── Activity ledger (merged from Transaction History) ── */}
+          <section className="pcl-section">
+
+            <div className="pcl-section-header">
+              <div>
+                <h3 className="pcl-section-title">Activity Ledger</h3>
+                <p className="pcl-section-sub">
+                  Review your historical data, bonuses, and investments.
+                </p>
+              </div>
+              <div className="pcl-header-actions">
+                <button className="pcl-filter-btn">
+                  <span className="material-symbols-outlined">filter_list</span>
+                  Filter
+                </button>
+                <button className="pcl-export-btn">
+                  <span className="material-symbols-outlined">download</span>
+                  Export PDF
+                </button>
+              </div>
+            </div>
+
+            {/* Stats bento */}
+            <div className="pcl-stats-grid">
+              {ledgerStats.map((s) => (
+                <div className="pc-glass-panel pcl-stat-card" key={s.key}>
+                  <span className="material-symbols-outlined pcl-stat-bg-icon"
+                    style={{ fontVariationSettings: "'FILL' 1" }}>
+                    {s.icon}
+                  </span>
+                  <span className="pcl-stat-label">{s.label}</span>
+                  <p className="pcl-stat-value">{s.value}</p>
+                  <p className={`pcl-stat-caption ${s.captionClass}`}>{s.caption}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Ledger table */}
+            <div className="pc-glass-panel pcl-table-wrap">
+              <div className="pcl-table-scroll">
+                <table className="pcl-table">
+                  <thead>
+                    <tr className="pcl-thead-row">
+                      <th className="pcl-th">Activity Type</th>
+                      <th className="pcl-th">Date</th>
+                      <th className="pcl-th">Amount</th>
+                      <th className="pcl-th pcl-th-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transactions.length === 0 && (
+                      <tr className="pcl-tbody-row">
+                        <td className="pcl-td pcl-empty-row" colSpan={4}>
+                          No transactions yet — completed purchases will show up here.
+                        </td>
+                      </tr>
+                    )}
+                    {transactions.map((tx) => (
+                      <tr className="pcl-tbody-row" key={tx.id}>
+                        <td className="pcl-td">
+                          <div className="pcl-tx-member">
+                            <div className={`pcl-tx-icon-wrap${tx.positive ? "" : " muted"}`}>
+                              <span
+                                className="material-symbols-outlined"
+                                style={tx.iconFill
+                                  ? { fontVariationSettings: "'FILL' 1" }
+                                  : {}}
+                              >
+                                {tx.icon}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="pcl-tx-label">{tx.label}</p>
+                              <p className="pcl-tx-sub">{tx.sub}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="pcl-td pcl-td-date">{tx.date}</td>
+                        <td className="pcl-td">
+                          <p className={`pcl-tx-amount${tx.positive ? "" : " muted"}`}>
+                            {tx.amount}
+                          </p>
+                          <p className="pcl-tx-amount-sub">{tx.amountSub}</p>
+                        </td>
+                        <td className="pcl-td pcl-td-right">
+                          <span className="pcl-status-badge">{tx.status}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile card list — replaces the table below 640px so nothing
+                  gets clipped or needs horizontal scrolling on a phone */}
+              <div className="pcl-tx-list">
+                {transactions.length === 0 && (
+                  <p className="pcl-empty-row">
+                    No transactions yet — completed purchases will show up here.
+                  </p>
+                )}
+                {transactions.map((tx) => (
+                  <div className="pcl-tx-card" key={tx.id}>
+                    <div className="pcl-tx-card-top">
+                      <div className={`pcl-tx-icon-wrap${tx.positive ? "" : " muted"}`}>
+                        <span
+                          className="material-symbols-outlined"
+                          style={tx.iconFill
+                            ? { fontVariationSettings: "'FILL' 1" }
+                            : {}}
+                        >
+                          {tx.icon}
+                        </span>
+                      </div>
+                      <div className="pcl-tx-card-info">
+                        <p className="pcl-tx-label">{tx.label}</p>
+                        <p className="pcl-tx-sub">{tx.sub}</p>
+                      </div>
+                      <div className="pcl-tx-card-amount">
+                        <p className={`pcl-tx-amount${tx.positive ? "" : " muted"}`}>
+                          {tx.amount}
+                        </p>
+                        <p className="pcl-tx-amount-sub">{tx.amountSub}</p>
+                      </div>
+                    </div>
+                    <div className="pcl-tx-card-bottom">
+                      <span className="pcl-tx-card-date">{tx.date}</span>
+                      <span className="pcl-status-badge">{tx.status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              <div className="pcl-pagination">
+                <span className="pcl-pagination-count">
+                  {transactions.length === 0
+                    ? "No entries yet"
+                    : `Showing 1 to ${transactions.length} of ${transactions.length} entries`}
+                </span>
+                <div className="pcl-pagination-buttons">
+                  <button className="pcl-page-btn" aria-label="Previous page">
+                    <span className="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <button className="pcl-page-btn current">1</button>
+                  <button className="pcl-page-btn">2</button>
+                  <button className="pcl-page-btn">3</button>
+                  <button className="pcl-page-btn" aria-label="Next page">
+                    <span className="material-symbols-outlined">chevron_right</span>
+                  </button>
+                </div>
               </div>
             </div>
           </section>
