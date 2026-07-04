@@ -62,15 +62,44 @@ const ledgerStats = [
   },
 ];
 
+const REFERRAL_LINK = "https://gemstonecode.com/join?ref=arivera92";
+
 export default function PurchaseCodesPage() {
   const [search, setSearch] = useState("");
   const [transactions] = useState(() => getTransactions());
+  const [copied, setCopied] = useState(false);
 
   const filtered = codes.filter(
     (c) =>
       c.id.toLowerCase().includes(search.toLowerCase()) ||
       c.tier.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleCopyReferral = async () => {
+    try {
+      await navigator.clipboard.writeText(REFERRAL_LINK);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy referral link:", err);
+    }
+  };
+
+  const handleShareReferral = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Join Gemstone Code",
+          text: "Join me on Gemstone Code and get access to executive networking codes.",
+          url: REFERRAL_LINK,
+        });
+      } catch (err) {
+        // User cancelled the share sheet — nothing to do.
+      }
+    } else {
+      handleCopyReferral();
+    }
+  };
 
   return (
     <div className="pc-root">
@@ -84,6 +113,36 @@ export default function PurchaseCodesPage() {
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="pc-main">
         <div className="pc-content">
+
+          {/* ── Direct referral link ────────────────────────── */}
+          <section className="pc-glass-panel pc-referral-box">
+            <label className="pc-referral-label">Your Direct Referral Link</label>
+            <div className="pc-referral-row">
+              <div className="pc-referral-input-wrap">
+                <span className="material-symbols-outlined">link</span>
+                <input
+                  type="text"
+                  readOnly
+                  value={REFERRAL_LINK}
+                  className="pc-referral-input"
+                  onFocus={(e) => e.target.select()}
+                  aria-label="Your direct referral link"
+                />
+              </div>
+              <div className="pc-referral-actions">
+                <button className="pc-referral-copy-btn" onClick={handleCopyReferral}>
+                  {copied ? "Copied!" : "Copy Link"}
+                </button>
+                <button
+                  className="pc-referral-share-btn"
+                  onClick={handleShareReferral}
+                  aria-label="Share referral link"
+                >
+                  <span className="material-symbols-outlined">ios_share</span>
+                </button>
+              </div>
+            </div>
+          </section>
 
           {/* ── Hero bento ─────────────────────────────────── */}
           <section className="pc-hero-grid">
@@ -117,8 +176,8 @@ export default function PurchaseCodesPage() {
             </div>
 
             {/* Quick stats column */}
-            <div className="pc-quick-stats">
-              <div className="pc-glass-panel pc-stat-mini">
+            <div className="pc-glass-panel pc-stat-mini-panel">
+              <div className="pc-stat-mini-row">
                 <div className="pc-stat-mini-icon primary">
                   <span className="material-symbols-outlined">token</span>
                 </div>
@@ -127,7 +186,7 @@ export default function PurchaseCodesPage() {
                   <p className="pc-stat-mini-value">12</p>
                 </div>
               </div>
-              <div className="pc-glass-panel pc-stat-mini">
+              <div className="pc-stat-mini-row">
                 <div className="pc-stat-mini-icon muted">
                   <span className="material-symbols-outlined">history</span>
                 </div>
@@ -247,16 +306,20 @@ export default function PurchaseCodesPage() {
             </div>
 
             {/* Stats bento */}
-            <div className="pcl-stats-grid">
+            <div className="pc-glass-panel pcl-stats-panel">
               {ledgerStats.map((s) => (
-                <div className="pc-glass-panel pcl-stat-card" key={s.key}>
-                  <span className="material-symbols-outlined pcl-stat-bg-icon"
-                    style={{ fontVariationSettings: "'FILL' 1" }}>
+                <div className="pcl-stat-col" key={s.key}>
+                  <span
+                    className="material-symbols-outlined pcl-stat-icon"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
                     {s.icon}
                   </span>
-                  <span className="pcl-stat-label">{s.label}</span>
-                  <p className="pcl-stat-value">{s.value}</p>
-                  <p className={`pcl-stat-caption ${s.captionClass}`}>{s.caption}</p>
+                  <div>
+                    <span className="pcl-stat-label">{s.label}</span>
+                    <p className="pcl-stat-value">{s.value}</p>
+                    <p className={`pcl-stat-caption ${s.captionClass}`}>{s.caption}</p>
+                  </div>
                 </div>
               ))}
             </div>
