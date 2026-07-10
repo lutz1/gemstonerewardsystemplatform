@@ -20,6 +20,7 @@ export const colors = {
   border: "rgba(61, 74, 65, 0.35)",
   borderFaint: "rgba(61, 74, 65, 0.15)",
   glassPanel: "rgba(47, 54, 49, 0.55)", // stand-in for the blurred glass panels
+  heroCard: "#123526", // rich dark green background for the Gem Value chart hero card
   glow: "rgba(0, 168, 107, 0.35)",
 };
 

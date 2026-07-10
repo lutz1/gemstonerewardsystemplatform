@@ -16,8 +16,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
 import { colors, fonts } from "@/constants/theme";
 
-const BG_IMAGE =
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80";
+const BG_IMAGE = require("../../assets/images/login_bg.png");
 
 export default function Login() {
   const { login } = useAuth();
@@ -50,10 +49,10 @@ export default function Login() {
   return (
     <View style={styles.root}>
       <Image
-        source={{ uri: BG_IMAGE }}
+        source={BG_IMAGE}
         style={StyleSheet.absoluteFill}
         contentFit="cover"
-        contentPosition={{ top: '50%', left: '53.8%' }}
+        contentPosition="center"
       />
       <LinearGradient
         colors={["rgba(14,21,16,0.95)", "rgba(14,21,16,0.6)", "rgba(14,21,16,0.3)"]}

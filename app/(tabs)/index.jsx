@@ -1,55 +1,15 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import Svg, { Path, Circle, Defs, LinearGradient as SvgLinearGradient, Stop } from "react-native-svg";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import TopBar from "@/components/TopBar";
+import GemValueChart from "@/components/GemValueChart";
 import { colors, fonts } from "@/constants/theme";
 
-const GUIDE_IMG_URL =
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80";
-
-// Placeholder trend data -- swap for real gem points history when available.
-const gemPointsTrend = [38, 52, 34, 68, 48, 76, 58];
-
-// Same geometry math as the web version -- this is plain JS, it ports
-// over completely unchanged. Only the <svg>/<path> tags below become
-// <Svg>/<Path> from react-native-svg.
-const CHART_W = 320;
-const CHART_H = 120;
-const CHART_PAD_Y = 12;
-
-function buildChartGeometry(data) {
-  const max = Math.max(...data);
-  const min = Math.min(...data, 0);
-  const range = max - min || 1;
-  const stepX = CHART_W / (data.length - 1);
-
-  const points = data.map((v, i) => {
-    const x = i * stepX;
-    const y =
-      CHART_H -
-      CHART_PAD_Y -
-      ((v - min) / range) * (CHART_H - CHART_PAD_Y * 2);
-    return { x, y };
-  });
-
-  const linePath = points
-    .map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-    .join(" ");
-
-  const areaPath =
-    `M${points[0].x.toFixed(1)},${CHART_H} ` +
-    points.map((p) => `L${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ") +
-    ` L${points[points.length - 1].x.toFixed(1)},${CHART_H} Z`;
-
-  return { points, linePath, areaPath };
-}
+const GUIDE_IMG = require("../../assets/images/bg_belowdashboard.png");
 
 export default function Dashboard() {
-  const { points, linePath, areaPath } = buildChartGeometry(gemPointsTrend);
-
   return (
     <View style={styles.root}>
       <TopBar userName="Marcus" showNotifDot />
@@ -97,14 +57,12 @@ export default function Dashboard() {
               </View>
             </View>
           </View>
-          <View style={styles.walletSide}>
-            <Text style={styles.walletEstLabel}>ESTIMATED VALUE</Text>
-            <Text style={styles.walletEstVal}>$1,245.00</Text>
-            <Pressable style={styles.exchangeBtn}>
-              <Text style={styles.exchangeBtnText}>Manage</Text>
-              <MaterialIcons name="arrow-forward" size={18} color={colors.onPrimaryContainer} />
-            </Pressable>
-          </View>
+          {/* Exchange: converts Gem Points into wallet balance -- also
+              where top-up and withdraw live once those are built out. */}
+          <Pressable style={styles.exchangeBtn}>
+            <MaterialIcons name="swap-horiz" size={18} color={colors.onPrimaryContainer} />
+            <Text style={styles.exchangeBtnText}>Exchange</Text>
+          </Pressable>
         </LinearGradient>
 
         {/* Quick stats */}
@@ -129,7 +87,12 @@ export default function Dashboard() {
           </View>
         </View>
 
-        <View style={[styles.glassCard, styles.referralCard]}>
+        {/* Whole row navigates, not just the chevron -- Purchase Codes
+            is where the referral link itself lives. */}
+        <Pressable
+          style={[styles.glassCard, styles.referralCard]}
+          onPress={() => router.push("/(tabs)/purchase-codes")}
+        >
           <View style={styles.referralInner}>
             <View style={styles.referralIconWrap}>
               <MaterialIcons name="campaign" size={20} color={colors.primary} />
@@ -139,36 +102,13 @@ export default function Dashboard() {
               <Text style={styles.referralSub}>Earn 500 Gems per sign-up</Text>
             </View>
           </View>
-          {/* TEMP: no referrals route in this project yet -- wire this
-              up once you have one */}
-          <Pressable
-            style={styles.chevronBtn}
-            accessibilityLabel="Go to referral hub"
-          >
+          <View style={styles.chevronBtn}>
             <MaterialIcons name="chevron-right" size={22} color={colors.primary} />
-          </Pressable>
-        </View>
-
-        {/* Gem points graph */}
-        <View style={[styles.glassCard, styles.graphCard]}>
-          <View style={styles.graphHeader}>
-            <Text style={styles.graphTitle}>Gem Points Trend</Text>
-            <Text style={styles.graphPeriod}>Last 7 Days</Text>
           </View>
-          <Svg width="100%" height={CHART_H} viewBox={`0 0 ${CHART_W} ${CHART_H}`}>
-            <Defs>
-              <SvgLinearGradient id="gemLineAreaFill" x1="0" y1="0" x2="0" y2="1">
-                <Stop offset="0%" stopColor="rgba(89, 222, 155, 0.35)" />
-                <Stop offset="100%" stopColor="rgba(89, 222, 155, 0)" />
-              </SvgLinearGradient>
-            </Defs>
-            <Path d={areaPath} fill="url(#gemLineAreaFill)" />
-            <Path d={linePath} fill="none" stroke={colors.primary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-            {points.map((p, i) => (
-              <Circle key={i} cx={p.x} cy={p.y} r={4} fill={colors.background} stroke={colors.primary} strokeWidth={2.5} />
-            ))}
-          </Svg>
-        </View>
+        </Pressable>
+
+        {/* Gem value chart */}
+        <GemValueChart />
 
         <Pressable style={styles.txLogsBtn} onPress={() => router.push("/(tabs)/purchase-codes")}>
           <MaterialIcons name="receipt-long" size={18} color={colors.primary} />
@@ -206,18 +146,18 @@ export default function Dashboard() {
         {/* Guide image card */}
         <Pressable style={styles.imgCard}>
           <Image
-            source={{ uri: GUIDE_IMG_URL }}
+            source={GUIDE_IMG}
             style={styles.imgCardImage}
             contentFit="cover"
-            contentPosition="center"
+            contentPosition={{ top: "90%", left: "50%" }}
           />
           <LinearGradient
             colors={["transparent", colors.background]}
             style={StyleSheet.absoluteFill}
           />
           <View style={styles.imgTextWrap}>
-            <Text style={styles.imgEyebrow}>New Resource</Text>
-            <Text style={styles.imgHeading}>Executive Network Guide 2024</Text>
+            <Text style={styles.imgEyebrow}>Gem Resource</Text>
+            <Text style={styles.imgHeading}>Go Mine, Go Exchange, Go Earn</Text>
           </View>
         </Pressable>
       </ScrollView>
@@ -312,28 +252,15 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
     marginTop: 4,
   },
-  walletSide: { gap: 4, marginTop: 8 },
-  walletEstLabel: {
-    fontFamily: fonts.hankenRegular,
-    fontSize: 11,
-    color: colors.onSurfaceVariant,
-  },
-  walletEstVal: {
-    fontFamily: fonts.jakartaSemiBold,
-    fontSize: 20,
-    color: colors.onSurface,
-  },
   exchangeBtn: {
-    marginTop: 8,
+    marginTop: 4,
     backgroundColor: colors.primaryContainer,
     borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: 13,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    alignSelf: "flex-start",
   },
   exchangeBtnText: {
     fontFamily: fonts.hankenBold,
@@ -407,22 +334,6 @@ const styles = StyleSheet.create({
   },
   chevronBtn: { padding: 4 },
 
-  graphCard: { padding: 20, gap: 16 },
-  graphHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  graphTitle: {
-    fontFamily: fonts.jakartaSemiBold,
-    fontSize: 16,
-    color: colors.onSurface,
-  },
-  graphPeriod: {
-    fontFamily: fonts.hankenRegular,
-    fontSize: 11,
-    color: colors.onSurfaceVariant,
-  },
 
   txLogsBtn: {
     flexDirection: "row",
