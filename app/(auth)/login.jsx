@@ -11,12 +11,14 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
 import { colors, fonts } from "@/constants/theme";
 
 const BG_IMAGE = require("../../assets/images/login_bg.png");
+const APP_LOGO = require("../../assets/images/app_logo.png");
 
 export default function Login() {
   const { login } = useAuth();
@@ -71,15 +73,16 @@ export default function Login() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.header}>
+            <Image source={APP_LOGO} style={styles.logo} contentFit="contain" />
             <Text style={styles.title}>Gemstone Code</Text>
-            <Text style={styles.subtitle}>Executive Networking Portal</Text>
+            <Text style={styles.subtitle}>MINING & EXCHANGE PLATFORM</Text>
           </View>
 
           <View style={styles.card}>
             <View style={styles.cardHeading}>
               <Text style={styles.cardHeadingTitle}>Secure Access</Text>
               <Text style={styles.cardHeadingSub}>
-                Enter your professional credentials to continue.
+                Enter your mining credentials to continue.
               </Text>
             </View>
 
@@ -109,8 +112,7 @@ export default function Login() {
             <View style={styles.field}>
               <View style={styles.fieldRow}>
                 <Text style={styles.fieldLabel}>Password</Text>
-                {/* TEMP: no /forgot-password route yet */}
-                <Pressable>
+                <Pressable onPress={() => router.push("/forgot-password")}>
                   <Text style={styles.forgotLink}>Forgot Password?</Text>
                 </Pressable>
               </View>
@@ -159,8 +161,10 @@ export default function Login() {
 
             <View style={styles.cardFooter}>
               <Text style={styles.cardFooterText}>
-                New to the network?{" "}
-                <Text style={styles.cardFooterLink}>Apply for Membership</Text>
+                New to the platform?{" "}
+                <Text style={styles.cardFooterLink} onPress={() => router.push("/register")}>
+                  Apply for Membership
+                </Text>
               </Text>
             </View>
           </View>
@@ -192,13 +196,20 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 16,
     alignItems: "center",
+    position: "relative",
+  },
+  logo: {
+    position: "absolute",
+    top: -104,
+    width: 100,
+    height: 100,
   },
   title: {
     fontFamily: fonts.jakartaBold,
     fontSize: 32,
     letterSpacing: -0.5,
     textTransform: "uppercase",
-    color: "#EDEDED", // approximation of the gradient-clipped title text
+    color: "#EDEDED",
     textAlign: "center",
   },
   subtitle: {

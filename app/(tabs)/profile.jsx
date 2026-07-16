@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View, Text, Image, Pressable, ScrollView, StyleSheet, Switch } from "react-native";
+import { View, Text, Image, Pressable, ScrollView, StyleSheet } from "react-native";
+import { router } from "expo-router";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
 import TopBar from "@/components/TopBar";
@@ -12,15 +12,7 @@ const profile = {
   phone: "+1 (555) 214-7788",
   location: "Austin, TX",
   memberSince: "Mar 2022",
-  tier: "Executive Tier",
   initials: "AR",
-};
-
-const tierProgress = {
-  current: "Executive",
-  next: "Platinum",
-  gemsToNext: 7150,
-  percent: 68,
 };
 
 // Icons come from two different sets (MaterialIcons doesn't have
@@ -45,46 +37,6 @@ const profileStats = [
   { key: "gems", icon: "diamond", label: "GEMS Balance", value: "42,850" },
   { key: "age", icon: "calendar_month", label: "Member Since", value: profile.memberSince },
 ];
-
-const preferenceToggles = [
-  {
-    key: "email-updates",
-    label: "Email notifications",
-    caption: "Purchase receipts, code activity, and balance alerts.",
-    defaultOn: true,
-  },
-  {
-    key: "marketing",
-    label: "Product announcements",
-    caption: "New tiers, packages, and feature releases.",
-    defaultOn: false,
-  },
-  {
-    key: "security-alerts",
-    label: "Security alerts",
-    caption: "Sign-ins from new devices or locations.",
-    defaultOn: true,
-  },
-];
-
-function ToggleRow({ label, caption, defaultOn }) {
-  const [on, setOn] = useState(defaultOn);
-  return (
-    <View style={styles.toggleRow}>
-      <View style={styles.toggleTextWrap}>
-        <Text style={styles.toggleLabel}>{label}</Text>
-        <Text style={styles.toggleCaption}>{caption}</Text>
-      </View>
-      <Switch
-        value={on}
-        onValueChange={setOn}
-        trackColor={{ false: "rgba(26, 33, 28, 0.6)", true: "rgba(89, 222, 155, 0.4)" }}
-        thumbColor={on ? colors.primary : colors.onSurfaceVariant}
-        ios_backgroundColor="rgba(26, 33, 28, 0.6)"
-      />
-    </View>
-  );
-}
 
 export default function ProfilePage() {
   const { logout } = useAuth();
@@ -112,9 +64,6 @@ export default function ProfilePage() {
             <View style={styles.heroTextWrap}>
               <View style={styles.nameRow}>
                 <Text style={styles.name}>{profile.name}</Text>
-                <View style={styles.tierBadge}>
-                  <Text style={styles.tierBadgeText}>{profile.tier}</Text>
-                </View>
               </View>
               <Text style={styles.handle}>{profile.handle}</Text>
               <View style={styles.metaRow}>
@@ -123,36 +72,10 @@ export default function ProfilePage() {
               </View>
             </View>
           </View>
-          <Pressable style={styles.editBtn}>
+          <Pressable style={styles.editBtn} onPress={() => router.push("/edit-profile")}>
             <MaterialIcons name="edit" size={16} color={colors.onSurface} />
             <Text style={styles.editBtnText}>Edit Profile</Text>
           </Pressable>
-        </View>
-
-        {/* Tier progress */}
-        <View style={[styles.glassPanel, styles.progressCard]}>
-          <View style={styles.progressTop}>
-            <View>
-              <Text style={styles.progressLabel}>Tier Progress</Text>
-              <View style={styles.progressTitleRow}>
-                <Text style={styles.progressTitle}>{tierProgress.current}</Text>
-                <MaterialIcons name="arrow-forward" size={16} color={colors.primary} />
-                <Text style={styles.progressTitle}>{tierProgress.next}</Text>
-              </View>
-            </View>
-            <View style={styles.progressRemaining}>
-              <MaterialIcons name="diamond" size={14} color={colors.primary} />
-              <Text style={styles.progressRemainingText}>
-                {tierProgress.gemsToNext.toLocaleString()} GEMS to go
-              </Text>
-            </View>
-          </View>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${tierProgress.percent}%` }]} />
-          </View>
-          <Text style={styles.progressCaption}>
-            Reach {tierProgress.next} Tier to unlock priority code drops and higher batch limits.
-          </Text>
         </View>
 
         {/* Quick stats */}
@@ -211,40 +134,23 @@ export default function ProfilePage() {
               <Text style={styles.securityLabel}>Password</Text>
               <Text style={styles.securityCaption}>Last changed 3 months ago</Text>
             </View>
-            <Pressable style={styles.outlineBtn}>
+            <Pressable style={styles.outlineBtn} onPress={() => router.push("/change-password")}>
               <Text style={styles.outlineBtnText}>Change</Text>
             </Pressable>
           </View>
 
           <View style={[styles.securityRow, styles.securityRowBorder]}>
             <View style={styles.securityIcon}>
-              <MaterialIcons name="verified-user" size={18} color={colors.primary} />
+              <MaterialIcons name="badge" size={18} color={colors.primary} />
             </View>
             <View style={styles.securityInfo}>
-              <Text style={styles.securityLabel}>Two-Factor Authentication</Text>
-              <Text style={styles.securityCaption}>Adds an extra step when signing in</Text>
+              <Text style={styles.securityLabel}>TIN Code</Text>
+              {/* TEMP: masked placeholder -- wire to the real TIN on file */}
+              <Text style={styles.securityCaption}>•••-•••-789</Text>
             </View>
-            <View style={styles.statusPill}>
-              <Text style={styles.statusPillText}>Enabled</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Preferences */}
-        <View style={[styles.glassPanel, styles.panel]}>
-          <View style={styles.panelHeader}>
-            <Text style={styles.panelTitle}>Notification Preferences</Text>
-            <Text style={styles.panelSub}>Choose what you hear from us, and how.</Text>
-          </View>
-          <View>
-            {preferenceToggles.map((t, i) => {
-              const { key, ...toggleProps } = t;
-              return (
-                <View key={key} style={i > 0 ? styles.toggleRowBorder : null}>
-                  <ToggleRow {...toggleProps} />
-                </View>
-              );
-            })}
+            <Pressable style={styles.outlineBtn} onPress={() => router.push("/change-tin")}>
+              <Text style={styles.outlineBtnText}>Change</Text>
+            </Pressable>
           </View>
         </View>
 
@@ -344,21 +250,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: colors.onSurface,
   },
-  tierBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 999,
-    backgroundColor: "rgba(89, 222, 155, 0.12)",
-    borderWidth: 1,
-    borderColor: "rgba(89, 222, 155, 0.25)",
-  },
-  tierBadgeText: {
-    fontFamily: fonts.hankenBold,
-    fontSize: 9,
-    color: colors.primary,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
   handle: {
     fontFamily: fonts.hankenRegular,
     fontSize: 13,
@@ -392,61 +283,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.hankenSemiBold,
     fontSize: 13,
     color: colors.onSurface,
-  },
-  progressCard: {
-    padding: 20,
-    gap: 12,
-  },
-  progressTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  progressLabel: {
-    fontFamily: fonts.hankenMedium,
-    fontSize: 10,
-    color: colors.secondary,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 2,
-  },
-  progressTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  progressTitle: {
-    fontFamily: fonts.jakartaSemiBold,
-    fontSize: 17,
-    color: colors.onSurface,
-  },
-  progressRemaining: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  progressRemainingText: {
-    fontFamily: fonts.hankenBold,
-    fontSize: 12,
-    color: colors.primary,
-  },
-  progressTrack: {
-    height: 8,
-    borderRadius: 999,
-    backgroundColor: "rgba(61, 74, 65, 0.3)",
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: 999,
-    backgroundColor: colors.primary,
-  },
-  progressCaption: {
-    fontFamily: fonts.hankenRegular,
-    fontSize: 12,
-    color: colors.onSurfaceVariant,
   },
   statsGrid: {
     flexDirection: "row",
@@ -568,43 +404,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.hankenSemiBold,
     fontSize: 12,
     color: colors.onSurface,
-  },
-  statusPill: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 999,
-    backgroundColor: "rgba(89, 222, 155, 0.12)",
-    borderWidth: 1,
-    borderColor: "rgba(89, 222, 155, 0.25)",
-  },
-  statusPillText: {
-    fontFamily: fonts.hankenBold,
-    fontSize: 9,
-    color: colors.primary,
-    textTransform: "uppercase",
-  },
-  toggleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 14,
-    paddingVertical: 12,
-  },
-  toggleRowBorder: {
-    borderTopWidth: 1,
-    borderTopColor: colors.borderFaint,
-  },
-  toggleTextWrap: { flex: 1, minWidth: 0 },
-  toggleLabel: {
-    fontFamily: fonts.hankenSemiBold,
-    fontSize: 13,
-    color: colors.onSurface,
-  },
-  toggleCaption: {
-    fontFamily: fonts.hankenRegular,
-    fontSize: 11,
-    color: colors.onSurfaceVariant,
-    marginTop: 2,
   },
   dangerPanel: {
     padding: 18,

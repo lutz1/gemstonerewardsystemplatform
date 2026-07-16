@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -10,6 +11,12 @@ import { colors, fonts } from "@/constants/theme";
 const GUIDE_IMG = require("../../assets/images/bg_belowdashboard.png");
 
 export default function Dashboard() {
+  // While the user is scrubbing the chart, the page's own scroll gets
+  // fully disabled -- this is what actually stops the parent screen
+  // from moving during a drag, rather than relying on gesture
+  // negotiation alone (which Android in particular doesn't always honor).
+  const [chartScrubbing, setChartScrubbing] = useState(false);
+
   return (
     <View style={styles.root}>
       <TopBar userName="Marcus" showNotifDot />
@@ -18,6 +25,7 @@ export default function Dashboard() {
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={!chartScrubbing}
       >
         {/* Welcome */}
         <View style={styles.welcome}>
@@ -31,39 +39,49 @@ export default function Dashboard() {
         </View>
 
         {/* Wallet & Gem Points */}
-        <LinearGradient
-          colors={["rgba(0,168,107,0.18)", "rgba(14,21,16,0.85)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.walletCard}
-        >
-          <View style={styles.walletTop}>
-            <View style={styles.walletMain}>
-              <View style={styles.walletIconRow}>
-                <View style={styles.walletIconWrap}>
-                  <MaterialIcons name="account-balance-wallet" size={18} color={colors.primary} />
+        <View style={styles.walletGlowWrap}>
+          <LinearGradient
+            colors={["#1B7A4F", "#0A2E1F"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.walletCard}
+          >
+            {/* Decorative watermark, purely visual depth */}
+            <MaterialIcons
+              name="diamond"
+              size={140}
+              color="rgba(255,255,255,0.06)"
+              style={styles.walletWatermark}
+            />
+
+            <View style={styles.walletTop}>
+              <View style={styles.walletMain}>
+                <View style={styles.walletIconRow}>
+                  <View style={styles.walletIconWrap}>
+                    <MaterialIcons name="account-balance-wallet" size={18} color="#fff" />
+                  </View>
+                  <Text style={styles.walletLabel}>Wallet & Gem Points</Text>
                 </View>
-                <Text style={styles.walletLabel}>Wallet & Gem Points</Text>
-              </View>
-              <View style={styles.walletValues}>
-                <View>
-                  <Text style={styles.walletSublabel}>Wallet Balance</Text>
-                  <Text style={styles.walletAmount}>12,450</Text>
-                </View>
-                <View>
-                  <Text style={styles.walletSublabel}>Gem Points</Text>
-                  <Text style={styles.walletAmount}>8,320</Text>
+                <View style={styles.walletValues}>
+                  <View>
+                    <Text style={styles.walletSublabel}>Wallet Balance</Text>
+                    <Text style={styles.walletAmount}>12,450</Text>
+                  </View>
+                  <View>
+                    <Text style={styles.walletSublabel}>Gem Points</Text>
+                    <Text style={styles.walletAmount}>8,320</Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-          {/* Exchange: converts Gem Points into wallet balance -- also
-              where top-up and withdraw live once those are built out. */}
-          <Pressable style={styles.exchangeBtn}>
-            <MaterialIcons name="swap-horiz" size={18} color={colors.onPrimaryContainer} />
-            <Text style={styles.exchangeBtnText}>Exchange</Text>
-          </Pressable>
-        </LinearGradient>
+            {/* Exchange: converts Gem Points into wallet balance -- also
+                where top-up and withdraw live once those are built out. */}
+            <Pressable style={styles.exchangeBtn} onPress={() => router.push("/exchange")}>
+              <MaterialIcons name="swap-horiz" size={18} color="#003921" />
+              <Text style={styles.exchangeBtnText}>Exchange</Text>
+            </Pressable>
+          </LinearGradient>
+        </View>
 
         {/* Quick stats */}
         <View style={styles.statsRow}>
@@ -108,7 +126,7 @@ export default function Dashboard() {
         </Pressable>
 
         {/* Gem value chart */}
-        <GemValueChart />
+        <GemValueChart onScrubbingChange={setChartScrubbing} />
 
         <Pressable style={styles.txLogsBtn} onPress={() => router.push("/(tabs)/purchase-codes")}>
           <MaterialIcons name="receipt-long" size={18} color={colors.primary} />
@@ -201,12 +219,27 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
+  walletGlowWrap: {
+    borderRadius: 14,
+    shadowColor: "#59DE9B",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 8,
+  },
   walletCard: {
-    borderRadius: 8,
+    borderRadius: 14,
     padding: 20,
     gap: 16,
     borderWidth: 1,
-    borderColor: "rgba(198, 198, 198, 0.15)",
+    borderColor: "rgba(89, 222, 155, 0.3)",
+    overflow: "hidden",
+    position: "relative",
+  },
+  walletWatermark: {
+    position: "absolute",
+    right: -24,
+    bottom: -24,
   },
   walletTop: { flexDirection: "row" },
   walletMain: { flex: 1 },
@@ -220,9 +253,9 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 8,
-    backgroundColor: "rgba(89, 222, 155, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
     borderWidth: 1,
-    borderColor: "rgba(89, 222, 155, 0.3)",
+    borderColor: "rgba(255, 255, 255, 0.25)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -254,13 +287,18 @@ const styles = StyleSheet.create({
   },
   exchangeBtn: {
     marginTop: 4,
-    backgroundColor: colors.primaryContainer,
+    backgroundColor: "#59DE9B",
     borderRadius: 8,
     paddingVertical: 13,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
+    shadowColor: "#59DE9B",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 6,
   },
   exchangeBtnText: {
     fontFamily: fonts.hankenBold,

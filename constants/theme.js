@@ -22,6 +22,12 @@ export const colors = {
   glassPanel: "rgba(47, 54, 49, 0.55)", // stand-in for the blurred glass panels
   heroCard: "#123526", // rich dark green background for the Gem Value chart hero card
   glow: "rgba(0, 168, 107, 0.35)",
+  gold: "#C9A227", // muted gold used for price boxes and laurel accents
+  tiers: {
+    emerald: { bg: "#0B3D2C", accent: "#59DE9B" },
+    sapphire: { bg: "#0E2B5C", accent: "#5B9BFF" },
+    diamond: { bg: "#232326", accent: "#E8E8EA" },
+  },
 };
 
 // These names match the @expo-google-fonts packages — double check the

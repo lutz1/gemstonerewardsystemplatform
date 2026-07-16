@@ -1,6 +1,13 @@
-import { useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from "react-native-svg";
+import { useEffect, useMemo, useState } from "react";
+import { View, Text, Pressable, StyleSheet, PanResponder } from "react-native";
+import Svg, {
+  Path,
+  Circle,
+  Line,
+  Defs,
+  LinearGradient as SvgLinearGradient,
+  Stop,
+} from "react-native-svg";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors, fonts } from "@/constants/theme";
 
@@ -36,8 +43,8 @@ function fetchGemValueHistory(range) {
 }
 
 // chartW is the MEASURED pixel width of the chart area, not a fixed
-// constant -- that's what makes the label overlay line up exactly with
-// the line underneath it, regardless of screen size.
+// constant -- that's what makes the label/touch overlay line up
+// exactly with the line underneath it, regardless of screen size.
 function buildChartGeometry(data, chartW) {
   const max = Math.max(...data);
   const min = Math.min(...data);
@@ -63,7 +70,7 @@ function buildChartGeometry(data, chartW) {
   const maxPoint = points.reduce((a, b) => (b.value > a.value ? b : a));
   const minPoint = points.reduce((a, b) => (b.value < a.value ? b : a));
 
-  return { linePath, areaPath, maxPoint, minPoint };
+  return { points, linePath, areaPath, maxPoint, minPoint, stepX };
 }
 
 // Keeps a floating label from clipping off the left/right edge of the
@@ -74,13 +81,15 @@ function labelAlignStyle(x, chartW) {
   return { left: x - 40, width: 80, alignItems: "center" };
 }
 
-export default function GemValueChart() {
+export default function GemValueChart({ onScrubbingChange }) {
   const [range, setRange] = useState("1M");
   const [data, setData] = useState(null);
   const [chartW, setChartW] = useState(0);
+  const [touchIndex, setTouchIndex] = useState(null); // scrub state, null when not touching
 
   useEffect(() => {
     let cancelled = false;
+    setTouchIndex(null); // clear any scrub state when the range changes
     fetchGemValueHistory(range).then((result) => {
       if (!cancelled) setData(result);
     });
@@ -93,12 +102,62 @@ export default function GemValueChart() {
   const geometry = showChart ? buildChartGeometry(data, chartW) : null;
   const sameValue = geometry && geometry.maxPoint.value === geometry.minPoint.value;
 
+  // Converts a raw touch X position into the nearest data point index.
+  const indexFromTouchX = (x) => {
+    if (!geometry) return null;
+    const clampedX = Math.max(0, Math.min(chartW, x));
+    const idx = Math.round(clampedX / geometry.stepX);
+    return Math.max(0, Math.min(data.length - 1, idx));
+  };
+
+  // Rebuilds the touch handler whenever chartW or data changes, so it
+  // never references stale (empty) values from before the chart
+  // finished measuring/loading -- that was the actual bug.
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        // "Capture" variants claim the touch before it can reach the
+        // parent ScrollView at all, and returning false from
+        // onPanResponderTerminationRequest means once we've grabbed
+        // it, nothing (including the ScrollView) can take it back
+        // mid-drag. Together these stop the screen from scrolling
+        // while scrubbing the chart.
+        onStartShouldSetPanResponder: () => true,
+        onStartShouldSetPanResponderCapture: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponderCapture: () => true,
+        onPanResponderTerminationRequest: () => false,
+        onPanResponderGrant: (evt) => {
+          onScrubbingChange?.(true);
+          setTouchIndex(indexFromTouchX(evt.nativeEvent.locationX));
+        },
+        onPanResponderMove: (evt) => setTouchIndex(indexFromTouchX(evt.nativeEvent.locationX)),
+        onPanResponderRelease: () => {
+          onScrubbingChange?.(false);
+          setTouchIndex(null);
+        },
+        onPanResponderTerminate: () => {
+          onScrubbingChange?.(false);
+          setTouchIndex(null);
+        },
+      }),
+    [chartW, data, onScrubbingChange]
+  );
+
+  const touchPoint =
+    touchIndex !== null && geometry ? geometry.points[touchIndex] : null;
+
   const current = data ? data[data.length - 1] : null;
   const change = data ? current - data[0] : 0;
   const pct = data ? ((change / data[0]) * 100).toFixed(1) : "0.0";
   const positive = change >= 0;
   const changeColor = positive ? colors.primary : colors.danger;
-  const estimatedValue = current !== null ? formatPeso(current * GEM_TO_PHP_RATE) : null;
+
+  // While scrubbing, the big value swaps to whatever point is being
+  // touched, same as most stock/price apps -- reverts once released.
+  const displayValue = touchPoint ? touchPoint.value : current;
+  const estimatedValue =
+    displayValue !== null ? formatPeso(displayValue * GEM_TO_PHP_RATE) : null;
 
   return (
     <View style={styles.card}>
@@ -110,16 +169,15 @@ export default function GemValueChart() {
         <MaterialIcons name="diamond" size={22} color="#fff" />
       </View>
 
-      <View style={styles.chartWrap} onLayout={(e) => setChartW(e.nativeEvent.layout.width)}>
+      <View
+        style={styles.chartWrap}
+        onLayout={(e) => setChartW(e.nativeEvent.layout.width)}
+        {...panResponder.panHandlers}
+      >
         {showChart && (
           <>
-            <Svg width={chartW} height={CHART_H}>
+            <Svg width={chartW} height={CHART_H} pointerEvents="none">
               <Defs>
-                {/* Opacity has to be its own prop (stopOpacity), not
-                    baked into an rgba() string -- react-native-svg
-                    doesn't reliably parse alpha out of rgba() stop
-                    colors, which was silently making this render as
-                    solid opaque white instead of fading. */}
                 <SvgLinearGradient id="gemAreaFill" x1="0" y1="0" x2="0" y2="1">
                   <Stop offset="0%" stopColor="#ffffff" stopOpacity={0.18} />
                   <Stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
@@ -134,35 +192,72 @@ export default function GemValueChart() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
+
+              {/* Scrub indicator: vertical guide line + dot at the
+                  touched point. Only rendered while actively touching. */}
+              {touchPoint && (
+                <>
+                  <Line
+                    x1={touchPoint.x}
+                    y1={CHART_PAD_TOP - 14}
+                    x2={touchPoint.x}
+                    y2={CHART_H}
+                    stroke="rgba(255,255,255,0.35)"
+                    strokeWidth={1}
+                    strokeDasharray="3,4"
+                  />
+                  <Circle cx={touchPoint.x} cy={touchPoint.y} r={4.5} fill="#fff" />
+                </>
+              )}
             </Svg>
 
-            {/* High value label -- plain RN Text overlaid on top of the
-                SVG (react-native-svg's own <Text> doesn't measure/wrap
-                reliably), with a small background chip so it stays
-                legible whether it's sitting over the shaded area or
-                the bare card background. */}
-            <View
-              style={[
-                styles.pointLabelWrap,
-                { top: geometry.maxPoint.y - 24 },
-                labelAlignStyle(geometry.maxPoint.x, chartW),
-              ]}
-            >
-              <View style={styles.pointLabelChip}>
-                <Text style={styles.pointLabelText}>{geometry.maxPoint.value} GEMS</Text>
-              </View>
-            </View>
+            {/* High/low labels -- hidden while scrubbing so they don't
+                collide visually with the touch tooltip below. pointerEvents
+                "none" so they never intercept the scrub touch. */}
+            {!touchPoint && (
+              <>
+                <View
+                  pointerEvents="none"
+                  style={[
+                    styles.pointLabelWrap,
+                    { top: geometry.maxPoint.y - 24 },
+                    labelAlignStyle(geometry.maxPoint.x, chartW),
+                  ]}
+                >
+                  <View style={styles.pointLabelChip}>
+                    <Text style={styles.pointLabelText}>{geometry.maxPoint.value} GEMS</Text>
+                  </View>
+                </View>
 
-            {!sameValue && (
+                {!sameValue && (
+                  <View
+                    pointerEvents="none"
+                    style={[
+                      styles.pointLabelWrap,
+                      { top: geometry.minPoint.y + 6 },
+                      labelAlignStyle(geometry.minPoint.x, chartW),
+                    ]}
+                  >
+                    <View style={styles.pointLabelChip}>
+                      <Text style={styles.pointLabelText}>{geometry.minPoint.value} GEMS</Text>
+                    </View>
+                  </View>
+                )}
+              </>
+            )}
+
+            {/* Scrub tooltip -- follows the touched point */}
+            {touchPoint && (
               <View
+                pointerEvents="none"
                 style={[
                   styles.pointLabelWrap,
-                  { top: geometry.minPoint.y + 6 },
-                  labelAlignStyle(geometry.minPoint.x, chartW),
+                  { top: Math.max(0, touchPoint.y - 26) },
+                  labelAlignStyle(touchPoint.x, chartW),
                 ]}
               >
-                <View style={styles.pointLabelChip}>
-                  <Text style={styles.pointLabelText}>{geometry.minPoint.value} GEMS</Text>
+                <View style={[styles.pointLabelChip, styles.touchChip]}>
+                  <Text style={styles.pointLabelText}>{touchPoint.value} GEMS</Text>
                 </View>
               </View>
             )}
@@ -184,22 +279,29 @@ export default function GemValueChart() {
 
       <View style={styles.statPanel}>
         <Text style={styles.bigValue}>
-          {current ?? "--"} <Text style={styles.bigValueUnit}>GEMS</Text>
+          {displayValue ?? "--"} <Text style={styles.bigValueUnit}>GEMS</Text>
         </Text>
         {estimatedValue && <Text style={styles.estimatedValue}>≈ {estimatedValue} estimated value</Text>}
-        <View style={styles.changeRow}>
-          <MaterialIcons
-            name={positive ? "north-east" : "south-east"}
-            size={16}
-            color={changeColor}
-          />
-          <Text style={[styles.changeText, { color: changeColor }]}>
-            {positive ? "+" : ""}
-            {change} ({positive ? "+" : ""}
-            {pct}%)
+
+        {touchPoint ? (
+          <Text style={[styles.rangeLabel, styles.standaloneRangeLabel]}>
+            Day {touchIndex + 1} of {range}
           </Text>
-          <Text style={styles.rangeLabel}>past {range}</Text>
-        </View>
+        ) : (
+          <View style={styles.changeRow}>
+            <MaterialIcons
+              name={positive ? "north-east" : "south-east"}
+              size={16}
+              color={changeColor}
+            />
+            <Text style={[styles.changeText, { color: changeColor }]}>
+              {positive ? "+" : ""}
+              {change} ({positive ? "+" : ""}
+              {pct}%)
+            </Text>
+            <Text style={styles.rangeLabel}>past {range}</Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -244,6 +346,11 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 6,
     paddingVertical: 2,
+  },
+  touchChip: {
+    backgroundColor: "rgba(9, 18, 13, 0.85)",
+    borderWidth: 1,
+    borderColor: "rgba(89, 222, 155, 0.5)",
   },
   pointLabelText: {
     fontFamily: fonts.hankenBold,
@@ -314,5 +421,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.hankenRegular,
     fontSize: 13,
     color: "rgba(255,255,255,0.5)",
+  },
+  standaloneRangeLabel: {
+    marginTop: 10,
   },
 });

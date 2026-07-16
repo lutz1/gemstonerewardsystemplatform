@@ -20,7 +20,6 @@ const DEFAULT_AVATAR_URL =
 export default function TopBar({
   logoText = "Gemstone Code",
   userName = "Alex Sterling",
-  userRole = "Executive Member",
   avatarUrl = DEFAULT_AVATAR_URL,
   showNotifDot = false,
   onNotifClick,
@@ -36,19 +35,24 @@ export default function TopBar({
     }
   };
 
+  const handleNotifPress = () => {
+    if (onNotifClick) {
+      onNotifClick();
+    } else {
+      router.push("/notification");
+    }
+  };
+
   return (
     <BlurView intensity={40} tint="dark" style={styles.topbar}>
       <View style={[styles.inner, { paddingTop: insets.top + 12 }]}>
         <Text style={styles.logo}>{logoText}</Text>
 
         <View style={styles.right}>
-          <View style={styles.userInfo}>
-            <Text style={styles.userRole}>{userRole}</Text>
-            <Text style={styles.userName}>{userName}</Text>
-          </View>
+          <Text style={styles.userName}>{userName}</Text>
 
           <Pressable
-            onPress={onNotifClick}
+            onPress={handleNotifPress}
             style={styles.notifBtn}
             hitSlop={8}
             accessibilityRole="button"
@@ -95,16 +99,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 14,
   },
-  userInfo: {
-    alignItems: "flex-end",
-  },
-  userRole: {
-    fontFamily: fonts.hankenMedium,
-    fontSize: 9,
-    color: colors.primary,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
   userName: {
     fontFamily: fonts.jakartaBold,
     fontSize: 13,
@@ -133,4 +127,3 @@ const styles = StyleSheet.create({
     borderColor: "rgba(89, 222, 155, 0.3)",
   },
 });
-    

@@ -28,6 +28,14 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="package-detail/[id]" />
         <Stack.Screen name="qr-payment/[id]" />
+        <Stack.Screen name="edit-profile" options={{ presentation: "modal" }} />
+        <Stack.Screen name="change-password" options={{ presentation: "modal" }} />
+        <Stack.Screen name="change-tin" options={{ presentation: "modal" }} />
+        <Stack.Screen name="notification" options={{ presentation: "modal" }} />
+        <Stack.Screen name="exchange/index" />
+        <Stack.Screen name="exchange/gems-to-wallet" />
+        <Stack.Screen name="exchange/withdraw" />
+        <Stack.Screen name="exchange/deposit" />
       </Stack.Protected>
 
       <Stack.Protected guard={!isLoggedIn}>

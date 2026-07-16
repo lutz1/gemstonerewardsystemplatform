@@ -6,37 +6,6 @@ import TopBar from "@/components/TopBar";
 import { colors, fonts } from "@/constants/theme";
 import { getTransactions } from "@/utils/TransactionsData";
 
-const codes = [
-  {
-    id: "#GSC-9921-XLP",
-    tier: "Platinum Tier",
-    tierColor: "platinum",
-    date: "Oct 24, 2024",
-    status: "active",
-  },
-  {
-    id: "#GSC-8842-EXC",
-    tier: "Executive Tier",
-    tierColor: "primary",
-    date: "Oct 20, 2024",
-    status: "active",
-  },
-  {
-    id: "#GSC-7712-STD",
-    tier: "Standard Tier",
-    tierColor: "muted",
-    date: "Oct 15, 2024",
-    status: "used",
-  },
-  {
-    id: "#GSC-6650-EXC",
-    tier: "Executive Tier",
-    tierColor: "primary",
-    date: "Oct 12, 2024",
-    status: "active",
-  },
-];
-
 const ledgerStats = [
   {
     key: "referral",
@@ -64,24 +33,11 @@ const ledgerStats = [
   },
 ];
 
-const TIER_DOT_COLORS = {
-  primary: colors.primary,
-  platinum: "#E5E4E2",
-  muted: colors.onSurfaceVariant,
-};
-
 const REFERRAL_LINK = "https://gemstonecode.com/join?ref=arivera92";
 
 export default function PurchaseCodes() {
-  const [search, setSearch] = useState("");
   const [transactions] = useState(() => getTransactions());
   const [copied, setCopied] = useState(false);
-
-  const filtered = codes.filter(
-    (c) =>
-      c.id.toLowerCase().includes(search.toLowerCase()) ||
-      c.tier.toLowerCase().includes(search.toLowerCase())
-  );
 
   const handleCopyReferral = async () => {
     await Clipboard.setStringAsync(REFERRAL_LINK);
@@ -175,101 +131,6 @@ export default function PurchaseCodes() {
           </View>
         </View>
 
-        {/* Code batches */}
-        <View style={styles.tableCard}>
-          <View style={styles.tableToolbar}>
-            <Text style={styles.tableTitle}>Purchased Code Batches</Text>
-            <View style={styles.toolbarRight}>
-              <View style={styles.searchWrap}>
-                <MaterialIcons name="search" size={16} color={colors.onSurfaceVariant} />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search ID..."
-                  placeholderTextColor="rgba(188, 202, 190, 0.5)"
-                  value={search}
-                  onChangeText={setSearch}
-                />
-              </View>
-              <Pressable style={styles.filterBtn}>
-                <MaterialIcons name="filter-list" size={18} color={colors.onSurfaceVariant} />
-              </Pressable>
-            </View>
-          </View>
-
-          <View>
-            {filtered.map((code) => (
-              <View
-                key={code.id}
-                style={[styles.codeRow, code.status === "used" && styles.codeRowUsed]}
-              >
-                <View style={styles.codeRowTop}>
-                  <Text
-                    style={[
-                      styles.codeId,
-                      code.status === "used" && { color: colors.secondary },
-                    ]}
-                  >
-                    {code.id}
-                  </Text>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      code.status === "used" && styles.statusBadgeUsed,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.statusBadgeText,
-                        code.status === "used" && { color: colors.onSurfaceVariant },
-                      ]}
-                    >
-                      {code.status === "used" ? "Used" : "Active"}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.codeRowBottom}>
-                  <View style={styles.tierCell}>
-                    <View
-                      style={[
-                        styles.tierDot,
-                        { backgroundColor: TIER_DOT_COLORS[code.tierColor] ?? colors.primary },
-                      ]}
-                    />
-                    <Text
-                      style={[
-                        styles.tierName,
-                        code.status === "used" && { color: colors.onSurfaceVariant },
-                      ]}
-                    >
-                      {code.tier}
-                    </Text>
-                  </View>
-                  <Text style={styles.codeDate}>{code.date}</Text>
-                  {code.status === "active" ? (
-                    <Pressable style={styles.actionBtn}>
-                      <MaterialIcons name="content-copy" size={18} color={colors.secondary} />
-                    </Pressable>
-                  ) : (
-                    <MaterialIcons name="check-circle" size={18} color="rgba(61, 74, 65, 0.6)" />
-                  )}
-                </View>
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.pagination}>
-            <Text style={styles.paginationCount}>Showing 4 of 24 batches</Text>
-            <View style={styles.paginationButtons}>
-              <Pressable style={styles.pageBtn} disabled>
-                <Text style={styles.pageBtnText}>Previous</Text>
-              </Pressable>
-              <Pressable style={[styles.pageBtn, styles.pageBtnActive]}>
-                <Text style={[styles.pageBtnText, { color: colors.primary }]}>Next Page</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-
         {/* Activity ledger */}
         <View style={styles.ledgerSection}>
           <View style={styles.ledgerHeader}>
@@ -277,17 +138,6 @@ export default function PurchaseCodes() {
             <Text style={styles.ledgerSub}>
               Review your historical data, bonuses, and investments.
             </Text>
-          </View>
-
-          <View style={styles.ledgerHeaderActions}>
-            <Pressable style={styles.filterActionBtn}>
-              <MaterialIcons name="filter-list" size={16} color={colors.onSurface} />
-              <Text style={styles.filterActionBtnText}>Filter</Text>
-            </Pressable>
-            <Pressable style={styles.exportBtn}>
-              <MaterialIcons name="download" size={16} color={colors.onPrimaryContainer} />
-              <Text style={styles.exportBtnText}>Export PDF</Text>
-            </Pressable>
           </View>
 
           {/* Ledger stats */}
@@ -307,6 +157,17 @@ export default function PurchaseCodes() {
                 </Text>
               </View>
             ))}
+          </View>
+
+          <View style={styles.ledgerHeaderActions}>
+            <Pressable style={styles.filterActionBtn}>
+              <MaterialIcons name="filter-list" size={16} color={colors.onSurface} />
+              <Text style={styles.filterActionBtnText}>Filter</Text>
+            </Pressable>
+            <Pressable style={styles.exportBtn}>
+              <MaterialIcons name="download" size={16} color={colors.onPrimaryContainer} />
+              <Text style={styles.exportBtnText}>Export PDF</Text>
+            </Pressable>
           </View>
 
           {/* Transaction list */}
@@ -513,143 +374,10 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
   },
 
-  tableCard: {
-    backgroundColor: colors.glassPanel,
-    borderWidth: 1,
-    borderColor: colors.borderFaint,
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  tableToolbar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexWrap: "wrap",
-    gap: 10,
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(61, 74, 65, 0.2)",
-    backgroundColor: "rgba(37, 44, 39, 0.5)",
-  },
-  tableTitle: {
-    fontFamily: fonts.jakartaSemiBold,
-    fontSize: 15,
-    color: colors.onSurface,
-  },
-  toolbarRight: { flexDirection: "row", alignItems: "center", gap: 8 },
-  searchWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: "rgba(26, 33, 28, 0.6)",
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 999,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  searchInput: {
-    fontFamily: fonts.hankenRegular,
-    fontSize: 13,
-    color: colors.onSurface,
-    width: 110,
-  },
-  filterBtn: {
-    width: 34,
-    height: 34,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 17,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  codeRow: {
-    padding: 16,
-    gap: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(61, 74, 65, 0.1)",
-  },
-  codeRowUsed: { opacity: 0.65 },
-  codeRowTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  codeId: {
-    fontFamily: fonts.hankenMedium,
-    fontSize: 13,
-    letterSpacing: 0.3,
-    color: colors.primary,
-  },
-  statusBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 4,
-    backgroundColor: "rgba(89, 222, 155, 0.1)",
-    borderWidth: 1,
-    borderColor: "rgba(89, 222, 155, 0.2)",
-  },
-  statusBadgeUsed: {
-    backgroundColor: "rgba(47, 54, 49, 0.5)",
-    borderColor: "rgba(61, 74, 65, 0.3)",
-  },
-  statusBadgeText: {
-    fontFamily: fonts.hankenBold,
-    fontSize: 9,
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-    color: colors.primary,
-  },
-  codeRowBottom: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  tierCell: { flexDirection: "row", alignItems: "center", gap: 8, flex: 1 },
-  tierDot: { width: 8, height: 8, borderRadius: 4 },
-  tierName: {
-    fontFamily: fonts.hankenBold,
-    fontSize: 13,
-    color: colors.onSurface,
-  },
-  codeDate: {
-    fontFamily: fonts.hankenRegular,
-    fontSize: 11,
-    color: colors.onSurfaceVariant,
-    marginRight: 12,
-  },
-  actionBtn: { padding: 2 },
-
-  pagination: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 14,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(61, 74, 65, 0.15)",
-    backgroundColor: "rgba(22, 29, 24, 0.3)",
-  },
   paginationCount: {
     fontFamily: fonts.hankenRegular,
     fontSize: 11,
     color: colors.secondary,
-  },
-  paginationButtons: { flexDirection: "row", gap: 8 },
-  pageBtn: {
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  pageBtnActive: {
-    backgroundColor: "rgba(89, 222, 155, 0.1)",
-    borderColor: "rgba(89, 222, 155, 0.2)",
-  },
-  pageBtnText: {
-    fontFamily: fonts.hankenRegular,
-    fontSize: 12,
-    color: colors.onSurfaceVariant,
   },
 
   ledgerSection: { gap: 16 },
