@@ -58,7 +58,7 @@ export default function Dashboard() {
               <View style={styles.walletMain}>
                 <View style={styles.walletIconRow}>
                   <View style={styles.walletIconWrap}>
-                    <MaterialIcons name="account-balance-wallet" size={18} color="#fff" />
+                    <MaterialIcons name="account-balance-wallet" size={18} color={colors.primary} />
                   </View>
                   <Text style={styles.walletLabel}>Wallet & Gem Points</Text>
                 </View>
@@ -77,7 +77,7 @@ export default function Dashboard() {
             {/* Exchange: converts Gem Points into wallet balance -- also
                 where top-up and withdraw live once those are built out. */}
             <Pressable style={styles.exchangeBtn} onPress={() => router.push("/exchange")}>
-              <MaterialIcons name="swap-horiz" size={18} color="#003921" />
+              <MaterialIcons name="swap-horiz" size={18} color={colors.onPrimaryContainer} />
               <Text style={styles.exchangeBtnText}>Exchange</Text>
             </Pressable>
           </LinearGradient>
@@ -107,23 +107,25 @@ export default function Dashboard() {
 
         {/* Whole row navigates, not just the chevron -- Purchase Codes
             is where the referral link itself lives. */}
-        <Pressable
-          style={[styles.glassCard, styles.referralCard]}
-          onPress={() => router.push("/(tabs)/purchase-codes")}
-        >
-          <View style={styles.referralInner}>
-            <View style={styles.referralIconWrap}>
-              <MaterialIcons name="campaign" size={20} color={colors.primary} />
+        <View style={styles.softGlowWrap}>
+          <Pressable
+            style={[styles.glassCard, styles.referralCard]}
+            onPress={() => router.push("/(tabs)/purchase-codes")}
+          >
+            <View style={styles.referralInner}>
+              <View style={styles.referralIconWrap}>
+                <MaterialIcons name="campaign" size={20} color={colors.primary} />
+              </View>
+              <View>
+                <Text style={styles.referralTitle}>Referral Hub</Text>
+                <Text style={styles.referralSub}>Earn 500 Gems per sign-up</Text>
+              </View>
             </View>
-            <View>
-              <Text style={styles.referralTitle}>Referral Hub</Text>
-              <Text style={styles.referralSub}>Earn 500 Gems per sign-up</Text>
+            <View style={styles.chevronBtn}>
+              <MaterialIcons name="chevron-right" size={22} color={colors.primary} />
             </View>
-          </View>
-          <View style={styles.chevronBtn}>
-            <MaterialIcons name="chevron-right" size={22} color={colors.primary} />
-          </View>
-        </Pressable>
+          </Pressable>
+        </View>
 
         {/* Gem value chart */}
         <GemValueChart onScrubbingChange={setChartScrubbing} />
@@ -136,48 +138,52 @@ export default function Dashboard() {
 
         {/* Insights & Alerts */}
         <Text style={styles.insightsTitle}>Insights & Alerts</Text>
-        <View style={[styles.glassCard, styles.insightsCard]}>
-          <View style={styles.insightRow}>
-            <MaterialIcons name="error-outline" size={22} color={colors.tertiary} style={styles.insightIcon} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.insightHeading}>Membership Renewal</Text>
-              <Text style={styles.insightText}>
-                Your Executive status expires in 12 days. Renew now for early-bird bonus.
-              </Text>
-              <Pressable>
-                <Text style={styles.renewBtn}>RENEW STATUS</Text>
-              </Pressable>
+        <View style={styles.softGlowWrap}>
+          <View style={[styles.glassCard, styles.insightsCard]}>
+            <View style={styles.insightRow}>
+              <MaterialIcons name="error-outline" size={22} color={colors.tertiary} style={styles.insightIcon} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.insightHeading}>Membership Renewal</Text>
+                <Text style={styles.insightText}>
+                  Your Executive status expires in 12 days. Renew now for early-bird bonus.
+                </Text>
+                <Pressable>
+                  <Text style={styles.renewBtn}>RENEW STATUS</Text>
+                </Pressable>
+              </View>
             </View>
-          </View>
 
-          <View style={[styles.insightRow, styles.insightRowBorder]}>
-            <MaterialIcons name="trending-up" size={22} color={colors.primary} style={styles.insightIcon} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.insightHeading}>Market Insight</Text>
-              <Text style={styles.insightText}>
-                Gem value increased by 0.4% in the last 24 hours. High network volume detected.
-              </Text>
+            <View style={[styles.insightRow, styles.insightRowBorder]}>
+              <MaterialIcons name="trending-up" size={22} color={colors.primary} style={styles.insightIcon} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.insightHeading}>Market Insight</Text>
+                <Text style={styles.insightText}>
+                  Gem value increased by 0.4% in the last 24 hours. High network volume detected.
+                </Text>
+              </View>
             </View>
           </View>
         </View>
 
         {/* Guide image card */}
-        <Pressable style={styles.imgCard}>
-          <Image
-            source={GUIDE_IMG}
-            style={styles.imgCardImage}
-            contentFit="cover"
-            contentPosition={{ top: "90%", left: "50%" }}
-          />
-          <LinearGradient
-            colors={["transparent", colors.background]}
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={styles.imgTextWrap}>
-            <Text style={styles.imgEyebrow}>Gem Resource</Text>
-            <Text style={styles.imgHeading}>Go Mine, Go Exchange, Go Earn</Text>
-          </View>
-        </Pressable>
+        <View style={styles.softGlowWrap}>
+          <Pressable style={styles.imgCard}>
+            <Image
+              source={GUIDE_IMG}
+              style={styles.imgCardImage}
+              contentFit="cover"
+              contentPosition={{ top: "90%", left: "50%" }}
+            />
+            <LinearGradient
+              colors={["transparent", colors.background]}
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={styles.imgTextWrap}>
+              <Text style={styles.imgEyebrow}>Gem Resource</Text>
+              <Text style={styles.imgHeading}>Go Mine, Go Exchange, Go Earn</Text>
+            </View>
+          </Pressable>
+        </View>
       </ScrollView>
     </View>
   );
@@ -221,18 +227,20 @@ const styles = StyleSheet.create({
 
   walletGlowWrap: {
     borderRadius: 14,
-    shadowColor: "#59DE9B",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 8,
+  },
+  // Kept as a plain wrapper (no shadow) rather than removing it from
+  // the JSX everywhere it's used -- easier to re-introduce a subtle
+  // glow later if the client changes their mind than to re-wire the
+  // markup again.
+  softGlowWrap: {
+    borderRadius: 8,
   },
   walletCard: {
     borderRadius: 14,
     padding: 20,
     gap: 16,
     borderWidth: 1,
-    borderColor: "rgba(89, 222, 155, 0.3)",
+    borderColor: "rgba(198, 198, 198, 0.15)",
     overflow: "hidden",
     position: "relative",
   },
@@ -253,9 +261,9 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    backgroundColor: "rgba(89, 222, 155, 0.2)",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.25)",
+    borderColor: "rgba(89, 222, 155, 0.3)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -294,11 +302,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    shadowColor: "#59DE9B",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 6,
   },
   exchangeBtnText: {
     fontFamily: fonts.hankenBold,
