@@ -68,6 +68,13 @@ export default function Products() {
                   style={StyleSheet.absoluteFill}
                   contentFit="cover"
                   contentPosition={TIER_BG_POSITION[pkg.tierColor]}
+                  // These are local require()'d assets, so this is
+                  // basically instant either way, but fading in
+                  // (rather than popping in) reads smoother, and
+                  // memory-disk caching avoids any re-decode cost if
+                  // this screen unmounts/remounts while switching tabs.
+                  transition={150}
+                  cachePolicy="memory-disk"
                 />
 
                 {/* Vignette: clear in the middle (where the gem sits),

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  Animated,
+  Easing,
 } from "react-native";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -24,6 +26,44 @@ export default function ForgotPassword() {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // displayedStage lags one animation-frame behind `stage` so the old
+  // stage's content stays mounted through the fade-out, then swaps to
+  // the new stage right as the fade-in starts. Without this the
+  // content would hard-cut the instant `stage` changes, with no
+  // transition at all.
+  const [displayedStage, setDisplayedStage] = useState(stage);
+  const stageOpacity = useRef(new Animated.Value(1)).current;
+  const stageShift = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (stage === displayedStage) return;
+    Animated.timing(stageOpacity, {
+      toValue: 0,
+      duration: 100,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (!finished) return;
+      setDisplayedStage(stage);
+      stageShift.setValue(10);
+      Animated.parallel([
+        Animated.timing(stageOpacity, {
+          toValue: 1,
+          duration: 160,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(stageShift, {
+          toValue: 0,
+          duration: 160,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
 
   const handleSendCode = async () => {
     setError("");
@@ -89,7 +129,7 @@ export default function ForgotPassword() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {stage !== "done" && (
+          {displayedStage !== "done" && (
             <Pressable style={styles.backLink} onPress={() => router.back()}>
               <MaterialIcons name="arrow-back" size={18} color={colors.onSurfaceVariant} />
               <Text style={styles.backLinkText}>Back to Login</Text>
@@ -102,142 +142,149 @@ export default function ForgotPassword() {
             </View>
           )}
 
-          {/* Stage 1: email */}
-          {stage === "email" && (
-            <>
-              <View style={styles.header}>
-                <Text style={styles.title}>Forgot Password</Text>
+          <Animated.View
+            style={{
+              opacity: stageOpacity,
+              transform: [{ translateY: stageShift }],
+            }}
+          >
+            {/* Stage 1: email */}
+            {displayedStage === "email" && (
+              <View style={{ gap: 20 }}>
+                <View style={styles.header}>
+                  <Text style={styles.title}>Forgot Password</Text>
+                  <Text style={styles.sub}>
+                    Enter your account email and we'll send a verification code to confirm it's you.
+                  </Text>
+                </View>
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>Email</Text>
+                  <View style={styles.fieldInputWrap}>
+                    <TextInput
+                      style={styles.fieldInput}
+                      placeholder="e.g. name@email.com"
+                      placeholderTextColor="rgba(188, 202, 190, 0.4)"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      value={email}
+                      onChangeText={setEmail}
+                    />
+                  </View>
+                </View>
+                <Pressable style={styles.submitBtn} onPress={handleSendCode} disabled={loading}>
+                  {loading ? (
+                    <ActivityIndicator color="#003921" size="small" />
+                  ) : (
+                    <Text style={styles.submitText}>SEND VERIFICATION CODE</Text>
+                  )}
+                </Pressable>
+              </View>
+            )}
+
+            {/* Stage 2: verify code */}
+            {displayedStage === "verify" && (
+              <View style={{ gap: 20 }}>
+                <View style={styles.header}>
+                  <Text style={styles.title}>Enter Code</Text>
+                  <Text style={styles.sub}>
+                    We sent a 6-digit verification code to {email || "your email"}.
+                  </Text>
+                </View>
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>Verification Code</Text>
+                  <View style={styles.fieldInputWrap}>
+                    <TextInput
+                      style={[styles.fieldInput, styles.codeInput]}
+                      placeholder="000000"
+                      placeholderTextColor="rgba(188, 202, 190, 0.4)"
+                      keyboardType="number-pad"
+                      maxLength={6}
+                      value={code}
+                      onChangeText={setCode}
+                    />
+                  </View>
+                </View>
+                <Pressable style={styles.submitBtn} onPress={handleVerifyCode} disabled={loading}>
+                  {loading ? (
+                    <ActivityIndicator color="#003921" size="small" />
+                  ) : (
+                    <Text style={styles.submitText}>VERIFY CODE</Text>
+                  )}
+                </Pressable>
+                <Pressable onPress={handleSendCode} disabled={loading}>
+                  <Text style={styles.resendLink}>Didn't get a code? Resend</Text>
+                </Pressable>
+              </View>
+            )}
+
+            {/* Stage 3: set new password */}
+            {displayedStage === "reset" && (
+              <View style={{ gap: 20 }}>
+                <View style={styles.header}>
+                  <Text style={styles.title}>Set New Password</Text>
+                  <Text style={styles.sub}>Choose a new password for your account.</Text>
+                </View>
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>New Password</Text>
+                  <View style={styles.fieldInputWrap}>
+                    <TextInput
+                      style={styles.fieldInput}
+                      placeholder="••••••••••••"
+                      placeholderTextColor="rgba(188, 202, 190, 0.4)"
+                      secureTextEntry={!showPw}
+                      value={newPassword}
+                      onChangeText={setNewPassword}
+                    />
+                  </View>
+                </View>
+                <View style={styles.field}>
+                  <Text style={styles.fieldLabel}>Confirm New Password</Text>
+                  <View style={styles.fieldInputWrap}>
+                    <TextInput
+                      style={styles.fieldInput}
+                      placeholder="••••••••••••"
+                      placeholderTextColor="rgba(188, 202, 190, 0.4)"
+                      secureTextEntry={!showPw}
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
+                    />
+                  </View>
+                </View>
+                <Pressable
+                  style={styles.showPwRow}
+                  onPress={() => setShowPw((v) => !v)}
+                >
+                  <MaterialIcons
+                    name={showPw ? "check-box" : "check-box-outline-blank"}
+                    size={18}
+                    color={colors.primary}
+                  />
+                  <Text style={styles.showPwText}>Show passwords</Text>
+                </Pressable>
+                <Pressable style={styles.submitBtn} onPress={handleResetPassword} disabled={loading}>
+                  {loading ? (
+                    <ActivityIndicator color="#003921" size="small" />
+                  ) : (
+                    <Text style={styles.submitText}>RESET PASSWORD</Text>
+                  )}
+                </Pressable>
+              </View>
+            )}
+
+            {/* Stage 4: done */}
+            {displayedStage === "done" && (
+              <View style={styles.doneState}>
+                <MaterialIcons name="check-circle" size={64} color={colors.primary} />
+                <Text style={styles.title}>Password Reset</Text>
                 <Text style={styles.sub}>
-                  Enter your account email and we'll send a verification code to confirm it's you.
+                  Your password has been updated. You can now log in with your new password.
                 </Text>
+                <Pressable style={styles.submitBtn} onPress={() => router.replace("/login")}>
+                  <Text style={styles.submitText}>BACK TO LOGIN</Text>
+                </Pressable>
               </View>
-              <View style={styles.field}>
-                <Text style={styles.fieldLabel}>Email</Text>
-                <View style={styles.fieldInputWrap}>
-                  <TextInput
-                    style={styles.fieldInput}
-                    placeholder="e.g. name@email.com"
-                    placeholderTextColor="rgba(188, 202, 190, 0.4)"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    value={email}
-                    onChangeText={setEmail}
-                  />
-                </View>
-              </View>
-              <Pressable style={styles.submitBtn} onPress={handleSendCode} disabled={loading}>
-                {loading ? (
-                  <ActivityIndicator color="#003921" size="small" />
-                ) : (
-                  <Text style={styles.submitText}>SEND VERIFICATION CODE</Text>
-                )}
-              </Pressable>
-            </>
-          )}
-
-          {/* Stage 2: verify code */}
-          {stage === "verify" && (
-            <>
-              <View style={styles.header}>
-                <Text style={styles.title}>Enter Code</Text>
-                <Text style={styles.sub}>
-                  We sent a 6-digit verification code to {email || "your email"}.
-                </Text>
-              </View>
-              <View style={styles.field}>
-                <Text style={styles.fieldLabel}>Verification Code</Text>
-                <View style={styles.fieldInputWrap}>
-                  <TextInput
-                    style={[styles.fieldInput, styles.codeInput]}
-                    placeholder="000000"
-                    placeholderTextColor="rgba(188, 202, 190, 0.4)"
-                    keyboardType="number-pad"
-                    maxLength={6}
-                    value={code}
-                    onChangeText={setCode}
-                  />
-                </View>
-              </View>
-              <Pressable style={styles.submitBtn} onPress={handleVerifyCode} disabled={loading}>
-                {loading ? (
-                  <ActivityIndicator color="#003921" size="small" />
-                ) : (
-                  <Text style={styles.submitText}>VERIFY CODE</Text>
-                )}
-              </Pressable>
-              <Pressable onPress={handleSendCode} disabled={loading}>
-                <Text style={styles.resendLink}>Didn't get a code? Resend</Text>
-              </Pressable>
-            </>
-          )}
-
-          {/* Stage 3: set new password */}
-          {stage === "reset" && (
-            <>
-              <View style={styles.header}>
-                <Text style={styles.title}>Set New Password</Text>
-                <Text style={styles.sub}>Choose a new password for your account.</Text>
-              </View>
-              <View style={styles.field}>
-                <Text style={styles.fieldLabel}>New Password</Text>
-                <View style={styles.fieldInputWrap}>
-                  <TextInput
-                    style={styles.fieldInput}
-                    placeholder="••••••••••••"
-                    placeholderTextColor="rgba(188, 202, 190, 0.4)"
-                    secureTextEntry={!showPw}
-                    value={newPassword}
-                    onChangeText={setNewPassword}
-                  />
-                </View>
-              </View>
-              <View style={styles.field}>
-                <Text style={styles.fieldLabel}>Confirm New Password</Text>
-                <View style={styles.fieldInputWrap}>
-                  <TextInput
-                    style={styles.fieldInput}
-                    placeholder="••••••••••••"
-                    placeholderTextColor="rgba(188, 202, 190, 0.4)"
-                    secureTextEntry={!showPw}
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                  />
-                </View>
-              </View>
-              <Pressable
-                style={styles.showPwRow}
-                onPress={() => setShowPw((v) => !v)}
-              >
-                <MaterialIcons
-                  name={showPw ? "check-box" : "check-box-outline-blank"}
-                  size={18}
-                  color={colors.primary}
-                />
-                <Text style={styles.showPwText}>Show passwords</Text>
-              </Pressable>
-              <Pressable style={styles.submitBtn} onPress={handleResetPassword} disabled={loading}>
-                {loading ? (
-                  <ActivityIndicator color="#003921" size="small" />
-                ) : (
-                  <Text style={styles.submitText}>RESET PASSWORD</Text>
-                )}
-              </Pressable>
-            </>
-          )}
-
-          {/* Stage 4: done */}
-          {stage === "done" && (
-            <View style={styles.doneState}>
-              <MaterialIcons name="check-circle" size={64} color={colors.primary} />
-              <Text style={styles.title}>Password Reset</Text>
-              <Text style={styles.sub}>
-                Your password has been updated. You can now log in with your new password.
-              </Text>
-              <Pressable style={styles.submitBtn} onPress={() => router.replace("/login")}>
-                <Text style={styles.submitText}>BACK TO LOGIN</Text>
-              </Pressable>
-            </View>
-          )}
+            )}
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

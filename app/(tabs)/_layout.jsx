@@ -1,4 +1,5 @@
 import { Tabs } from "expo-router";
+import { Platform } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { colors, fonts } from "@/constants/theme";
@@ -27,8 +28,24 @@ export default function TabsLayout() {
         },
         // Renders behind the tab bar content — this is the BlurView
         // doing the same job as `backdrop-filter: blur(24px)` did.
+        //
+        // On iOS this is a native UIVisualEffectView and is cheap.
+        // On Android, expo-blur's default implementation has to
+        // recompute the blur as content scrolls underneath this
+        // absolute-positioned bar, which is the actual source of the
+        // scroll jank on Products/Profile -- not anything in those
+        // screens themselves. `experimentalBlurMethod="dimezisBlurView"`
+        // swaps in a real-time native blur renderer on Android (SDK
+        // 51+ / Android 12+) that doesn't have that recompute cost.
+        // Falls back to the default method automatically on older
+        // devices/SDKs.
         tabBarBackground: () => (
-          <BlurView intensity={50} tint="dark" style={{ flex: 1 }} />
+          <BlurView
+            intensity={50}
+            tint="dark"
+            style={{ flex: 1 }}
+            experimentalBlurMethod={Platform.OS === "android" ? "dimezisBlurView" : undefined}
+          />
         ),
       }}
     >

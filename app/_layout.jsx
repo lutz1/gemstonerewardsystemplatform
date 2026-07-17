@@ -38,9 +38,37 @@ function RootNavigator() {
         <Stack.Screen name="exchange/deposit" />
       </Stack.Protected>
 
+      {/* (auth) no longer has its own _layout.jsx, so it's purely
+          organizational now (like exchange/) rather than a nested
+          navigator -- that's what makes each screen inside it
+          individually addressable here. login and forgot-password
+          stay guarded to logged-out only. Same fast fade as register
+          below, instead of the default native-stack slide-in (which
+          runs ~300-350ms and reads as sluggish for a simple auth
+          hand-off between screens). */}
       <Stack.Protected guard={!isLoggedIn}>
-        <Stack.Screen name="(auth)" />
+        <Stack.Screen
+          name="(auth)/login"
+          options={{ animation: "fade", animationDuration: 180 }}
+        />
+        <Stack.Screen
+          name="(auth)/forgot-password"
+          options={{ animation: "fade", animationDuration: 180 }}
+        />
       </Stack.Protected>
+
+      {/* register.jsx stays on disk at app/(auth)/register.jsx, but is
+          referenced directly here, unguarded, so it's reachable both
+          logged-out (real sign-up, via the login screen) and
+          logged-in (Direct Referral's "Register New Member" action
+          from PurchaseCodes). Before this, (auth) was one single
+          nested navigator gated to logged-out only, so
+          router.push("/register") fired while logged in had no
+          matching screen and silently did nothing. */}
+      <Stack.Screen
+        name="(auth)/register"
+        options={{ presentation: "modal", animation: "fade", animationDuration: 180 }}
+      />
     </Stack>
   );
 }
