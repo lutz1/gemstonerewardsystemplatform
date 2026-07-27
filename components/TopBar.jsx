@@ -80,6 +80,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     overflow: "hidden",
+    zIndex: 20,
+    elevation: 20,
   },
   inner: {
     flexDirection: "row",

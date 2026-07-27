@@ -1,13 +1,12 @@
 import { Tabs } from "expo-router";
-import { Platform } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { colors, fonts } from "@/constants/theme";
 
-// This whole file replaces BottomNav.jsx — there's no separate
-// component to import into each screen anymore. Expo Router renders
-// this bar automatically around every screen inside (tabs).
-export default function TabsLayout() {
+// Same tab bar visual language as the customer app's (tabs)/_layout.jsx,
+// so it doesn't feel like a totally different product -- just a
+// different set of destinations.
+export default function AdminTabsLayout() {
   return (
     <Tabs
       screenOptions={{
@@ -30,26 +29,8 @@ export default function TabsLayout() {
           paddingBottom: 8,
           paddingTop: 6,
         },
-        // Renders behind the tab bar content — this is the BlurView
-        // doing the same job as `backdrop-filter: blur(24px)` did.
-        //
-        // On iOS this is a native UIVisualEffectView and is cheap.
-        // On Android, expo-blur's default implementation has to
-        // recompute the blur as content scrolls underneath this
-        // absolute-positioned bar, which is the actual source of the
-        // scroll jank on Products/Profile -- not anything in those
-        // screens themselves. `experimentalBlurMethod="dimezisBlurView"`
-        // swaps in a real-time native blur renderer on Android (SDK
-        // 51+ / Android 12+) that doesn't have that recompute cost.
-        // Falls back to the default method automatically on older
-        // devices/SDKs.
         tabBarBackground: () => (
-          <BlurView
-            intensity={50}
-            tint="dark"
-            style={{ flex: 1 }}
-            experimentalBlurMethod={Platform.OS === "android" ? "dimezisBlurView" : undefined}
-          />
+          <BlurView intensity={50} tint="dark" style={{ flex: 1 }} />
         ),
       }}
     >
@@ -63,16 +44,16 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="products"
+        name="users"
         options={{
-          title: "Products",
+          title: "Users",
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="inventory" color={color} size={size} />
+            <MaterialIcons name="group" color={color} size={size} />
           ),
         }}
       />
       <Tabs.Screen
-        name="purchase-codes"
+        name="codes/index"
         options={{
           title: "Codes",
           tabBarIcon: ({ color, size }) => (
@@ -89,6 +70,9 @@ export default function TabsLayout() {
           ),
         }}
       />
+      {/* Pending approval detail is reachable from the Codes tab, not
+          shown as its own tab icon. */}
+      <Tabs.Screen name="codes/pending" options={{ href: null }} />
     </Tabs>
   );
 }
