@@ -77,6 +77,9 @@ export default function AdminTabsLayout() {
           Profile tab, not shown as their own tab icons. */}
       <Tabs.Screen name="change-email" options={{ href: null }} />
       <Tabs.Screen name="change-password" options={{ href: null }} />
+      {/* password-resets is NOT registered here -- it lives inside
+          app/admin/user/password-reset.jsx, nested in the Users tab's
+          own Stack layout, so it isn't a separate top-level tab. */}
     </Tabs>
   );
 }

@@ -43,7 +43,7 @@ export default function AdminChangePassword() {
   return (
     <View style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Pressable onPress={() => router.back()} hitSlop={8}>
+        <Pressable onPress={() => router.replace("/admin/profile")} hitSlop={8}>
           <MaterialIcons name="close" size={22} color={colors.onSurface} />
         </Pressable>
         <Text style={styles.headerTitle}>Change Password</Text>

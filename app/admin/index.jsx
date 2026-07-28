@@ -4,6 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import AdminHeader from "@/components/AdminHeader";
 import { colors, fonts } from "@/constants/theme";
 import { pendingApprovals, users, purchaseTotalsByTier, formatPeso } from "@/utils/AdminMockData";
+import { passwordResetRequests } from "@/utils/PasswordResetRequests";
 
 export default function AdminDashboard() {
   const totalRevenue = purchaseTotalsByTier.reduce((sum, t) => sum + t.total, 0);
@@ -57,6 +58,32 @@ export default function AdminDashboard() {
             </View>
           ))}
         </Pressable>
+
+        {/* Password Reset Requests -- same card layout as Pending
+            Approval above, so both "things awaiting action" read the
+            same way on the dashboard. */}
+        {passwordResetRequests.length > 0 && (
+          <Pressable
+            style={styles.pendingCard}
+            onPress={() => router.push("/admin/users/password-resets")}
+          >
+            <View style={styles.pendingCardTop}>
+              <Text style={styles.pendingCardTitle}>Password Reset Requests</Text>
+              <MaterialIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
+            </View>
+            <Text style={styles.pendingCardSub}>
+              {passwordResetRequests.length} requests awaiting approval
+            </Text>
+            {passwordResetRequests.slice(0, 3).map((r) => (
+              <View style={styles.pendingRow} key={r.id}>
+                <View>
+                  <Text style={styles.pendingRowName}>{r.customerName}</Text>
+                  <Text style={styles.pendingRowTier}>{r.email} · {r.requestedAt}</Text>
+                </View>
+              </View>
+            ))}
+          </Pressable>
+        )}
       </ScrollView>
     </View>
   );
