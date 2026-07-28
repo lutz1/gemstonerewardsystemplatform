@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from "react-native";
+import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import AdminHeader from "@/components/AdminHeader";
 import { colors, fonts } from "@/constants/theme";
@@ -31,7 +32,11 @@ export default function UserManagement() {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {filtered.map((u) => (
-          <View style={styles.userCard} key={u.id}>
+          <Pressable
+            style={({ pressed }) => [styles.userCard, pressed && styles.userCardPressed]}
+            key={u.id}
+            onPress={() => router.push(`/admin/users/${u.id}`)}
+          >
             <View style={styles.userAvatar}>
               <Text style={styles.userAvatarText}>
                 {u.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
@@ -57,7 +62,8 @@ export default function UserManagement() {
                 {u.status === "suspended" ? "Suspended" : "Active"}
               </Text>
             </View>
-          </View>
+            <MaterialIcons name="chevron-right" size={20} color={colors.onSurfaceVariant} />
+          </Pressable>
         ))}
 
         {filtered.length === 0 && (
@@ -99,6 +105,9 @@ const styles = StyleSheet.create({
     borderColor: colors.borderFaint,
     borderRadius: 12,
     padding: 14,
+  },
+  userCardPressed: {
+    backgroundColor: "rgba(26, 33, 28, 0.9)",
   },
   userAvatar: {
     width: 40,

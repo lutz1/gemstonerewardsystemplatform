@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { colors, fonts } from "@/constants/theme";
-import { pendingApprovals, formatPeso } from "@/utils/AdminMockData";
+import { pendingApprovals, purchaseTotalsByTier, formatPeso } from "@/utils/AdminMockData";
 
 const TIER_FILTERS = ["All", "Emerald", "Sapphire", "Diamond"];
 
@@ -19,6 +19,16 @@ export default function PendingApproval() {
   const [search, setSearch] = useState("");
   const [tierFilter, setTierFilter] = useState("All");
 
+  // TEMP: no backend yet, so Approve/Reject mutate the shared mock
+  // data directly (pendingApprovals + purchaseTotalsByTier) instead of
+  // calling a real API. `version` just forces a re-render after each
+  // mutation, since splicing an array in place doesn't trigger one on
+  // its own. Replace all of this with real approve/reject endpoints
+  // once a backend exists.
+  const [version, setVersion] = useState(0);
+  const [processing, setProcessing] = useState(null); // { id, action } | null
+  const [feedback, setFeedback] = useState(null); // { id, action } | null
+
   const filtered = pendingApprovals.filter((p) => {
     const matchesTier = tierFilter === "All" || p.tier === tierFilter;
     const matchesSearch =
@@ -26,6 +36,38 @@ export default function PendingApproval() {
       p.referenceNumber.toLowerCase().includes(search.toLowerCase());
     return matchesTier && matchesSearch;
   });
+
+  const removeFromPending = (id) => {
+    const idx = pendingApprovals.findIndex((p) => p.id === id);
+    if (idx !== -1) pendingApprovals.splice(idx, 1);
+  };
+
+  const handleApprove = async (item) => {
+    setProcessing({ id: item.id, action: "approve" });
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
+    const tierEntry = purchaseTotalsByTier.find((t) => t.tier === item.tier);
+    if (tierEntry) {
+      tierEntry.count += 1;
+      tierEntry.total += item.amount;
+    }
+    removeFromPending(item.id);
+
+    setProcessing(null);
+    setFeedback({ id: item.id, action: "approve" });
+    setVersion((v) => v + 1);
+  };
+
+  const handleReject = async (item) => {
+    setProcessing({ id: item.id, action: "reject" });
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
+    removeFromPending(item.id);
+
+    setProcessing(null);
+    setFeedback({ id: item.id, action: "reject" });
+    setVersion((v) => v + 1);
+  };
 
   return (
     <View style={styles.root}>
@@ -69,40 +111,63 @@ export default function PendingApproval() {
           {filtered.length} {filtered.length === 1 ? "result" : "results"}
         </Text>
 
-        {filtered.map((p) => (
-          <View style={styles.card} key={p.id}>
-            <View style={styles.cardTop}>
-              <View style={styles.cardTopLeft}>
-                <View style={[styles.tierDot, { backgroundColor: TIER_COLOR[p.tier] }]} />
-                <Text style={styles.customerName}>{p.customerName}</Text>
+        {filtered.map((p) => {
+          const isProcessing = processing?.id === p.id;
+          const isApproving = isProcessing && processing.action === "approve";
+          const isRejecting = isProcessing && processing.action === "reject";
+
+          return (
+            <View style={styles.card} key={p.id}>
+              <View style={styles.cardTop}>
+                <View style={styles.cardTopLeft}>
+                  <View style={[styles.tierDot, { backgroundColor: TIER_COLOR[p.tier] }]} />
+                  <Text style={styles.customerName}>{p.customerName}</Text>
+                </View>
+                <Text style={styles.amount}>{formatPeso(p.amount)}</Text>
               </View>
-              <Text style={styles.amount}>{formatPeso(p.amount)}</Text>
-            </View>
-            <View style={styles.cardMetaRow}>
-              <Text style={styles.metaText}>{p.tier}</Text>
-              <Text style={styles.metaDot}>·</Text>
-              <Text style={styles.metaText}>{p.date}</Text>
-              <Text style={styles.metaDot}>·</Text>
-              <Text style={[styles.metaText, styles.mono]}>{p.referenceNumber}</Text>
-            </View>
+              <View style={styles.cardMetaRow}>
+                <Text style={styles.metaText}>{p.tier}</Text>
+                <Text style={styles.metaDot}>·</Text>
+                <Text style={styles.metaText}>{p.date}</Text>
+                <Text style={styles.metaDot}>·</Text>
+                <Text style={[styles.metaText, styles.mono]}>{p.referenceNumber}</Text>
+              </View>
 
-            {/* TEMP: approve/reject actions intentionally left as plain
-                buttons with no backend call wired -- this is where a
-                real "approve payment" / "reject payment" API call goes
-                once the admin backend exists. */}
-            <View style={styles.actionRow}>
-              <Pressable style={styles.rejectBtn}>
-                <Text style={styles.rejectBtnText}>Reject</Text>
-              </Pressable>
-              <Pressable style={styles.approveBtn}>
-                <MaterialIcons name="check" size={16} color="#003921" />
-                <Text style={styles.approveBtnText}>Approve</Text>
-              </Pressable>
+              <View style={styles.actionRow}>
+                <Pressable
+                  style={styles.rejectBtn}
+                  onPress={() => handleReject(p)}
+                  disabled={isProcessing}
+                >
+                  {isRejecting ? (
+                    <ActivityIndicator color={colors.onSurfaceVariant} size="small" />
+                  ) : (
+                    <Text style={styles.rejectBtnText}>Reject</Text>
+                  )}
+                </Pressable>
+                <Pressable
+                  style={styles.approveBtn}
+                  onPress={() => handleApprove(p)}
+                  disabled={isProcessing}
+                >
+                  {isApproving ? (
+                    <ActivityIndicator color="#003921" size="small" />
+                  ) : (
+                    <>
+                      <MaterialIcons name="check" size={16} color="#003921" />
+                      <Text style={styles.approveBtnText}>Approve</Text>
+                    </>
+                  )}
+                </Pressable>
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
 
-        {filtered.length === 0 && (
+        {filtered.length === 0 && pendingApprovals.length === 0 && (
+          <Text style={styles.emptyText}>No pending approvals — all caught up.</Text>
+        )}
+        {filtered.length === 0 && pendingApprovals.length > 0 && (
           <Text style={styles.emptyText}>No pending approvals match your filters.</Text>
         )}
       </ScrollView>

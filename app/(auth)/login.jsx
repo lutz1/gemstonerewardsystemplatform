@@ -371,4 +371,4 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     color: "rgba(188, 202, 190, 0.4)",
   },
-});
+}); 

@@ -73,6 +73,10 @@ export default function AdminTabsLayout() {
       {/* Pending approval detail is reachable from the Codes tab, not
           shown as its own tab icon. */}
       <Tabs.Screen name="codes/pending" options={{ href: null }} />
+      {/* Change Email / Change Password are reachable from the
+          Profile tab, not shown as their own tab icons. */}
+      <Tabs.Screen name="change-email" options={{ href: null }} />
+      <Tabs.Screen name="change-password" options={{ href: null }} />
     </Tabs>
   );
 }
