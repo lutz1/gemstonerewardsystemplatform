@@ -51,7 +51,7 @@
   height: calc(100% + 2px);
   object-fit: cover;
   object-position: center;
-  filter: grayscale(20%) brightness(0.7);
+  filter: brightness(0.7);
   /* absolutely no movement */
   transform: none !important;
   -webkit-transform: none !important;
@@ -94,6 +94,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  transform: translateY(28px);
   animation: fadeSlideUp 0.7s ease both;
 }
 
@@ -441,6 +442,10 @@
 /* ─── Responsive ─────────────────────────────────────────────── */
 
 @media (max-width: 520px) {
+  .lp-main {
+    transform: none;
+  }
+
   .lp-card {
     padding: 32px 24px;
   }

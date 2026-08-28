@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./LoginPage.css";
+import bgImage from "../../../assets/images/login_bg.png";
+import { useAuth } from "../../../context/AuthContext";
 
-const BG_IMAGE =
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80";
+const BG_IMAGE = bgImage;
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw]     = useState(false);
@@ -35,11 +37,8 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      // ── Replace with your real auth call ─────────────────────
-      await new Promise((res) => setTimeout(res, 1500));
-      // e.g. await signIn(email, password);
-      // ─────────────────────────────────────────────────────────
-      navigate("/dashboard");
+      await login(email, password);
+      navigate("/pin-verification");
     } catch (err) {
       setError(err?.message || "Authentication failed. Please try again.");
     } finally {
@@ -59,13 +58,13 @@ export default function LoginPage() {
       <main className="lp-main">
         <header className="lp-header">
           <h1 className="lp-title">Gemstone Code</h1>
-          <p className="lp-subtitle">Executive Networking Portal</p>
+          <p className="lp-subtitle">Mining &amp; Exchange Platform</p>
         </header>
 
         <div className="lp-card">
           <div className="lp-card-heading">
             <h2>Secure Access</h2>
-            <p>Enter your professional credentials to continue.</p>
+            <p>Enter your mining credentials to continue.</p>
           </div>
 
           <form className="lp-form" onSubmit={handleSubmit} noValidate>
