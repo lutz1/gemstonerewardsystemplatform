@@ -38,10 +38,11 @@ exports.getMpinStatus = onCall({ region: 'asia-southeast1' }, async (request) =>
 
     return {
       mpinSetup: userSnapshot.data()?.mpinSetup === true,
+      role: userSnapshot.data()?.role || 'member',
     };
   } catch (error) {
     if (error.code === 5) {
-      return { mpinSetup: false };
+      return { mpinSetup: false, role: 'member' };
     }
 
     throw error;

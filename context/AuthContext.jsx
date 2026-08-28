@@ -5,13 +5,16 @@ import { app, auth } from "../src/firebase";
 
 const AuthContext = createContext(null);
 
-async function getMpinSetup() {
+async function getAccountStatus() {
   try {
     const getMpinStatus = httpsCallable(getFunctions(app, "asia-southeast1"), "getMpinStatus");
     const result = await getMpinStatus();
-    return result.data?.mpinSetup === true;
+    return {
+      mpinSetup: result.data?.mpinSetup === true,
+      role: result.data?.role || "member",
+    };
   } catch {
-    return false;
+    return { mpinSetup: false, role: "member" };
   }
 }
 
@@ -35,8 +38,9 @@ export function AuthProvider({ children }) {
       }
 
       const token = await user.getIdTokenResult();
-      setRole(token.claims.role || token.claims.userRole || "member");
-      setMpinSetup(await getMpinSetup());
+      const status = await getAccountStatus();
+      setRole(status.role || token.claims.role || token.claims.userRole || "member");
+      setMpinSetup(status.mpinSetup);
       setAuthReady(true);
     });
 
@@ -46,8 +50,9 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const credential = await signInWithEmailAndPassword(auth, email, password);
     const token = await credential.user.getIdTokenResult();
-    setRole(token.claims.role || token.claims.userRole || "member");
-    setMpinSetup(await getMpinSetup());
+    const status = await getAccountStatus();
+    setRole(status.role || token.claims.role || token.claims.userRole || "member");
+    setMpinSetup(status.mpinSetup);
     setPinVerified(false);
   };
   const verifyPin = async (mpin) => {
