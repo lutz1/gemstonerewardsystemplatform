@@ -1,5 +1,6 @@
 import { signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
 import { auth } from "../../firebase";
@@ -25,9 +26,19 @@ const tierProgress = {
 
 const profileStats = [
   { key: "codes", icon: "token", label: "Codes Purchased", value: "168" },
-  { key: "referrals", icon: "diversity_3", label: "Active Referrals", value: "9" },
+  {
+    key: "referrals",
+    icon: "diversity_3",
+    label: "Active Referrals",
+    value: "9",
+  },
   { key: "gems", icon: "diamond", label: "GEMS Balance", value: "42,850" },
-  { key: "age", icon: "calendar_month", label: "Member Since", value: profile.memberSince },
+  {
+    key: "age",
+    icon: "calendar_month",
+    label: "Member Since",
+    value: profile.memberSince,
+  },
 ];
 
 const preferenceToggles = [
@@ -73,6 +84,7 @@ function ToggleRow({ label, caption, defaultOn }) {
 }
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -111,7 +123,6 @@ export default function ProfilePage() {
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="prof-main">
         <div className="prof-content">
-
           {/* ── Identity hero ──────────────────────────────── */}
           <section className="prof-glass-panel prof-hero">
             <div className="prof-hero-identity">
@@ -123,12 +134,18 @@ export default function ProfilePage() {
                 </div>
                 <p className="prof-handle">{profile.handle}</p>
                 <p className="prof-meta">
-                  <span className="material-symbols-outlined prof-meta-icon">mail</span>
+                  <span className="material-symbols-outlined prof-meta-icon">
+                    mail
+                  </span>
                   {profile.email}
                 </p>
               </div>
             </div>
-            <button className="prof-edit-btn">
+            <button
+              className="prof-edit-btn"
+              type="button"
+              onClick={() => navigate("/edit-profile")}
+            >
               <span className="material-symbols-outlined">edit</span>
               Edit Profile
             </button>
@@ -140,11 +157,17 @@ export default function ProfilePage() {
               <div>
                 <p className="prof-progress-label">Tier Progress</p>
                 <p className="prof-progress-title">
-                  {tierProgress.current} <span className="material-symbols-outlined prof-progress-arrow">arrow_forward</span> {tierProgress.next}
+                  {tierProgress.current}{" "}
+                  <span className="material-symbols-outlined prof-progress-arrow">
+                    arrow_forward
+                  </span>{" "}
+                  {tierProgress.next}
                 </p>
               </div>
               <p className="prof-progress-remaining">
-                <span className="material-symbols-outlined prof-progress-diamond">diamond</span>
+                <span className="material-symbols-outlined prof-progress-diamond">
+                  diamond
+                </span>
                 {tierProgress.gemsToNext.toLocaleString()} GEMS to go
               </p>
             </div>
@@ -155,7 +178,8 @@ export default function ProfilePage() {
               />
             </div>
             <p className="prof-progress-caption">
-              Reach {tierProgress.next} Tier to unlock priority code drops and higher batch limits.
+              Reach {tierProgress.next} Tier to unlock priority code drops and
+              higher batch limits.
             </p>
           </section>
 
@@ -178,7 +202,9 @@ export default function ProfilePage() {
           <section className="prof-glass-panel prof-panel">
             <div className="prof-panel-header">
               <h3 className="prof-panel-title">Account Details</h3>
-              <p className="prof-panel-sub">Keep your contact information current.</p>
+              <p className="prof-panel-sub">
+                Keep your contact information current.
+              </p>
             </div>
             <div className="prof-field-grid">
               <div className="prof-field">
@@ -204,7 +230,9 @@ export default function ProfilePage() {
           <section className="prof-glass-panel prof-panel">
             <div className="prof-panel-header">
               <h3 className="prof-panel-title">Security</h3>
-              <p className="prof-panel-sub">Manage how you sign in and stay protected.</p>
+              <p className="prof-panel-sub">
+                Manage how you sign in and stay protected.
+              </p>
             </div>
             <div className="prof-security-row">
               <div className="prof-security-icon">
@@ -212,9 +240,17 @@ export default function ProfilePage() {
               </div>
               <div className="prof-security-info">
                 <p className="prof-security-label">Password</p>
-                <p className="prof-security-caption">Last changed 3 months ago</p>
+                <p className="prof-security-caption">
+                  Last changed 3 months ago
+                </p>
               </div>
-              <button className="prof-outline-btn">Change</button>
+              <button
+                className="prof-outline-btn"
+                type="button"
+                onClick={() => navigate("/change-password")}
+              >
+                Change
+              </button>
             </div>
             <div className="prof-security-row">
               <div className="prof-security-icon">
@@ -222,7 +258,9 @@ export default function ProfilePage() {
               </div>
               <div className="prof-security-info">
                 <p className="prof-security-label">Two-Factor Authentication</p>
-                <p className="prof-security-caption">Adds an extra step when signing in</p>
+                <p className="prof-security-caption">
+                  Adds an extra step when signing in
+                </p>
               </div>
               <span className="prof-status-pill enabled">Enabled</span>
             </div>
@@ -232,7 +270,9 @@ export default function ProfilePage() {
           <section className="prof-glass-panel prof-panel">
             <div className="prof-panel-header">
               <h3 className="prof-panel-title">Notification Preferences</h3>
-              <p className="prof-panel-sub">Choose what you hear from us, and how.</p>
+              <p className="prof-panel-sub">
+                Choose what you hear from us, and how.
+              </p>
             </div>
             <div className="prof-toggle-list">
               {preferenceToggles.map((t) => (
@@ -245,7 +285,9 @@ export default function ProfilePage() {
           <section className="prof-glass-panel prof-danger-panel">
             <div>
               <p className="prof-danger-title">Sign out of Gemstone Code</p>
-              <p className="prof-danger-caption">You can always sign back in with your credentials.</p>
+              <p className="prof-danger-caption">
+                You can always sign back in with your credentials.
+              </p>
             </div>
             <button
               className="prof-signout-btn"
@@ -256,17 +298,24 @@ export default function ProfilePage() {
               Log Out
             </button>
           </section>
-
         </div>
 
         {/* Footer */}
         <footer className="prof-footer">
           <div className="prof-footer-inner">
-            <p className="prof-footer-copy">© 2024 Gemstone Code. All rights reserved.</p>
+            <p className="prof-footer-copy">
+              © 2024 Gemstone Code. All rights reserved.
+            </p>
             <div className="prof-footer-links">
-              <a className="prof-footer-link" href="#">Privacy Policy</a>
-              <a className="prof-footer-link" href="#">Terms of Service</a>
-              <a className="prof-footer-link" href="#">Help Center</a>
+              <a className="prof-footer-link" href="#">
+                Privacy Policy
+              </a>
+              <a className="prof-footer-link" href="#">
+                Terms of Service
+              </a>
+              <a className="prof-footer-link" href="#">
+                Help Center
+              </a>
             </div>
           </div>
         </footer>
@@ -290,10 +339,16 @@ export default function ProfilePage() {
             aria-labelledby="logout-modal-title"
           >
             <div className="prof-modal-icon">
-              <span className="material-symbols-outlined" aria-hidden="true">logout</span>
+              <span className="material-symbols-outlined" aria-hidden="true">
+                logout
+              </span>
             </div>
-            <h2 id="logout-modal-title" className="prof-modal-title">Log out?</h2>
-            <p className="prof-modal-copy">Are you sure you want to log out of Gemstone Code?</p>
+            <h2 id="logout-modal-title" className="prof-modal-title">
+              Log out?
+            </h2>
+            <p className="prof-modal-copy">
+              Are you sure you want to log out of Gemstone Code?
+            </p>
             <div className="prof-modal-actions">
               <button
                 className="prof-modal-cancel"
