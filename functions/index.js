@@ -83,38 +83,3 @@ exports.verifyMpin = onCall({ region: 'asia-southeast1' }, async (request) => {
   return { verified: true };
 });
 
-exports.completeMpinSetup = onCall({ region: 'asia-southeast1' }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'Authentication is required.');
-  }
-
-  validateMpin(request.data?.mpin);
-
-  await getFirestore()
-    .collection('users')
-    .doc(request.auth.uid)
-    .set({ mpinSetup: true, mpinHash: hashMpin(request.data.mpin) }, { merge: true });
-
-  return { mpinSetup: true };
-});
-
-exports.verifyMpin = onCall({ region: 'asia-southeast1' }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'Authentication is required.');
-  }
-
-  validateMpin(request.data?.mpin);
-
-  const userSnapshot = await getFirestore()
-    .collection('users')
-    .doc(request.auth.uid)
-    .get();
-  const matches = userSnapshot.data()?.mpinHash === hashMpin(request.data.mpin);
-
-  if (!matches) {
-    throw new HttpsError('permission-denied', 'Incorrect MPIN.');
-  }
-
-  return { verified: true };
-});
-
