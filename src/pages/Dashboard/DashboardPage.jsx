@@ -12,7 +12,8 @@ import {
     MdTrendingUp,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import guideImage from "../../../assets/images/bg_belowdashboard.png";
+import guideImage from "../../assets/bg_belowdashboard.png";
+import BottomNav from "../../components/BottomNavigationBar/BottomNav.jsx";
 import GemValueChart from "../../components/GemValueChart/GemValueChart.jsx";
 import TopBar from "../../components/TopBar/TopBar.jsx";
 import "./DashboardPage.css";
@@ -180,6 +181,7 @@ export default function Dashboard() {
           </div>
         </button>
       </div>
+      <BottomNav activeItem="dashboard" />
     </div>
   );
 }
