@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import bgImage from "../../../assets/images/login_bg.png";
-import bgImageLandscape from "../../../assets/images/login_bg_landscape.jpeg";
 import { useAuth } from "../../../context/AuthContext";
+import bgImage from "../../assets/login_bg.png";
+import bgImageLandscape from "../../assets/login_bg_landscape.jpeg";
 import "./LoginPage.css";
 
 const BG_IMAGE = bgImage;
