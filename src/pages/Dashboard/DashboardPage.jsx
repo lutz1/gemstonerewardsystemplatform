@@ -1,18 +1,18 @@
 import {
-  MdAccountBalanceWallet,
-  MdArrowForward,
-  MdCampaign,
-  MdChevronRight,
-  MdDiamond,
-  MdErrorOutline,
-  MdGroup,
-  MdQrCode,
-  MdReceiptLong,
-  MdSwapHoriz,
-  MdTrendingUp,
+    MdAccountBalanceWallet,
+    MdArrowForward,
+    MdCampaign,
+    MdChevronRight,
+    MdDiamond,
+    MdErrorOutline,
+    MdGroup,
+    MdQrCode,
+    MdReceiptLong,
+    MdSwapHoriz,
+    MdTrendingUp,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import guideImage from "../../assets/bg_belowdashboard.png";
+import guideImage from "../../../assets/images/bg_belowdashboard.png";
 import GemValueChart from "../../components/GemValueChart/GemValueChart.jsx";
 import TopBar from "../../components/TopBar/TopBar.jsx";
 import "./DashboardPage.css";

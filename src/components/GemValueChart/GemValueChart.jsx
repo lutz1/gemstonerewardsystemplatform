@@ -1,5 +1,5 @@
-import { ArrowDownRight, ArrowUpRight, Gem } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { MdDiamond, MdNorthEast, MdSouthEast } from "react-icons/md";
 import "./GemValueChart.css";
 
 const RANGES = ["1D", "1W", "1M", "3M", "1Y", "5Y"];
@@ -187,7 +187,7 @@ export default function GemValueChart({ onScrubbingChange }) {
           <span className="gem-chart__eyebrow">Gems</span>
           <h3 className="gem-chart__title">Gem value</h3>
         </div>
-        <Gem size={22} color="#fff" />
+        <MdDiamond size={22} color="#fff" />
       </div>
 
       <div
@@ -329,9 +329,9 @@ export default function GemValueChart({ onScrubbingChange }) {
         ) : (
           <div className="gem-chart__change-row">
             {positive ? (
-              <ArrowUpRight size={16} color={changeColorVar} />
+              <MdNorthEast size={16} color={changeColorVar} />
             ) : (
-              <ArrowDownRight size={16} color={changeColorVar} />
+              <MdSouthEast size={16} color={changeColorVar} />
             )}
             <span
               className="gem-chart__change-text"

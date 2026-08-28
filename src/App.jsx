@@ -1,15 +1,35 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "./pages/Login/LoginPage";
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { AuthProvider, useAuth } from "../context/AuthContext";
+import ComingSoonPage from "./components/ComingSoonPage";
 import PinVerification from "./components/PinVerification/PinVerification";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
+import LoginPage from "./pages/Login/LoginPage";
+import PackageDetailPage from "./pages/PackageDetail/ProductsPage";
 import DirectReferralsPage from "./pages/Products/ProductsPage";
 import TransactionHistoryPage from "./pages/Profile/ProfilePage";
 import PurchaseCodesPage from "./pages/PurchaseCodes/PurchaseCodesPage";
-import PackageDetailPage from "./pages/PackageDetail/ProductsPage";
 import QrPaymentPage from "./pages/QrPayment/QrPaymentPage";
-import ComingSoonPage from "./components/ComingSoonPage";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { AuthProvider } from "../context/AuthContext";
+
+function ProtectedRoute({ children, allowedRoles, requirePin = true }) {
+  const location = useLocation();
+  const { isLoggedIn, role, pinVerified, authReady } = useAuth();
+
+  if (!authReady) return null;
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (requirePin && !pinVerified) {
+    return <Navigate to="/pin-verification" replace />;
+  }
+
+  return children || <Outlet />;
+}
 
 export default function App() {
   return (

@@ -14,13 +14,21 @@ exports.getMpinStatus = onCall({ region: 'asia-southeast1' }, async (request) =>
     throw new HttpsError('unauthenticated', 'Authentication is required.');
   }
 
-  const userSnapshot = await getFirestore()
-    .collection('users')
-    .doc(request.auth.uid)
-    .get();
+  try {
+    const userSnapshot = await getFirestore()
+      .collection('users')
+      .doc(request.auth.uid)
+      .get();
 
-  return {
-    mpinSetup: userSnapshot.data()?.mpinSetup === true,
-  };
+    return {
+      mpinSetup: userSnapshot.data()?.mpinSetup === true,
+    };
+  } catch (error) {
+    if (error.code === 5) {
+      return { mpinSetup: false };
+    }
+
+    throw error;
+  }
 });
 
