@@ -9,7 +9,7 @@ import { getPackageById, calcTotal, formatCurrency } from "@/utils/PackagesData"
 import { confirmQrScan, completePayment } from "@/utils/MockPaymentAPI";
 import { addTransaction } from "@/utils/TransactionsData";
 
-const RECEIPT_REDIRECT_SECONDS = 5;
+const PENDING_REDIRECT_SECONDS = 5;
 
 function formatTxDate(date) {
   return date
@@ -24,11 +24,14 @@ export default function QrPayment() {
 
   const [permission, requestPermission] = useCameraPermissions();
 
-  // "scanning" -> "confirmed" -> "receipt"
+  // "scanning" -> "confirmed" -> "pending"
+  // Payment no longer completes instantly -- it lands in "pending" and
+  // waits for an admin to approve it (the admin panel's Purchase Codes
+  // > Pending Approval list is where that happens).
   const [stage, setStage] = useState("scanning");
   const [scanResult, setScanResult] = useState(null);
-  const [receipt, setReceipt] = useState(null);
-  const [redirectIn, setRedirectIn] = useState(RECEIPT_REDIRECT_SECONDS);
+  const [pendingInfo, setPendingInfo] = useState(null);
+  const [redirectIn, setRedirectIn] = useState(PENDING_REDIRECT_SECONDS);
 
   const hasConfirmedRef = useRef(false); // guards against double-fire
 
@@ -64,7 +67,7 @@ export default function QrPayment() {
   async function handleCompletePayment() {
     try {
       const result = await completePayment(pkg, scanResult);
-      setReceipt(result);
+      setPendingInfo(result);
       addTransaction({
         icon: "shopping_bag",
         iconFill: false,
@@ -72,27 +75,32 @@ export default function QrPayment() {
         sub: `${pkg.name} • ${pkg.tier}`,
         date: formatTxDate(new Date()),
         amount: `- ${formatCurrency(total)}`,
-        amountSub: `Receipt ${result.receiptId}`,
+        amountSub: `Ref ${result.receiptId}`,
         positive: false,
-        status: "Completed",
+        // Customer-facing status stays "Pending" until an admin
+        // approves it from the admin panel.
+        status: "Pending",
       });
-      setStage("receipt");
+      // TEMP: this is also where a real backend call would create the
+      // pending-approval record the admin panel reads from. For now
+      // it's only reflected in the customer's own transaction list.
+      setStage("pending");
     } catch {
       // TEMP: surface a real error state here later
     }
   }
 
-  // Receipt: 5s auto-redirect regardless of button press
+  // Pending: 5s auto-redirect regardless of button press
   useEffect(() => {
-    if (stage !== "receipt") return;
+    if (stage !== "pending") return;
 
-    setRedirectIn(RECEIPT_REDIRECT_SECONDS);
+    setRedirectIn(PENDING_REDIRECT_SECONDS);
     const tick = setInterval(() => {
       setRedirectIn((s) => Math.max(0, s - 1));
     }, 1000);
     const redirectTimer = setTimeout(() => {
       router.replace("/(tabs)");
-    }, RECEIPT_REDIRECT_SECONDS * 1000);
+    }, PENDING_REDIRECT_SECONDS * 1000);
 
     return () => {
       clearInterval(tick);
@@ -119,7 +127,7 @@ export default function QrPayment() {
       <TopBar />
 
       <View style={styles.content}>
-        {stage !== "receipt" && (
+        {stage !== "pending" && (
           <Pressable
             style={styles.backLink}
             onPress={() => router.push(`/package-detail/${pkg.id}`)}
@@ -163,11 +171,15 @@ export default function QrPayment() {
               </View>
             )}
 
-            {(stage === "confirmed" || stage === "receipt") && (
+            {(stage === "confirmed" || stage === "pending") && (
               <View style={styles.doneState}>
-                <MaterialIcons name="check-circle" size={64} color={colors.primary} />
+                <MaterialIcons
+                  name={stage === "confirmed" ? "check-circle" : "hourglass-top"}
+                  size={64}
+                  color={stage === "confirmed" ? colors.primary : "#E8C468"}
+                />
                 <Text style={styles.doneText}>
-                  {stage === "confirmed" ? "QR Code Scanned" : "Payment Complete"}
+                  {stage === "confirmed" ? "QR Code Scanned" : "Payment Submitted"}
                 </Text>
               </View>
             )}
@@ -205,10 +217,19 @@ export default function QrPayment() {
             </View>
           )}
 
-          {/* Receipt */}
-          {stage === "receipt" && receipt && (
-            <View style={styles.receiptBlock}>
-              <Text style={styles.receiptTitle}>Review Payment Receipt</Text>
+          {/* Pending approval */}
+          {stage === "pending" && pendingInfo && (
+            <View style={styles.pendingBlock}>
+              <View style={styles.pendingBadge}>
+                <MaterialIcons name="schedule" size={14} color="#E8C468" />
+                <Text style={styles.pendingBadgeText}>Pending Approval</Text>
+              </View>
+
+              <Text style={styles.receiptTitle}>Your payment is being reviewed</Text>
+              <Text style={styles.pendingNote}>
+                An admin needs to confirm this payment before your codes are activated. You'll
+                see it move to "Completed" in your Purchase Codes history once approved.
+              </Text>
 
               <View style={styles.detailRows}>
                 <View style={styles.detailRow}>
@@ -224,11 +245,11 @@ export default function QrPayment() {
                   <Text style={styles.detailValue}>{formatCurrency(pkg.price)} / code</Text>
                 </View>
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Receipt ID</Text>
-                  <Text style={[styles.detailValue, styles.mono]}>{receipt.receiptId}</Text>
+                  <Text style={styles.detailLabel}>Reference Number</Text>
+                  <Text style={[styles.detailValue, styles.mono]}>{pendingInfo.receiptId}</Text>
                 </View>
                 <View style={[styles.detailRow, styles.detailTotal]}>
-                  <Text style={[styles.detailLabel, styles.totalText]}>Total Paid</Text>
+                  <Text style={[styles.detailLabel, styles.totalText]}>Amount</Text>
                   <Text style={[styles.detailValue, styles.totalText]}>
                     {formatCurrency(total)}
                   </Text>
@@ -361,7 +382,33 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
   },
   detailsBlock: { gap: 20 },
-  receiptBlock: { gap: 16 },
+  pendingBlock: { gap: 16 },
+  pendingBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "center",
+    gap: 6,
+    backgroundColor: "rgba(232, 196, 104, 0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(232, 196, 104, 0.35)",
+    borderRadius: 999,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+  },
+  pendingBadgeText: {
+    fontFamily: fonts.hankenBold,
+    fontSize: 11,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    color: "#E8C468",
+  },
+  pendingNote: {
+    fontFamily: fonts.hankenRegular,
+    fontSize: 13,
+    color: colors.onSurfaceVariant,
+    textAlign: "center",
+    lineHeight: 19,
+  },
   receiptTitle: {
     fontFamily: fonts.jakartaBold,
     fontSize: 18,

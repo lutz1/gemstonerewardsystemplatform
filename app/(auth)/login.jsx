@@ -15,13 +15,13 @@ import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
-import { colors, fonts } from "@/constants/theme";
+import { fonts } from "@/constants/theme";
 
 const BG_IMAGE = require("../../assets/images/login_bg.png");
 const APP_LOGO = require("../../assets/images/app_logo.png");
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, loginAsAdmin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -36,11 +36,17 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      // TEMP: swap this delay for a real Firebase signInWithEmailAndPassword
-      // call. Once it succeeds, call login() same as here -- everything
-      // downstream (Stack.Protected) reacts to that automatically.
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      login();
+      // Single screen handles both roles: try admin credentials first,
+      // fall back to customer credentials. AuthContext picks the right
+      // destination (/admin vs /(tabs)) based on which one matched.
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      const okAdmin = loginAsAdmin(email, password);
+      if (!okAdmin) {
+        const okCustomer = login(email, password);
+        if (!okCustomer) {
+          setError("Authentication failed. Please try again.");
+        }
+      }
     } catch (err) {
       setError(err?.message || "Authentication failed. Please try again.");
     } finally {
@@ -82,7 +88,7 @@ export default function Login() {
             <View style={styles.cardHeading}>
               <Text style={styles.cardHeadingTitle}>Secure Access</Text>
               <Text style={styles.cardHeadingSub}>
-                Enter your mining credentials to continue.
+                Use user / user for customer preview, admin / admin for admin preview.
               </Text>
             </View>
 
@@ -356,4 +362,13 @@ const styles = StyleSheet.create({
     color: "rgba(61, 74, 65, 0.9)",
     fontSize: 14,
   },
-});
+  adminLink: {
+    marginTop: 16,
+    textAlign: "center",
+    fontFamily: fonts.jetbrainsMedium,
+    fontSize: 10,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    color: "rgba(188, 202, 190, 0.4)",
+  },
+}); 
