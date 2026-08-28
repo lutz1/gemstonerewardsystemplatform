@@ -63,6 +63,54 @@
   animation: pin-enter 0.55s ease both;
 }
 
+.pin-success {
+  padding: 12px 0 4px;
+  animation: pin-enter 0.4s ease both;
+}
+
+.pin-success-check {
+  display: inline-flex;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 8px;
+}
+
+.pin-success-check svg {
+  width: 100%;
+  height: 100%;
+}
+
+.pin-success-circle {
+  stroke: var(--primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 151;
+  stroke-dashoffset: 151;
+  animation: pin-circle 0.5s ease-out forwards;
+}
+
+.pin-success-tick {
+  stroke: var(--primary);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: pin-tick 0.35s ease-out 0.45s forwards;
+}
+
+@keyframes pin-circle {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pin-tick {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .pin-brand-mark {
   width: 48px;
   height: 48px;
