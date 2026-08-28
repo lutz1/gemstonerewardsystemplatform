@@ -1,0 +1,261 @@
+* {
+  box-sizing: border-box;
+}
+
+.pin-root {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  color: var(--on-surface);
+  background:
+    linear-gradient(135deg, rgba(0, 168, 107, 0.14), transparent 42%),
+    var(--background);
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.pin-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(89, 222, 155, 0.12) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.pin-glow {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.pin-glow-one {
+  top: -120px;
+  right: -70px;
+  background: #59de9b;
+}
+
+.pin-glow-two {
+  bottom: -150px;
+  left: -80px;
+  background: #e86c6e;
+}
+
+.pin-panel {
+  width: min(100%, 390px);
+  position: relative;
+  z-index: 1;
+  padding: 42px 32px 28px;
+  border: 1px solid rgba(198, 198, 198, 0.16);
+  border-radius: 8px;
+  background: rgba(14, 21, 16, 0.78);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  text-align: center;
+  animation: pin-enter 0.55s ease both;
+}
+
+.pin-brand-mark {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(89, 222, 155, 0.35);
+  border-radius: 50%;
+  color: var(--primary);
+  background: rgba(89, 222, 155, 0.1);
+}
+
+.pin-brand-mark .material-symbols-outlined {
+  font-size: 24px;
+}
+
+.pin-eyebrow {
+  color: var(--primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.pin-panel h1 {
+  margin-top: 10px;
+  color: var(--on-surface);
+  font-family: 'Plus Jakarta Sans', 'Hanken Grotesk', sans-serif;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.pin-copy {
+  max-width: 270px;
+  margin: 10px auto 0;
+  color: var(--on-surface-variant);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.pin-dots {
+  min-height: 32px;
+  margin: 28px 0 16px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.pin-dot {
+  width: 13px;
+  height: 13px;
+  display: block;
+  border: 1px solid var(--outline);
+  border-radius: 50%;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+}
+
+.pin-dot.filled {
+  border-color: var(--primary);
+  background: var(--primary);
+  box-shadow: 0 0 12px rgba(89, 222, 155, 0.45);
+  transform: scale(1.08);
+}
+
+.pin-error {
+  min-height: 18px;
+  margin-bottom: 12px;
+  color: var(--error);
+  font-size: 13px;
+}
+
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.pin-key {
+  min-height: 58px;
+  border: 1px solid rgba(134, 148, 137, 0.22);
+  border-radius: 8px;
+  color: var(--on-surface);
+  background: rgba(37, 44, 39, 0.76);
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', 'Hanken Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pin-key:hover,
+.pin-key:focus-visible {
+  border-color: var(--primary);
+  background: rgba(0, 168, 107, 0.28);
+  outline: none;
+}
+
+.pin-key:active {
+  transform: scale(0.95);
+}
+
+.pin-key-action {
+  color: var(--on-surface-variant);
+}
+
+.pin-key-action .material-symbols-outlined {
+  font-size: 21px;
+}
+
+.pin-key-empty {
+  min-height: 58px;
+}
+
+.pin-submit {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--on-primary);
+  background: var(--primary);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  transition: filter 0.15s ease, opacity 0.15s ease;
+}
+
+.pin-submit:hover:not(:disabled),
+.pin-submit:focus-visible:not(:disabled) {
+  filter: brightness(1.08);
+  outline: 2px solid rgba(89, 222, 155, 0.35);
+  outline-offset: 2px;
+}
+
+.pin-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.pin-submit .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.pin-signout {
+  margin-top: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  color: var(--on-surface-variant);
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.pin-signout:hover,
+.pin-signout:focus-visible {
+  color: var(--primary);
+  outline: none;
+}
+
+.pin-signout .material-symbols-outlined {
+  font-size: 17px;
+}
+
+@keyframes pin-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 420px) {
+  .pin-root {
+    padding: 14px;
+  }
+
+  .pin-panel {
+    padding: 32px 20px 24px;
+  }
+
+  .pin-keypad {
+    gap: 9px;
+  }
+}
