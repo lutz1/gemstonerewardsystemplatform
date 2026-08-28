@@ -150,7 +150,11 @@ export default function UserManagementPage() {
     <div
       className={`admin-users-root${isSearchFocused ? " search-is-focused" : ""}`}
     >
-      <TopBar userName="Admin" userRole="Administrator" />
+      <TopBar
+        userName="Admin"
+        userRole="Administrator"
+        profilePath="/admin/profile"
+      />
       <main className="admin-users-main">
         <header className="admin-users-header">
           <div>

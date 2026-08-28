@@ -13,12 +13,16 @@ import AdminPage from "./pages/Admin/AdminPage";
 import AdminProfilePage from "./pages/Admin/Profile/AdminProfilePage";
 import UserManagementPage from "./pages/Admin/UserManagement/UserManagementPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
+import ExchangePage from "./pages/Exchange/ExchangePage";
 import LoginPage from "./pages/Login/LoginPage";
 import PackageDetailPage from "./pages/PackageDetail/ProductsPage";
 import DirectReferralsPage from "./pages/Products/ProductsPage";
 import TransactionHistoryPage from "./pages/Profile/ProfilePage";
+import ChangePasswordPage from "./pages/ProfileAccount/ChangePasswordPage";
+import EditProfilePage from "./pages/ProfileAccount/EditProfilePage";
 import PurchaseCodesPage from "./pages/PurchaseCodes/PurchaseCodesPage";
 import QrPaymentPage from "./pages/QrPayment/QrPaymentPage";
+import RegisterPage from "./pages/Register/RegisterPage";
 
 function ProtectedRoute({ children, allowedRoles, requirePin = true }) {
   const location = useLocation();
@@ -60,10 +64,7 @@ export default function App() {
             path="/forgot-password"
             element={<ComingSoonPage title="Forgot Password" />}
           />
-          <Route
-            path="/register"
-            element={<ComingSoonPage title="Apply for Membership" />}
-          />
+          <Route path="/register" element={<RegisterPage />} />
 
           {/* ── App pages ─────────────────────────────────────────── */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
@@ -82,6 +83,10 @@ export default function App() {
             <Route path="/purchase-codes" element={<PurchaseCodesPage />} />
             <Route path="/profile" element={<TransactionHistoryPage />} />
             <Route path="/transactions" element={<TransactionHistoryPage />} />
+            <Route path="/edit-profile" element={<EditProfilePage />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
+            <Route path="/exchange" element={<ExchangePage />} />
+            <Route path="/exchange/:mode" element={<ExchangePage />} />
 
             {/* ── Purchase flow: package detail + QR payment ──────────── */}
             <Route

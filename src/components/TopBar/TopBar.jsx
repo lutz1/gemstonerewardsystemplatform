@@ -12,6 +12,7 @@ const DEFAULT_AVATAR_URL =
  * - userName:   member's display name                (default "Alex Sterling")
  * - userRole:   member tier/role label                (default "Executive Member")
  * - avatarUrl:  avatar image src                      (default sample avatar)
+ * - profilePath: route opened by the avatar             (default "/profile")
  * - onNotifClick: handler for the notification bell   (optional)
  * - onAvatarClick: handler for the avatar. If not provided, clicking the
  *                   avatar navigates to /profile by default.
@@ -21,6 +22,7 @@ export default function TopBar({
   userName = "Alex Sterling",
   userRole = "Executive Member",
   avatarUrl = DEFAULT_AVATAR_URL,
+  profilePath = "/profile",
   showNotifDot = false,
   onNotifClick,
   onAvatarClick,
@@ -31,7 +33,7 @@ export default function TopBar({
     if (onAvatarClick) {
       onAvatarClick();
     } else {
-      navigate("/profile");
+      navigate(profilePath);
     }
   };
 
