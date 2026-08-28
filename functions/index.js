@@ -6,6 +6,11 @@ const crypto = require('crypto');
 
 initializeApp();
 
+// Project's Firestore database is named "default" rather than the reserved "(default)" id.
+function db() {
+  return getFirestore('default');
+}
+
 function hashMpin(mpin) {
   return crypto.createHash('sha256').update(mpin).digest('hex');
 }
@@ -26,7 +31,7 @@ exports.getMpinStatus = onCall({ region: 'asia-southeast1' }, async (request) =>
   }
 
   try {
-    const userSnapshot = await getFirestore()
+    const userSnapshot = await db()
       .collection('users')
       .doc(request.auth.uid)
       .get();
@@ -50,7 +55,7 @@ exports.completeMpinSetup = onCall({ region: 'asia-southeast1' }, async (request
 
   validateMpin(request.data?.mpin);
 
-  await getFirestore()
+  await db()
     .collection('users')
     .doc(request.auth.uid)
     .set({ mpinSetup: true, mpinHash: hashMpin(request.data.mpin) }, { merge: true });
@@ -65,7 +70,7 @@ exports.verifyMpin = onCall({ region: 'asia-southeast1' }, async (request) => {
 
   validateMpin(request.data?.mpin);
 
-  const userSnapshot = await getFirestore()
+  const userSnapshot = await db()
     .collection('users')
     .doc(request.auth.uid)
     .get();
