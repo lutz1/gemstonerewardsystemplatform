@@ -1,6 +1,4 @@
 import { onIdTokenChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { createContext, useContext, useEffect, useState } from "react";
 import { app, auth } from "../src/firebase";
 
 const AuthContext = createContext(null);
