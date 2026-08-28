@@ -1,5 +1,6 @@
 .admin-root {
   min-height: 100vh;
+  padding-bottom: 80px;
   background: var(--background, #f4f8f5);
   color: var(--text, #17352a);
 }
@@ -53,7 +54,10 @@
   color: inherit;
   cursor: pointer;
   text-align: left;
-  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .admin-card:hover,

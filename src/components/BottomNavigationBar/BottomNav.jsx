@@ -1,14 +1,27 @@
 import { Link } from "react-router-dom";
 import "./BottomNav.css";
 
-const navItems = [
-  { key: "dashboard", icon: "dashboard",    label: "Dashboard",  to: "/dashboard" },
-  { key: "products", icon: "inventory_2",  label: "Products",  to: "/products" },
-  { key: "codes",     icon: "qr_code_2",    label: "Codes",      to: "/purchase-codes" },
-  { key: "profile",   icon: "person",       label: "Profile",    to: "/profile" },
+const memberNavItems = [
+  { key: "dashboard", icon: "dashboard", label: "Dashboard", to: "/dashboard" },
+  { key: "products", icon: "inventory_2", label: "Products", to: "/products" },
+  { key: "codes", icon: "qr_code_2", label: "Codes", to: "/purchase-codes" },
+  { key: "profile", icon: "person", label: "Profile", to: "/profile" },
 ];
 
-export default function BottomNav({ activeItem }) {
+const adminNavItems = [
+  {
+    key: "dashboard",
+    icon: "dashboard",
+    label: "Dashboard",
+    to: "/admin/dashboard",
+  },
+  { key: "users", icon: "group", label: "User Management", to: "/admin/users" },
+  { key: "profile", icon: "person", label: "Profile", to: "/admin/profile" },
+];
+
+export default function BottomNav({ activeItem, variant = "member" }) {
+  const navItems = variant === "admin" ? adminNavItems : memberNavItems;
+
   return (
     <nav className="bn-bar" aria-label="Main navigation">
       {navItems.map((item) => {
