@@ -50,8 +50,17 @@ export function AuthProvider({ children }) {
     setMpinSetup(await getMpinSetup());
     setPinVerified(false);
   };
-  const verifyPin = () => setPinVerified(true);
-  const completeMpinSetup = () => setMpinSetup(true);
+  const verifyPin = async (mpin) => {
+    const verifyMpin = httpsCallable(getFunctions(app, "asia-southeast1"), "verifyMpin");
+    await verifyMpin({ mpin });
+    setPinVerified(true);
+  };
+  const completeMpinSetup = async (mpin) => {
+    const saveMpinSetup = httpsCallable(getFunctions(app, "asia-southeast1"), "completeMpinSetup");
+    await saveMpinSetup({ mpin });
+    setMpinSetup(true);
+    setPinVerified(true);
+  };
   const logout = () => signOut(auth);
 
   return (

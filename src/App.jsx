@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "rea
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import ComingSoonPage from "./components/ComingSoonPage";
 import PinVerification from "./components/PinVerification/PinVerification";
+import AdminPage from "./pages/Admin/AdminPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import LoginPage from "./pages/Login/LoginPage";
 import PackageDetailPage from "./pages/PackageDetail/ProductsPage";
@@ -43,6 +44,10 @@ export default function App() {
         <Route path="/register"        element={<ComingSoonPage title="Apply for Membership" />} />
 
         {/* ── App pages ─────────────────────────────────────────── */}
+        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+          <Route path="/admin" element={<AdminPage />} />
+        </Route>
+
         <Route element={<ProtectedRoute allowedRoles={["member", "admin"]} />}>
           <Route path="/dashboard"        element={<DashboardPage />} />
           <Route path="/products"         element={<DirectReferralsPage />} />

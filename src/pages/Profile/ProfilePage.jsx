@@ -1,7 +1,9 @@
-import { useState } from "react";
-import "./ProfilePage.css";
+import { signOut } from "firebase/auth";
+import { useEffect, useState } from "react";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
+import { auth } from "../../firebase";
+import "./ProfilePage.css";
 
 const profile = {
   name: "Alexis Rivera",
@@ -71,6 +73,32 @@ function ToggleRow({ label, caption, defaultOn }) {
 }
 
 export default function ProfilePage() {
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    if (!showLogoutModal) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape" && !isLoggingOut) {
+        setShowLogoutModal(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isLoggingOut, showLogoutModal]);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut(auth);
+      window.location.assign("/login");
+    } catch {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div className="prof-root">
       {/* ── Atmosphere glows ─────────────────────────────────── */}
@@ -219,7 +247,11 @@ export default function ProfilePage() {
               <p className="prof-danger-title">Sign out of Gemstone Code</p>
               <p className="prof-danger-caption">You can always sign back in with your credentials.</p>
             </div>
-            <button className="prof-signout-btn">
+            <button
+              className="prof-signout-btn"
+              type="button"
+              onClick={() => setShowLogoutModal(true)}
+            >
               <span className="material-symbols-outlined">logout</span>
               Log Out
             </button>
@@ -240,6 +272,49 @@ export default function ProfilePage() {
         </footer>
       </main>
       <BottomNav activeItem="profile" />
+
+      {showLogoutModal && (
+        <div
+          className="prof-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isLoggingOut) {
+              setShowLogoutModal(false);
+            }
+          }}
+        >
+          <section
+            className="prof-logout-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="logout-modal-title"
+          >
+            <div className="prof-modal-icon">
+              <span className="material-symbols-outlined" aria-hidden="true">logout</span>
+            </div>
+            <h2 id="logout-modal-title" className="prof-modal-title">Log out?</h2>
+            <p className="prof-modal-copy">Are you sure you want to log out of Gemstone Code?</p>
+            <div className="prof-modal-actions">
+              <button
+                className="prof-modal-cancel"
+                type="button"
+                disabled={isLoggingOut}
+                onClick={() => setShowLogoutModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="prof-modal-confirm"
+                type="button"
+                disabled={isLoggingOut}
+                onClick={handleLogout}
+              >
+                {isLoggingOut ? "Logging out..." : "Log Out"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

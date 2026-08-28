@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./PinVerification.css";
 import { useAuth } from "../../../context/AuthContext";
+import "./PinVerification.css";
 
 const keypad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "backspace"];
 
 export default function PinVerification() {
   const navigate = useNavigate();
-  const { mpinSetup, verifyPin, completeMpinSetup, logout } = useAuth();
+  const { mpinSetup, role, verifyPin, completeMpinSetup, logout } = useAuth();
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
 
@@ -34,15 +34,30 @@ export default function PinVerification() {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (pin.length !== 4) {
       setError("Enter all 4 digits to continue.");
       return;
     }
-    if (!mpinSetup) completeMpinSetup();
-    verifyPin();
-    navigate("/dashboard");
+    if (!mpinSetup) {
+      try {
+        await completeMpinSetup(pin);
+        navigate(role === "admin" ? "/admin" : "/dashboard");
+        return;
+      } catch (err) {
+        setError(err?.message || "Unable to save your PIN setup. Please try again.");
+        setPin("");
+        return;
+      }
+    }
+    try {
+      await verifyPin(pin);
+      navigate(role === "admin" ? "/admin" : "/dashboard");
+    } catch (err) {
+      setError(err?.message || "Incorrect PIN. Please try again.");
+      setPin("");
+    }
   };
 
   return (
