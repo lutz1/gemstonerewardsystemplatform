@@ -1,6 +1,11 @@
+import { createContext, useContext, useEffect, useState } from "react";
 import { onIdTokenChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+<<<<<<< HEAD
+import { getFunctions, httpsCallable } from "firebase/functions";
+=======
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { createContext, useContext, useEffect, useState } from "react";
+>>>>>>> 006b9ef4b3d1cb04fadb1c4343f4ea8ec9597896
 import { app, auth } from "../src/firebase";
 
 const AuthContext = createContext(null);
