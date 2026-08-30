@@ -11,10 +11,12 @@ import ComingSoonPage from "./components/ComingSoonPage";
 import PinVerification from "./components/PinVerification/PinVerification";
 import AdminPage from "./pages/Admin/AdminPage";
 import AdminProfilePage from "./pages/Admin/Profile/AdminProfilePage";
+import AdminSettingsPage from "./pages/Admin/Settings/AdminSettingsPage";
 import UserManagementPage from "./pages/Admin/UserManagement/UserManagementPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import ExchangePage from "./pages/Exchange/ExchangePage";
 import LoginPage from "./pages/Login/LoginPage";
+import NotificationsPage from "./pages/Notifications/NotificationsPage";
 import PackageDetailPage from "./pages/PackageDetail/ProductsPage";
 import DirectReferralsPage from "./pages/Products/ProductsPage";
 import TransactionHistoryPage from "./pages/Profile/ProfilePage";
@@ -71,13 +73,19 @@ export default function App() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/dashboard" element={<AdminPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
+            <Route path="/admin/settings" element={<AdminSettingsPage />} />
             <Route path="/admin/profile" element={<AdminProfilePage />} />
+            <Route
+              path="/admin/notifications"
+              element={<NotificationsPage isAdmin />}
+            />
           </Route>
 
           <Route
             element={<ProtectedRoute allowedRoles={["member", "admin"]} />}
           >
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/products" element={<DirectReferralsPage />} />
             <Route path="/direct-referrals" element={<DirectReferralsPage />} />
             <Route path="/purchase-codes" element={<PurchaseCodesPage />} />
