@@ -270,6 +270,8 @@ export default function UserManagementPage() {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     return userList.filter((user) => {
+      const role = user.role || "member";
+      if (role === "admin") return false; // admins are never listed here
       const matchesSearch = [
         user.name ?? "",
         user.email ?? "",
@@ -277,13 +279,12 @@ export default function UserManagementPage() {
       ].some((value) => value.toLowerCase().includes(normalizedSearch));
       const matchesStatus =
         statusFilter === "all" || user.status === statusFilter;
-      const matchesRole =
-        roleFilter === "all" || (user.role || "member") === roleFilter;
+      const matchesRole = roleFilter === "all" || role === roleFilter;
       return matchesSearch && matchesStatus && matchesRole;
     });
   }, [roleFilter, searchTerm, statusFilter, userList]);
 
-  const pageSize = 5;
+  const pageSize = 10;
   const pageCount = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
   const safeCurrentPage = Math.min(currentPage, pageCount);
   const visibleUsers = filteredUsers.slice(
@@ -467,11 +468,30 @@ export default function UserManagementPage() {
                   { value: "all", label: "All roles" },
                   { value: "member", label: "Member" },
                   { value: "leader", label: "Leader" },
-                  { value: "admin", label: "Admin" },
                 ]}
               />
             </div>
             <div className="admin-users-toolbar-actions">
+              <button
+                type="button"
+                className="admin-users-primary-button"
+                onClick={() => setIsAddUserOpen(true)}
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  person_add
+                </span>
+                Add User
+              </button>
+              <button
+                type="button"
+                className="admin-users-primary-button"
+                onClick={() => setIsPromotionOpen(true)}
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  supervisor_account
+                </span>
+                Promote to Leader
+              </button>
               <div className="admin-users-export-action">
                 <button
                   type="button"
@@ -487,26 +507,6 @@ export default function UserManagementPage() {
                   Export
                 </button>
               </div>
-              <button
-                type="button"
-                className="admin-users-primary-button"
-                onClick={() => setIsPromotionOpen(true)}
-              >
-                <span className="material-symbols-outlined" aria-hidden="true">
-                  supervisor_account
-                </span>
-                Promote to Leader
-              </button>
-              <button
-                type="button"
-                className="admin-users-primary-button"
-                onClick={() => setIsAddUserOpen(true)}
-              >
-                <span className="material-symbols-outlined" aria-hidden="true">
-                  person_add
-                </span>
-                Add User
-              </button>
             </div>
           </div>
 
