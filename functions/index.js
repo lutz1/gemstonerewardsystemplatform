@@ -47,6 +47,39 @@ exports.healthCheck = onRequest({ region: 'asia-southeast1' }, (_request, respon
   response.status(200).json({ status: 'ok' });
 });
 
+exports.getUsers = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+
+  await assertIsAdmin(request.auth.uid);
+
+  const snapshot = await db().collection('users').get();
+  const users = snapshot.docs.map((doc) => {
+    const data = doc.data() || {};
+    const name = data.name || [data.firstName, data.middleName, data.lastName]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+
+    return {
+      id: doc.id,
+      ...data,
+      name: name || 'Unknown User',
+      email: data.email || '',
+      role: data.role || 'member',
+      status: data.status || 'active',
+      totalSpent: Number(data.totalSpent ?? 0),
+    };
+  });
+
+  return users.sort((a, b) => {
+    const aDate = new Date(a.joinDate || 0).getTime();
+    const bDate = new Date(b.joinDate || 0).getTime();
+    return bDate - aDate;
+  });
+});
+
 exports.getMpinStatus = onCall({ region: 'asia-southeast1' }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Authentication is required.');
