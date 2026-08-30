@@ -185,6 +185,42 @@ exports.promoteMemberToLeader = onCall({ region: 'asia-southeast1' }, async (req
   };
 });
 
+exports.saveAdminSettings = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+
+  await assertIsAdmin(request.auth.uid);
+
+  const data = request.data || {};
+  const defaultGemValueRaw = data.defaultGemValue;
+  const defaultGemValue =
+    defaultGemValueRaw === '' || defaultGemValueRaw === null || defaultGemValueRaw === undefined
+      ? null
+      : Number(defaultGemValueRaw);
+
+  if (defaultGemValue !== null && (!Number.isFinite(defaultGemValue) || defaultGemValue < 0)) {
+    throw new HttpsError('invalid-argument', 'Default GEM Value must be a non-negative number.');
+  }
+
+  const settingsDoc = {
+    defaultGemValue,
+    currency: typeof data.currency === 'string' && data.currency ? data.currency : 'PHP',
+    minExchangeValue: Number(data.minExchangeValue ?? 0),
+    approvalRequired: Boolean(data.approvalRequired),
+    maintenanceMode: Boolean(data.maintenanceMode),
+    systemEmail:
+      typeof data.systemEmail === 'string' && data.systemEmail.trim()
+        ? data.systemEmail.trim()
+        : 'support@gemstonecode.com',
+    updatedAt: new Date().toISOString(),
+  };
+
+  await db().collection('settings').doc('admin').set(settingsDoc, { merge: true });
+
+  return { success: true, ...settingsDoc };
+});
+
 exports.createUser = onCall({ region: 'asia-southeast1' }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Authentication is required.');

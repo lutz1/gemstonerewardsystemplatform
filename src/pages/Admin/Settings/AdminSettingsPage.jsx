@@ -1,6 +1,8 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useState } from "react";
 import BottomNav from "../../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../../components/TopBar/TopBar";
+import { app } from "../../../firebase";
 import "./AdminSettingsPage.css";
 
 // Persisted to localStorage so edits survive a page refresh. If this page
@@ -9,7 +11,7 @@ import "./AdminSettingsPage.css";
 const STORAGE_KEY = "admin-settings-config";
 
 const defaultConfig = {
-  defaultGemValue: 0,
+  defaultGemValue: "",
   currency: "PHP",
   minExchangeValue: 100,
   approvalRequired: true,
@@ -55,20 +57,67 @@ function ToggleRow({ label, caption, checked, onToggle }) {
 export default function AdminSettingsPage() {
   const [config, setConfig] = useState(loadStoredConfig);
   const [saved, setSaved] = useState(false);
+  const [isEditingGemValue, setIsEditingGemValue] = useState(false);
+  const [showGemValueDisclaimer, setShowGemValueDisclaimer] = useState(false);
+  const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
+  const [isSavingConfig, setIsSavingConfig] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const updateField = (field, value) => {
     setConfig((currentValue) => ({ ...currentValue, [field]: value }));
     setSaved(false);
   };
 
+  const handleEditGemValue = () => {
+    setShowGemValueDisclaimer(true);
+  };
+
+  const handleConfirmGemValueEdit = () => {
+    setShowGemValueDisclaimer(false);
+    setIsEditingGemValue(true);
+  };
+
   const handleSave = () => {
+    setShowSaveConfirmation(true);
+  };
+
+  const handleConfirmSave = async () => {
+    setShowSaveConfirmation(false);
+    setIsSavingConfig(true);
+    setSaveError("");
+
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-    } catch {
-      // Storage can fail (private browsing, quota, disabled storage) —
-      // the form still works in-session even if persistence doesn't.
+      const saveAdminSettings = httpsCallable(
+        getFunctions(app, "asia-southeast1"),
+        "saveAdminSettings",
+      );
+
+      const payload = {
+        ...config,
+        defaultGemValue:
+          config.defaultGemValue === "" || config.defaultGemValue == null
+            ? null
+            : Number(config.defaultGemValue),
+      };
+
+      await saveAdminSettings(payload);
+
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      } catch {
+        // Storage can fail (private browsing, quota, disabled storage) —
+        // the form still works in-session even if persistence doesn't.
+      }
+
+      setSaved(true);
+    } catch (error) {
+      setSaved(false);
+      setSaveError(
+        error?.message || "Failed to save configuration. Please try again.",
+      );
+    } finally {
+      setIsSavingConfig(false);
     }
-    setSaved(true);
   };
 
   const handleReset = () => {
@@ -118,125 +167,55 @@ export default function AdminSettingsPage() {
                 <span>Current default</span>
               </div>
               <div className="admin-settings-value-row">
-                <strong>{config.defaultGemValue.toFixed(2)}</strong>
+                <strong>
+                  {config.defaultGemValue === "" || config.defaultGemValue == null
+                    ? "—"
+                    : Number(config.defaultGemValue).toFixed(2)}
+                </strong>
                 <span>{config.currency}</span>
               </div>
               <small>Per GEM conversion value</small>
             </div>
 
             <div className="admin-settings-field-group">
-              <label htmlFor="defaultGemValue">Default GEM Value</label>
+              <div className="admin-settings-edit-header">
+                <label htmlFor="defaultGemValue">Default GEM Value</label>
+                <button
+                  type="button"
+                  className="admin-settings-inline-button"
+                  onClick={() => {
+                    if (isEditingGemValue) {
+                      setIsEditingGemValue(false);
+                      return;
+                    }
+                    handleEditGemValue();
+                  }}
+                >
+                  {isEditingGemValue ? "Cancel" : "Edit Gem Value"}
+                </button>
+              </div>
               <div className="admin-settings-input-wrap">
                 <span className="admin-settings-prefix">₱</span>
                 <input
                   id="defaultGemValue"
-                  type="number"
-                  min="0"
-                  step="0.01"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={config.defaultGemValue}
-                  onChange={(event) =>
-                    updateField(
-                      "defaultGemValue",
-                      Number(event.target.value || 0),
-                    )
-                  }
+                  readOnly={!isEditingGemValue}
+                  onWheel={(event) => event.preventDefault()}
+                  onChange={(event) => {
+                    const nextValue = event.target.value;
+                    if (!/^\d*\.?\d*$/.test(nextValue)) {
+                      return;
+                    }
+                    if (nextValue.split(".").length > 2) {
+                      return;
+                    }
+                    updateField("defaultGemValue", nextValue);
+                  }}
                 />
               </div>
-            </div>
-          </article>
-
-          <article className="admin-settings-panel">
-            <div className="admin-settings-panel-header">
-              <div>
-                <p className="admin-settings-panel-eyebrow">Operations</p>
-                <h2>System rules</h2>
-              </div>
-            </div>
-
-            <div className="admin-settings-form-grid">
-              <div className="admin-settings-field-group">
-                <label htmlFor="currency">Currency</label>
-                <select
-                  id="currency"
-                  value={config.currency}
-                  onChange={(event) =>
-                    updateField("currency", event.target.value)
-                  }
-                >
-                  <option>PHP</option>
-                  <option>USD</option>
-                </select>
-              </div>
-
-              <div className="admin-settings-field-group">
-                <label htmlFor="minExchangeValue">Minimum exchange value</label>
-                <div className="admin-settings-input-wrap">
-                  <span className="admin-settings-prefix">₱</span>
-                  <input
-                    id="minExchangeValue"
-                    type="number"
-                    min="0"
-                    step="10"
-                    value={config.minExchangeValue}
-                    onChange={(event) =>
-                      updateField(
-                        "minExchangeValue",
-                        Number(event.target.value || 0),
-                      )
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="admin-settings-toggle-list">
-              <ToggleRow
-                label="Approval required"
-                caption="Require admin approval before processing conversion requests."
-                checked={config.approvalRequired}
-                onToggle={() =>
-                  updateField("approvalRequired", !config.approvalRequired)
-                }
-              />
-              <ToggleRow
-                label="Maintenance mode"
-                caption="Temporarily pause member transactions and checkout flows."
-                checked={config.maintenanceMode}
-                onToggle={() =>
-                  updateField("maintenanceMode", !config.maintenanceMode)
-                }
-              />
-            </div>
-          </article>
-
-          <article className="admin-settings-panel">
-            <div className="admin-settings-panel-header">
-              <div>
-                <p className="admin-settings-panel-eyebrow">Support</p>
-                <h2>Contact settings</h2>
-              </div>
-            </div>
-
-            <div className="admin-settings-field-group">
-              <label htmlFor="systemEmail">Support email</label>
-              <input
-                id="systemEmail"
-                type="email"
-                value={config.systemEmail}
-                onChange={(event) =>
-                  updateField("systemEmail", event.target.value)
-                }
-              />
-            </div>
-
-            <div className="admin-settings-note">
-              <span className="material-symbols-outlined" aria-hidden="true">
-                info
-              </span>
-              <p>
-                The system will use this default GEM value for all new
-                conversions until a new override is published.
-              </p>
             </div>
           </article>
         </section>
@@ -244,19 +223,116 @@ export default function AdminSettingsPage() {
         <div className="admin-settings-actions">
           <button
             type="button"
-            className="admin-settings-secondary-button"
-            onClick={handleReset}
-          >
-            Reset
-          </button>
-          <button
-            type="button"
             className="admin-settings-primary-button"
             onClick={handleSave}
+            disabled={isSavingConfig}
           >
-            Save configuration
+            {isSavingConfig ? "Saving..." : "Save configuration"}
           </button>
         </div>
+
+        {saveError && (
+          <div className="admin-settings-error" role="alert">
+            {saveError}
+          </div>
+        )}
+
+        {showGemValueDisclaimer && (
+          <div
+            className="admin-settings-modal-backdrop"
+            role="presentation"
+            onMouseDown={() => setShowGemValueDisclaimer(false)}
+          >
+            <div
+              className="admin-settings-modal"
+              onMouseDown={(event) => event.stopPropagation()}
+            >
+              <div className="admin-settings-modal-header">
+                <h2>Important notice</h2>
+                <button
+                  type="button"
+                  onClick={() => setShowGemValueDisclaimer(false)}
+                  aria-label="Close disclaimer"
+                >
+                  <span className="material-symbols-outlined" aria-hidden="true">
+                    close
+                  </span>
+                </button>
+              </div>
+
+              <p className="admin-settings-modal-message">
+                Updating the Default GEM Value will change the platform-wide
+                conversion rate used for new transactions. Please confirm before
+                saving the change.
+              </p>
+
+              <div className="admin-settings-modal-actions">
+                <button
+                  type="button"
+                  className="admin-settings-secondary-button"
+                  onClick={() => setShowGemValueDisclaimer(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="admin-settings-primary-button"
+                  onClick={handleConfirmGemValueEdit}
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showSaveConfirmation && (
+          <div
+            className="admin-settings-modal-backdrop"
+            role="presentation"
+            onMouseDown={() => setShowSaveConfirmation(false)}
+          >
+            <div
+              className="admin-settings-modal"
+              onMouseDown={(event) => event.stopPropagation()}
+            >
+              <div className="admin-settings-modal-header">
+                <h2>Confirm save</h2>
+                <button
+                  type="button"
+                  onClick={() => setShowSaveConfirmation(false)}
+                  aria-label="Close save confirmation"
+                >
+                  <span className="material-symbols-outlined" aria-hidden="true">
+                    close
+                  </span>
+                </button>
+              </div>
+
+              <p className="admin-settings-modal-message">
+                Save the current admin settings to the platform configuration?
+              </p>
+
+              <div className="admin-settings-modal-actions">
+                <button
+                  type="button"
+                  className="admin-settings-secondary-button"
+                  onClick={() => setShowSaveConfirmation(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="admin-settings-primary-button"
+                  onClick={handleConfirmSave}
+                  disabled={isSavingConfig}
+                >
+                  {isSavingConfig ? "Saving..." : "Confirm"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {saved && (
           <div
