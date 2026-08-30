@@ -1,0 +1,158 @@
+/* ---------------------------------------------------------------------
+   Modal shell (backdrop / card / header)
+   This block also appears in promotetoleader/PromoteToLeaderModal.css.
+   It's duplicated on purpose so this folder can be dropped in anywhere
+   without depending on UserManagementPage.css. If you change how modals
+   look site-wide, update it in both places.
+--------------------------------------------------------------------- */
+.admin-users-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(4, 10, 6, 0.76);
+  backdrop-filter: blur(8px);
+}
+
+.admin-users-modal {
+  display: grid;
+  width: min(100%, 560px);
+  max-height: calc(100vh - 40px);
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--color-border-faint);
+  border-radius: 12px;
+  background: var(--surface-container);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+}
+
+.admin-users-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-users-modal-header h2 {
+  margin: 0;
+  color: var(--color-on-surface);
+  font-family: var(--font-jakarta);
+}
+
+.admin-users-modal-header button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: rgba(47, 54, 49, 0.5);
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+/* Shared field/label helper — also used by the promotion modal's search
+   field. Duplicated here for the same reason as the modal shell above. */
+.admin-users-field-span-2 {
+  grid-column: 1 / -1;
+}
+
+/* Shared primary button — also styled in UserManagementPage.css (for the
+   toolbar) and PromoteToLeaderModal.css (for the confirm button). */
+.admin-users-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--on-primary-container);
+  box-shadow: 0 8px 20px rgba(0, 168, 107, 0.18);
+  font-family: var(--font-hanken);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-users-primary-button:hover,
+.admin-users-primary-button:focus-visible {
+  background: var(--primary-fixed);
+}
+
+/* Shared inline error banner — also used by the promotion modal. */
+.admin-users-form-error {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Shared input/select styling — also used by the promotion modal's
+   search field. */
+.admin-users-modal input,
+.admin-users-modal select {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: var(--surface-container-high);
+  color: var(--color-on-surface);
+  font: inherit;
+}
+
+/* ---------------------------------------------------------------------
+   Add User form — everything below here is exclusive to this modal.
+--------------------------------------------------------------------- */
+.admin-users-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-users-modal-grid label {
+  display: grid;
+  gap: 6px;
+  color: var(--color-on-surface-variant);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.admin-users-name-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 520px) {
+  .admin-users-name-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-users-field-error {
+  color: #ff6b6b;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.admin-users-modal input[aria-invalid="true"],
+.admin-users-modal select[aria-invalid="true"] {
+  border-color: #ff6b6b;
+}
+
+@media (max-width: 520px) {
+  .admin-users-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -3,6 +3,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import BottomNav from "../../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../../components/TopBar/TopBar";
 import { app } from "../../../firebase";
+import AddUserModal from "./adduser/AddUserModal";
+import ExportUsersButton from "./export/ExportUsersButton";
+import PromoteToLeaderModal from "./promotetoleader/PromoteToLeaderModal";
 import "./UserManagementPage.css";
 
 function formatPeso(value) {
@@ -71,11 +74,6 @@ export default function UserManagementPage() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isPromotionOpen, setIsPromotionOpen] = useState(false);
-  const [promotionSearch, setPromotionSearch] = useState("");
-  const [selectedPromotionUserId, setSelectedPromotionUserId] = useState("");
-  const [isPromoting, setIsPromoting] = useState(false);
-  const [promotionError, setPromotionError] = useState("");
-  const [promotionSuccess, setPromotionSuccess] = useState(false);
 
   // The table's scroll panel can scroll both horizontally (extra columns)
   // and vertically (extra rows). Without axis locking, a drag/swipe that's
@@ -187,85 +185,6 @@ export default function UserManagementPage() {
     void loadUsers();
   }, []);
 
-  const promotionMatches = useMemo(() => {
-    const normalized = promotionSearch.trim().toLowerCase();
-    if (!normalized) return userList.filter((user) => user.role !== "leader");
-
-    return userList.filter((user) => {
-      const searchable = [user.name, user.email, user.id]
-        .filter(Boolean)
-        .join(" ");
-      return (
-        user.role !== "leader" && searchable.toLowerCase().includes(normalized)
-      );
-    });
-  }, [promotionSearch, userList]);
-
-  const closePromotionModal = () => {
-    setIsPromotionOpen(false);
-    setPromotionSearch("");
-    setSelectedPromotionUserId("");
-    setPromotionError("");
-    setPromotionSuccess(false);
-    setIsPromoting(false);
-  };
-
-  const handlePromoteMember = async () => {
-    const selectedUser = userList.find(
-      (user) => user.id === selectedPromotionUserId,
-    );
-    if (!selectedUser) {
-      setPromotionError("Please select a member to promote.");
-      return;
-    }
-
-    setIsPromoting(true);
-    setPromotionError("");
-
-    try {
-      const promoteMemberToLeader = httpsCallable(
-        getFunctions(app, "asia-southeast1"),
-        "promoteMemberToLeader",
-      );
-
-      await promoteMemberToLeader({ userId: selectedUser.id });
-
-      setUserList((currentUsers) =>
-        currentUsers.map((user) =>
-          user.id === selectedUser.id ? { ...user, role: "leader" } : user,
-        ),
-      );
-      setPromotionSuccess(true);
-
-      setTimeout(() => {
-        closePromotionModal();
-      }, 1500);
-    } catch (error) {
-      setPromotionError(
-        error?.message || "Failed to promote member. Please try again.",
-      );
-    } finally {
-      setIsPromoting(false);
-    }
-  };
-
-  const emptyNewUser = {
-    lastName: "",
-    firstName: "",
-    middleName: "",
-    birthdate: "",
-    civilStatus: "single",
-    address: "",
-    phone: "",
-    email: "",
-    role: "member",
-    status: "active",
-  };
-  const [newUser, setNewUser] = useState(emptyNewUser);
-  const [formErrors, setFormErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState("");
-
   const filteredUsers = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
@@ -291,118 +210,6 @@ export default function UserManagementPage() {
     (safeCurrentPage - 1) * pageSize,
     safeCurrentPage * pageSize,
   );
-
-  const closeAddUserModal = () => {
-    setIsAddUserOpen(false);
-    setNewUser(emptyNewUser);
-    setFormErrors({});
-    setSubmitError("");
-  };
-
-  const handleAddUser = async (event) => {
-    event.preventDefault();
-    const lastName = newUser.lastName.trim();
-    const firstName = newUser.firstName.trim();
-    const middleName = newUser.middleName.trim();
-    const birthdate = newUser.birthdate.trim();
-    const address = newUser.address.trim();
-    const phone = newUser.phone.trim();
-    const email = newUser.email.trim();
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phonePattern = /^[0-9+\-()\s]{7,15}$/;
-
-    const errors = {};
-    if (!lastName) errors.lastName = "Last name is required.";
-    if (!firstName) errors.firstName = "First name is required.";
-    if (!middleName) errors.middleName = "Middle name is required.";
-    if (!birthdate) errors.birthdate = "Birthdate is required.";
-    if (!address) errors.address = "Address is required.";
-    if (!phone) {
-      errors.phone = "Phone is required.";
-    } else if (!phonePattern.test(phone)) {
-      errors.phone = "Enter a valid phone number.";
-    }
-    if (!email) {
-      errors.email = "Email is required.";
-    } else if (!emailPattern.test(email)) {
-      errors.email = "Enter a valid email address.";
-    } else if (
-      userList.some((user) => user.email.toLowerCase() === email.toLowerCase())
-    ) {
-      errors.email = "A user with this email already exists.";
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
-
-    setSubmitError("");
-    setIsSubmitting(true);
-    try {
-      const createUser = httpsCallable(
-        getFunctions(app, "asia-southeast1"),
-        "createUser",
-      );
-      const result = await createUser({
-        lastName,
-        firstName,
-        middleName,
-        birthdate,
-        civilStatus: newUser.civilStatus,
-        address,
-        phone,
-        email,
-        role: newUser.role,
-        status: newUser.status,
-      });
-      closeAddUserModal();
-      setCurrentPage(1);
-      await loadUsers();
-    } catch (error) {
-      setSubmitError(
-        error?.message || "Failed to create user. Please try again.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const exportUsers = () => {
-    const headers = [
-      "ID",
-      "Name",
-      "Email",
-      "Role",
-      "Member since",
-      "Status",
-      "Total spent",
-    ];
-    const rows = filteredUsers.map((user) => [
-      user.id,
-      user.name,
-      user.email,
-      user.role || "member",
-      formatJoinDate(user.joinDate),
-      user.status,
-      user.totalSpent,
-    ]);
-    const csv = [headers, ...rows]
-      .map((row) =>
-        row
-          .map((value) => `"${String(value).replaceAll('"', '""')}"`)
-          .join(","),
-      )
-      .join("\n");
-    const url = URL.createObjectURL(
-      new Blob([csv], { type: "text/csv;charset=utf-8" }),
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "users.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div
@@ -492,21 +299,7 @@ export default function UserManagementPage() {
                 </span>
                 Promote to Leader
               </button>
-              <div className="admin-users-export-action">
-                <button
-                  type="button"
-                  className="admin-users-secondary-button"
-                  onClick={exportUsers}
-                >
-                  <span
-                    className="material-symbols-outlined"
-                    aria-hidden="true"
-                  >
-                    download
-                  </span>
-                  Export
-                </button>
-              </div>
+              <ExportUsersButton users={filteredUsers} />
             </div>
           </div>
 
@@ -604,309 +397,29 @@ export default function UserManagementPage() {
         </section>
       </main>
       <BottomNav activeItem="users" variant="admin" />
-      {isPromotionOpen && (
-        <div
-          className="admin-users-modal-backdrop"
-          role="presentation"
-          onMouseDown={closePromotionModal}
-        >
-          <div
-            className="admin-users-modal admin-users-promotion-modal"
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            <div className="admin-users-modal-header">
-              <h2>Promote Member</h2>
-              <button
-                type="button"
-                onClick={closePromotionModal}
-                aria-label="Close promotion modal"
-              >
-                <span className="material-symbols-outlined" aria-hidden="true">
-                  close
-                </span>
-              </button>
-            </div>
 
-            {promotionSuccess ? (
-              <div className="admin-users-success-state" aria-live="polite">
-                <div className="admin-users-success-check">
-                  <span
-                    className="material-symbols-outlined"
-                    aria-hidden="true"
-                  >
-                    check
-                  </span>
-                </div>
-                <h3>Promotion successful</h3>
-                <p>
-                  {userList.find((user) => user.id === selectedPromotionUserId)
-                    ?.name || "Member"}{" "}
-                  is now a leader.
-                </p>
-              </div>
-            ) : (
-              <>
-                <label className="admin-users-field-span-2">
-                  Search member by name or email
-                  <input
-                    type="search"
-                    value={promotionSearch}
-                    placeholder="Search member name"
-                    onChange={(event) => {
-                      setPromotionSearch(event.target.value);
-                      setSelectedPromotionUserId("");
-                    }}
-                  />
-                </label>
+      <PromoteToLeaderModal
+        isOpen={isPromotionOpen}
+        onClose={() => setIsPromotionOpen(false)}
+        userList={userList}
+        onPromoted={(userId) =>
+          setUserList((currentUsers) =>
+            currentUsers.map((user) =>
+              user.id === userId ? { ...user, role: "leader" } : user,
+            ),
+          )
+        }
+      />
 
-                <div className="admin-users-promotion-list">
-                  {promotionMatches.length === 0 ? (
-                    <p className="admin-users-promotion-empty">
-                      No member found.
-                    </p>
-                  ) : (
-                    promotionMatches.map((user) => (
-                      <button
-                        key={user.id}
-                        type="button"
-                        className={`admin-users-promotion-option ${
-                          selectedPromotionUserId === user.id ? "selected" : ""
-                        }`}
-                        onClick={() => setSelectedPromotionUserId(user.id)}
-                      >
-                        <div className="admin-user-identity">
-                          <span className="admin-user-avatar">
-                            {(user.name || user.email || "U")
-                              .split(" ")
-                              .map((part) => part[0])
-                              .join("")
-                              .slice(0, 2)
-                              .toUpperCase() || "U"}
-                          </span>
-                          <span>
-                            <strong>{user.name}</strong>
-                            <small>{user.email}</small>
-                          </span>
-                        </div>
-                        <span className="admin-user-role">
-                          {user.role || "member"}
-                        </span>
-                      </button>
-                    ))
-                  )}
-                </div>
-
-                {promotionError && (
-                  <p className="admin-users-form-error" role="alert">
-                    {promotionError}
-                  </p>
-                )}
-
-                <button
-                  type="button"
-                  className="admin-users-primary-button"
-                  disabled={!selectedPromotionUserId || isPromoting}
-                  onClick={handlePromoteMember}
-                >
-                  {isPromoting ? "Promoting..." : "Confirm Promotion"}
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isAddUserOpen && (
-        <div
-          className="admin-users-modal-backdrop"
-          role="presentation"
-          onMouseDown={closeAddUserModal}
-        >
-          <form
-            className="admin-users-modal"
-            onSubmit={handleAddUser}
-            noValidate
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            <div className="admin-users-modal-header">
-              <h2>Add User</h2>
-              <button
-                type="button"
-                onClick={closeAddUserModal}
-                aria-label="Close add user form"
-              >
-                <span className="material-symbols-outlined" aria-hidden="true">
-                  close
-                </span>
-              </button>
-            </div>
-            <div className="admin-users-modal-grid">
-              <label className="admin-users-field-span-2">
-                Last Name, First Name, Middle Name
-                <div className="admin-users-name-fields">
-                  <input
-                    required
-                    placeholder="Last name"
-                    aria-label="Last name"
-                    value={newUser.lastName}
-                    aria-invalid={Boolean(formErrors.lastName)}
-                    onChange={(event) =>
-                      setNewUser({ ...newUser, lastName: event.target.value })
-                    }
-                  />
-                  <input
-                    required
-                    placeholder="First name"
-                    aria-label="First name"
-                    value={newUser.firstName}
-                    aria-invalid={Boolean(formErrors.firstName)}
-                    onChange={(event) =>
-                      setNewUser({ ...newUser, firstName: event.target.value })
-                    }
-                  />
-                  <input
-                    required
-                    placeholder="Middle name"
-                    aria-label="Middle name"
-                    value={newUser.middleName}
-                    aria-invalid={Boolean(formErrors.middleName)}
-                    onChange={(event) =>
-                      setNewUser({ ...newUser, middleName: event.target.value })
-                    }
-                  />
-                </div>
-                {(formErrors.lastName ||
-                  formErrors.firstName ||
-                  formErrors.middleName) && (
-                  <span className="admin-users-field-error">
-                    {formErrors.lastName ||
-                      formErrors.firstName ||
-                      formErrors.middleName}
-                  </span>
-                )}
-              </label>
-              <label>
-                Birthdate
-                <input
-                  required
-                  type="date"
-                  value={newUser.birthdate}
-                  aria-invalid={Boolean(formErrors.birthdate)}
-                  onChange={(event) =>
-                    setNewUser({ ...newUser, birthdate: event.target.value })
-                  }
-                />
-                {formErrors.birthdate && (
-                  <span className="admin-users-field-error">
-                    {formErrors.birthdate}
-                  </span>
-                )}
-              </label>
-              <label>
-                Civil Status
-                <select
-                  value={newUser.civilStatus}
-                  onChange={(event) =>
-                    setNewUser({ ...newUser, civilStatus: event.target.value })
-                  }
-                >
-                  <option value="single">Single</option>
-                  <option value="married">Married</option>
-                  <option value="widowed">Widowed</option>
-                  <option value="separated">Separated</option>
-                </select>
-              </label>
-              <label className="admin-users-field-span-2">
-                Address
-                <input
-                  required
-                  value={newUser.address}
-                  aria-invalid={Boolean(formErrors.address)}
-                  onChange={(event) =>
-                    setNewUser({ ...newUser, address: event.target.value })
-                  }
-                />
-                {formErrors.address && (
-                  <span className="admin-users-field-error">
-                    {formErrors.address}
-                  </span>
-                )}
-              </label>
-              <label>
-                Phone
-                <input
-                  required
-                  type="tel"
-                  value={newUser.phone}
-                  aria-invalid={Boolean(formErrors.phone)}
-                  onChange={(event) =>
-                    setNewUser({ ...newUser, phone: event.target.value })
-                  }
-                />
-                {formErrors.phone && (
-                  <span className="admin-users-field-error">
-                    {formErrors.phone}
-                  </span>
-                )}
-              </label>
-              <label>
-                Email Address
-                <input
-                  required
-                  type="email"
-                  value={newUser.email}
-                  aria-invalid={Boolean(formErrors.email)}
-                  onChange={(event) =>
-                    setNewUser({ ...newUser, email: event.target.value })
-                  }
-                />
-                {formErrors.email && (
-                  <span className="admin-users-field-error">
-                    {formErrors.email}
-                  </span>
-                )}
-              </label>
-              <label>
-                Role
-                <select
-                  value={newUser.role}
-                  onChange={(event) =>
-                    setNewUser({ ...newUser, role: event.target.value })
-                  }
-                >
-                  <option value="member">Member</option>
-                  <option value="leader">Leader</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </label>
-              <label>
-                Status
-                <select
-                  value={newUser.status}
-                  onChange={(event) =>
-                    setNewUser({ ...newUser, status: event.target.value })
-                  }
-                >
-                  <option value="active">Active</option>
-                  <option value="suspended">Suspended</option>
-                </select>
-              </label>
-            </div>
-            {submitError && (
-              <p className="admin-users-form-error" role="alert">
-                {submitError}
-              </p>
-            )}
-            <button
-              type="submit"
-              className="admin-users-primary-button"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Creating..." : "Create User"}
-            </button>
-          </form>
-        </div>
-      )}
+      <AddUserModal
+        isOpen={isAddUserOpen}
+        onClose={() => setIsAddUserOpen(false)}
+        existingUsers={userList}
+        onUserCreated={async () => {
+          setCurrentPage(1);
+          await loadUsers();
+        }}
+      />
     </div>
   );
 }

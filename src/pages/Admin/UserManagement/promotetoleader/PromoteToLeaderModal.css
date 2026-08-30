@@ -1,0 +1,267 @@
+/* ---------------------------------------------------------------------
+   Modal shell (backdrop / card / header)
+   This block also appears in adduser/AddUserModal.css. It's duplicated
+   on purpose so this folder can be dropped in anywhere without
+   depending on UserManagementPage.css. If you change how modals look
+   site-wide, update it in both places.
+--------------------------------------------------------------------- */
+.admin-users-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(4, 10, 6, 0.76);
+  backdrop-filter: blur(8px);
+}
+
+.admin-users-modal {
+  display: grid;
+  width: min(100%, 560px);
+  max-height: calc(100vh - 40px);
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--color-border-faint);
+  border-radius: 12px;
+  background: var(--surface-container);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+}
+
+.admin-users-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-users-modal-header h2 {
+  margin: 0;
+  color: var(--color-on-surface);
+  font-family: var(--font-jakarta);
+}
+
+.admin-users-modal-header button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: rgba(47, 54, 49, 0.5);
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+/* Shared field/label helper — also used by the add-user form's paired
+   fields. Duplicated here for the same reason as the modal shell above. */
+.admin-users-field-span-2 {
+  grid-column: 1 / -1;
+}
+
+/* Direct-child label styling — this one only ever matches this modal's
+   search field, since the add-user form's labels sit inside a grid
+   wrapper rather than as direct children of .admin-users-modal. */
+.admin-users-modal > label {
+  display: grid;
+  gap: 6px;
+  color: var(--color-on-surface-variant);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Shared primary button — also styled in UserManagementPage.css (for the
+   toolbar) and AddUserModal.css (for the create button). */
+.admin-users-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--on-primary-container);
+  box-shadow: 0 8px 20px rgba(0, 168, 107, 0.18);
+  font-family: var(--font-hanken);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-users-primary-button:hover,
+.admin-users-primary-button:focus-visible {
+  background: var(--primary-fixed);
+}
+
+/* Shared inline error banner — also used by the add-user form. */
+.admin-users-form-error {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Shared input/select styling — also used by the add-user form. */
+.admin-users-modal input,
+.admin-users-modal select {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: var(--surface-container-high);
+  color: var(--color-on-surface);
+  font: inherit;
+}
+
+/* Avatar/name row — also used by the main user table in
+   UserManagementPage.css, since each promotion result reuses the same
+   avatar-and-name layout. */
+.admin-user-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-user-identity > span:last-child {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-user-identity small {
+  color: var(--color-on-surface-variant);
+  font-size: 0.8rem;
+}
+
+.admin-user-avatar {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(89, 222, 155, 0.12);
+  border: 1px solid rgba(89, 222, 155, 0.25);
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.admin-user-role {
+  color: var(--color-on-surface-variant);
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+/* ---------------------------------------------------------------------
+   Promotion modal — everything below here is exclusive to this modal.
+--------------------------------------------------------------------- */
+.admin-users-promotion-modal {
+  width: min(100%, 540px);
+}
+
+.admin-users-promotion-list {
+  display: grid;
+  gap: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.admin-users-promotion-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 10px;
+  background: rgba(14, 21, 16, 0.65);
+  color: var(--color-on-surface);
+  cursor: pointer;
+  text-align: left;
+}
+
+.admin-users-promotion-option.selected {
+  border-color: var(--color-primary);
+  background: rgba(89, 222, 155, 0.12);
+}
+
+.admin-users-promotion-empty {
+  margin: 0;
+  padding: 16px 12px;
+  border: 1px dashed var(--outline-variant);
+  border-radius: 10px;
+  color: var(--color-on-surface-variant);
+  text-align: center;
+}
+
+.admin-users-success-state {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 18px 8px 8px;
+  text-align: center;
+}
+
+.admin-users-success-check {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(89, 222, 155, 0.12);
+  border: 2px solid rgba(89, 222, 155, 0.35);
+  animation: admin-users-check-pop 0.4s ease-out;
+}
+
+.admin-users-success-check .material-symbols-outlined {
+  color: var(--color-primary);
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.admin-users-success-state h3 {
+  margin: 0;
+  color: var(--color-on-surface);
+}
+
+.admin-users-success-state p {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+}
+
+@keyframes admin-users-check-pop {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.4;
+  }
+  70% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-user-identity,
+  .admin-user-identity > span:last-child {
+    min-width: 0;
+  }
+
+  .admin-user-identity small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

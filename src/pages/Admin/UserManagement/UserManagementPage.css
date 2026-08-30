@@ -148,12 +148,10 @@
   color: var(--color-primary);
 }
 
-.admin-users-export-action {
-  display: flex;
-}
-
-.admin-users-primary-button,
-.admin-users-secondary-button {
+/* Also styled (independently) in adduser/AddUserModal.css and
+   promotetoleader/PromoteToLeaderModal.css, since those modals each
+   have their own submit/confirm button using this same class. */
+.admin-users-primary-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -162,6 +160,9 @@
   padding: 0 14px;
   border: 1px solid transparent;
   border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--on-primary-container);
+  box-shadow: 0 8px 20px rgba(0, 168, 107, 0.18);
   font-family: var(--font-hanken);
   font-size: 14px;
   font-weight: 700;
@@ -169,26 +170,9 @@
   white-space: nowrap;
 }
 
-.admin-users-primary-button {
-  background: var(--color-primary);
-  color: var(--on-primary-container);
-  box-shadow: 0 8px 20px rgba(0, 168, 107, 0.18);
-}
-
-.admin-users-secondary-button {
-  border-color: var(--outline-variant);
-  background: rgba(47, 54, 49, 0.5);
-  color: var(--color-on-surface);
-}
-
 .admin-users-primary-button:hover,
 .admin-users-primary-button:focus-visible {
   background: var(--primary-fixed);
-}
-
-.admin-users-secondary-button:hover,
-.admin-users-secondary-button:focus-visible {
-  border-color: var(--color-primary);
 }
 
 .admin-users-search,
@@ -373,6 +357,8 @@
   border-bottom: 0;
 }
 
+/* Also styled (independently) in promotetoleader/PromoteToLeaderModal.css,
+   since the promotion list reuses the same avatar-and-name layout. */
 .admin-user-identity {
   display: flex;
   align-items: center;
@@ -444,6 +430,8 @@
   color: var(--tertiary);
 }
 
+/* Also styled (independently) in promotetoleader/PromoteToLeaderModal.css,
+   since each promotion result shows the member's current role too. */
 .admin-user-role {
   color: var(--color-on-surface-variant);
   font-size: 0.9rem;
@@ -465,8 +453,7 @@
   gap: 6px;
 }
 
-.admin-users-pagination button,
-.admin-users-modal-header button {
+.admin-users-pagination button {
   display: grid;
   width: 36px;
   height: 36px;
@@ -481,210 +468,6 @@
 .admin-users-pagination button:disabled {
   cursor: not-allowed;
   opacity: 0.4;
-}
-
-.admin-users-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  overflow-y: auto;
-  background: rgba(4, 10, 6, 0.76);
-  backdrop-filter: blur(8px);
-}
-
-.admin-users-modal {
-  display: grid;
-  width: min(100%, 560px);
-  max-height: calc(100vh - 40px);
-  gap: 16px;
-  padding: 24px;
-  border: 1px solid var(--color-border-faint);
-  border-radius: 12px;
-  background: var(--surface-container);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
-  overflow-y: auto;
-}
-
-.admin-users-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.admin-users-modal-header h2 {
-  margin: 0;
-  color: var(--color-on-surface);
-  font-family: var(--font-jakarta);
-}
-
-.admin-users-modal > label {
-  display: grid;
-  gap: 6px;
-  color: var(--color-on-surface-variant);
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
-.admin-users-modal-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.admin-users-promotion-modal {
-  width: min(100%, 540px);
-}
-
-.admin-users-promotion-list {
-  display: grid;
-  gap: 10px;
-  max-height: 260px;
-  overflow-y: auto;
-}
-
-.admin-users-promotion-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--outline-variant);
-  border-radius: 10px;
-  background: rgba(14, 21, 16, 0.65);
-  color: var(--color-on-surface);
-  cursor: pointer;
-  text-align: left;
-}
-
-.admin-users-promotion-option.selected {
-  border-color: var(--color-primary);
-  background: rgba(89, 222, 155, 0.12);
-}
-
-.admin-users-promotion-empty {
-  margin: 0;
-  padding: 16px 12px;
-  border: 1px dashed var(--outline-variant);
-  border-radius: 10px;
-  color: var(--color-on-surface-variant);
-  text-align: center;
-}
-
-.admin-users-success-state {
-  display: grid;
-  place-items: center;
-  gap: 12px;
-  padding: 18px 8px 8px;
-  text-align: center;
-}
-
-.admin-users-success-check {
-  display: grid;
-  place-items: center;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: rgba(89, 222, 155, 0.12);
-  border: 2px solid rgba(89, 222, 155, 0.35);
-  animation: admin-users-check-pop 0.4s ease-out;
-}
-
-.admin-users-success-check .material-symbols-outlined {
-  color: var(--color-primary);
-  font-size: 34px;
-  font-weight: 700;
-}
-
-.admin-users-success-state h3 {
-  margin: 0;
-  color: var(--color-on-surface);
-}
-
-.admin-users-success-state p {
-  margin: 0;
-  color: var(--color-on-surface-variant);
-}
-
-@keyframes admin-users-check-pop {
-  0% {
-    transform: scale(0.75);
-    opacity: 0.4;
-  }
-  70% {
-    transform: scale(1.12);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.admin-users-modal-grid label {
-  display: grid;
-  gap: 6px;
-  color: var(--color-on-surface-variant);
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
-.admin-users-field-span-2 {
-  grid-column: 1 / -1;
-}
-
-.admin-users-name-fields {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-@media (max-width: 520px) {
-  .admin-users-name-fields {
-    grid-template-columns: 1fr;
-  }
-}
-
-.admin-users-field-error {
-  color: #ff6b6b;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.admin-users-form-error {
-  margin: 0;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 107, 107, 0.4);
-  border-radius: 8px;
-  background: rgba(255, 107, 107, 0.1);
-  color: #ff6b6b;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.admin-users-modal input[aria-invalid="true"],
-.admin-users-modal select[aria-invalid="true"] {
-  border-color: #ff6b6b;
-}
-
-@media (max-width: 520px) {
-  .admin-users-modal-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.admin-users-modal input,
-.admin-users-modal select {
-  min-height: 42px;
-  padding: 0 12px;
-  border: 1px solid var(--outline-variant);
-  border-radius: 8px;
-  background: var(--surface-container-high);
-  color: var(--color-on-surface);
-  font: inherit;
 }
 
 .admin-users-empty {
@@ -740,10 +523,6 @@
     grid-template-columns: 1fr 1fr;
     align-items: end;
     gap: 8px;
-  }
-
-  .admin-users-export-action {
-    min-width: 0;
   }
 
   .admin-users-filter-group > *,
