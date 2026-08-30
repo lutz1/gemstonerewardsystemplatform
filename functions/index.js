@@ -1,10 +1,13 @@
 const { onRequest } = require('firebase-functions/v2/https');
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { getFirestore } = require('firebase-admin/firestore');
+const { getAuth } = require('firebase-admin/auth');
 const { initializeApp } = require('firebase-admin/app');
 const crypto = require('crypto');
 
 initializeApp();
+
+const DEFAULT_PASSWORD = 'gemstonecode';
 
 // Project's Firestore database is named "default" rather than the reserved "(default)" id.
 function db() {
@@ -19,6 +22,25 @@ function validateMpin(mpin) {
   if (typeof mpin !== 'string' || !/^\d{4}$/.test(mpin)) {
     throw new HttpsError('invalid-argument', 'MPIN must contain exactly 4 digits.');
   }
+}
+
+// Generates a cryptographically secure, Ethereum-style wallet address.
+function generateWalletAddress() {
+  return `0x${crypto.randomBytes(20).toString('hex')}`;
+}
+
+async function assertIsAdmin(uid) {
+  const snapshot = await db().collection('users').doc(uid).get();
+  if (snapshot.data()?.role !== 'admin') {
+    throw new HttpsError('permission-denied', 'Admin privileges are required.');
+  }
+}
+
+function requireNonEmptyString(value, fieldName) {
+  if (typeof value !== 'string' || !value.trim()) {
+    throw new HttpsError('invalid-argument', `${fieldName} is required.`);
+  }
+  return value.trim();
 }
 
 exports.healthCheck = onRequest({ region: 'asia-southeast1' }, (_request, response) => {
@@ -82,5 +104,75 @@ exports.verifyMpin = onCall({ region: 'asia-southeast1' }, async (request) => {
   }
 
   return { verified: true };
+});
+
+exports.createUser = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+
+  await assertIsAdmin(request.auth.uid);
+
+  const data = request.data || {};
+  const firstName = requireNonEmptyString(data.firstName, 'First name');
+  const lastName = requireNonEmptyString(data.lastName, 'Last name');
+  const middleName = requireNonEmptyString(data.middleName, 'Middle name');
+  const birthdate = requireNonEmptyString(data.birthdate, 'Birthdate');
+  const address = requireNonEmptyString(data.address, 'Address');
+  const phone = requireNonEmptyString(data.phone, 'Phone');
+  const email = requireNonEmptyString(data.email, 'Email').toLowerCase();
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new HttpsError('invalid-argument', 'Enter a valid email address.');
+  }
+
+  const role = data.role === 'admin' ? 'admin' : 'member';
+  const status = data.status === 'suspended' ? 'suspended' : 'active';
+  const civilStatus = ['single', 'married', 'widowed', 'separated'].includes(data.civilStatus)
+    ? data.civilStatus
+    : 'single';
+  const name = `${firstName} ${lastName}`;
+
+  let userRecord;
+  try {
+    userRecord = await getAuth().createUser({
+      email,
+      password: DEFAULT_PASSWORD,
+      displayName: name,
+    });
+  } catch (error) {
+    if (error.code === 'auth/email-already-exists') {
+      throw new HttpsError('already-exists', 'A user with this email already exists.');
+    }
+    throw new HttpsError('internal', 'Failed to create the authentication account.');
+  }
+
+  await getAuth().setCustomUserClaims(userRecord.uid, { role });
+
+  const walletAddress = generateWalletAddress();
+  const joinDate = new Date().toISOString();
+
+  const userDoc = {
+    firstName,
+    lastName,
+    middleName,
+    name,
+    birthdate,
+    civilStatus,
+    address,
+    phone,
+    email,
+    role,
+    status,
+    walletAddress,
+    totalSpent: 0,
+    mpinSetup: false,
+    joinDate,
+    createdAt: joinDate,
+  };
+
+  await db().collection('users').doc(userRecord.uid).set(userDoc);
+
+  return { id: userRecord.uid, ...userDoc };
 });
 

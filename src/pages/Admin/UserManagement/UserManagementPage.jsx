@@ -1,8 +1,20 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useMemo, useState } from "react";
-import { formatPeso, users } from "../../../../utils/AdminMockData";
 import BottomNav from "../../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../../components/TopBar/TopBar";
+import { app } from "../../../firebase";
 import "./UserManagementPage.css";
+
+function formatPeso(value) {
+  const numericValue = Number(value ?? 0);
+  return `₱${numericValue.toLocaleString("en-PH")}`;
+}
+
+function formatJoinDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
 
 function FilterDropdown({ label, value, options, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,24 +63,35 @@ function FilterDropdown({ label, value, options, onChange }) {
 }
 
 export default function UserManagementPage() {
-  const [userList, setUserList] = useState(users);
+  const [userList, setUserList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [newUser, setNewUser] = useState({
-    name: "",
+  const emptyNewUser = {
+    lastName: "",
+    firstName: "",
+    middleName: "",
+    birthdate: "",
+    civilStatus: "single",
+    address: "",
+    phone: "",
     email: "",
     role: "member",
-  });
+    status: "active",
+  };
+  const [newUser, setNewUser] = useState(emptyNewUser);
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const filteredUsers = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     return userList.filter((user) => {
-      const matchesSearch = [user.name, user.email, user.id].some((value) =>
+      const matchesSearch = [user.name ?? "", user.email ?? "", user.id ?? ""].some((value) =>
         value.toLowerCase().includes(normalizedSearch),
       );
       const matchesStatus =
@@ -87,27 +110,101 @@ export default function UserManagementPage() {
     safeCurrentPage * pageSize,
   );
 
-  const handleAddUser = (event) => {
-    event.preventDefault();
-    const name = newUser.name.trim();
-    const email = newUser.email.trim();
-    if (!name || !email) return;
-
-    setUserList((currentUsers) => [
-      ...currentUsers,
-      {
-        id: `U-${String(currentUsers.length + 1).padStart(3, "0")}`,
-        name,
-        email,
-        joinDate: "Aug 2026",
-        status: "active",
-        role: newUser.role,
-        totalSpent: 0,
-      },
-    ]);
-    setNewUser({ name: "", email: "", role: "member" });
+  const closeAddUserModal = () => {
     setIsAddUserOpen(false);
-    setCurrentPage(1);
+    setNewUser(emptyNewUser);
+    setFormErrors({});
+    setSubmitError("");
+  };
+
+  const handleAddUser = async (event) => {
+    event.preventDefault();
+    const lastName = newUser.lastName.trim();
+    const firstName = newUser.firstName.trim();
+    const middleName = newUser.middleName.trim();
+    const birthdate = newUser.birthdate.trim();
+    const address = newUser.address.trim();
+    const phone = newUser.phone.trim();
+    const email = newUser.email.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^[0-9+\-()\s]{7,15}$/;
+
+    const errors = {};
+    if (!lastName) errors.lastName = "Last name is required.";
+    if (!firstName) errors.firstName = "First name is required.";
+    if (!middleName) errors.middleName = "Middle name is required.";
+    if (!birthdate) errors.birthdate = "Birthdate is required.";
+    if (!address) errors.address = "Address is required.";
+    if (!phone) {
+      errors.phone = "Phone is required.";
+    } else if (!phonePattern.test(phone)) {
+      errors.phone = "Enter a valid phone number.";
+    }
+    if (!email) {
+      errors.email = "Email is required.";
+    } else if (!emailPattern.test(email)) {
+      errors.email = "Enter a valid email address.";
+    } else if (
+      userList.some((user) => user.email.toLowerCase() === email.toLowerCase())
+    ) {
+      errors.email = "A user with this email already exists.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setSubmitError("");
+    setIsSubmitting(true);
+    try {
+      const createUser = httpsCallable(
+        getFunctions(app, "asia-southeast1"),
+        "createUser",
+      );
+      const result = await createUser({
+        lastName,
+        firstName,
+        middleName,
+        birthdate,
+        civilStatus: newUser.civilStatus,
+        address,
+        phone,
+        email,
+        role: newUser.role,
+        status: newUser.status,
+      });
+      const created = result.data;
+
+      setUserList((currentUsers) => [
+        ...currentUsers,
+        {
+          id: created.id,
+          name: created.name,
+          lastName,
+          firstName,
+          middleName,
+          birthdate,
+          civilStatus: newUser.civilStatus,
+          address,
+          phone,
+          email,
+          walletAddress: created.walletAddress,
+          joinDate: created.joinDate,
+          status: newUser.status,
+          role: newUser.role,
+          totalSpent: 0,
+        },
+      ]);
+      closeAddUserModal();
+      setCurrentPage(1);
+    } catch (error) {
+      setSubmitError(
+        error?.message || "Failed to create user. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const exportUsers = () => {
@@ -125,7 +222,7 @@ export default function UserManagementPage() {
       user.name,
       user.email,
       user.role || "member",
-      user.joinDate,
+      formatJoinDate(user.joinDate),
       user.status,
       user.totalSpent,
     ]);
@@ -274,7 +371,7 @@ export default function UserManagementPage() {
                           </span>
                         </div>
                       </td>
-                      <td>{user.joinDate}</td>
+                      <td>{formatJoinDate(user.joinDate)}</td>
                       <td>
                         <span className="admin-user-role">
                           {user.role || "member"}
@@ -329,18 +426,19 @@ export default function UserManagementPage() {
         <div
           className="admin-users-modal-backdrop"
           role="presentation"
-          onMouseDown={() => setIsAddUserOpen(false)}
+          onMouseDown={closeAddUserModal}
         >
           <form
             className="admin-users-modal"
             onSubmit={handleAddUser}
+            noValidate
             onMouseDown={(event) => event.stopPropagation()}
           >
             <div className="admin-users-modal-header">
               <h2>Add User</h2>
               <button
                 type="button"
-                onClick={() => setIsAddUserOpen(false)}
+                onClick={closeAddUserModal}
                 aria-label="Close add user form"
               >
                 <span className="material-symbols-outlined" aria-hidden="true">
@@ -348,41 +446,168 @@ export default function UserManagementPage() {
                 </span>
               </button>
             </div>
-            <label>
-              Name
-              <input
-                required
-                value={newUser.name}
-                onChange={(event) =>
-                  setNewUser({ ...newUser, name: event.target.value })
-                }
-              />
-            </label>
-            <label>
-              Email
-              <input
-                required
-                type="email"
-                value={newUser.email}
-                onChange={(event) =>
-                  setNewUser({ ...newUser, email: event.target.value })
-                }
-              />
-            </label>
-            <label>
-              Role
-              <select
-                value={newUser.role}
-                onChange={(event) =>
-                  setNewUser({ ...newUser, role: event.target.value })
-                }
-              >
-                <option value="member">Member</option>
-                <option value="admin">Admin</option>
-              </select>
-            </label>
-            <button type="submit" className="admin-users-primary-button">
-              Create User
+            <div className="admin-users-modal-grid">
+              <label className="admin-users-field-span-2">
+                Last Name, First Name, Middle Name
+                <div className="admin-users-name-fields">
+                  <input
+                    required
+                    placeholder="Last name"
+                    aria-label="Last name"
+                    value={newUser.lastName}
+                    aria-invalid={Boolean(formErrors.lastName)}
+                    onChange={(event) =>
+                      setNewUser({ ...newUser, lastName: event.target.value })
+                    }
+                  />
+                  <input
+                    required
+                    placeholder="First name"
+                    aria-label="First name"
+                    value={newUser.firstName}
+                    aria-invalid={Boolean(formErrors.firstName)}
+                    onChange={(event) =>
+                      setNewUser({ ...newUser, firstName: event.target.value })
+                    }
+                  />
+                  <input
+                    required
+                    placeholder="Middle name"
+                    aria-label="Middle name"
+                    value={newUser.middleName}
+                    aria-invalid={Boolean(formErrors.middleName)}
+                    onChange={(event) =>
+                      setNewUser({ ...newUser, middleName: event.target.value })
+                    }
+                  />
+                </div>
+                {(formErrors.lastName ||
+                  formErrors.firstName ||
+                  formErrors.middleName) && (
+                  <span className="admin-users-field-error">
+                    {formErrors.lastName ||
+                      formErrors.firstName ||
+                      formErrors.middleName}
+                  </span>
+                )}
+              </label>
+              <label>
+                Birthdate
+                <input
+                  required
+                  type="date"
+                  value={newUser.birthdate}
+                  aria-invalid={Boolean(formErrors.birthdate)}
+                  onChange={(event) =>
+                    setNewUser({ ...newUser, birthdate: event.target.value })
+                  }
+                />
+                {formErrors.birthdate && (
+                  <span className="admin-users-field-error">
+                    {formErrors.birthdate}
+                  </span>
+                )}
+              </label>
+              <label>
+                Civil Status
+                <select
+                  value={newUser.civilStatus}
+                  onChange={(event) =>
+                    setNewUser({ ...newUser, civilStatus: event.target.value })
+                  }
+                >
+                  <option value="single">Single</option>
+                  <option value="married">Married</option>
+                  <option value="widowed">Widowed</option>
+                  <option value="separated">Separated</option>
+                </select>
+              </label>
+              <label className="admin-users-field-span-2">
+                Address
+                <input
+                  required
+                  value={newUser.address}
+                  aria-invalid={Boolean(formErrors.address)}
+                  onChange={(event) =>
+                    setNewUser({ ...newUser, address: event.target.value })
+                  }
+                />
+                {formErrors.address && (
+                  <span className="admin-users-field-error">
+                    {formErrors.address}
+                  </span>
+                )}
+              </label>
+              <label>
+                Phone
+                <input
+                  required
+                  type="tel"
+                  value={newUser.phone}
+                  aria-invalid={Boolean(formErrors.phone)}
+                  onChange={(event) =>
+                    setNewUser({ ...newUser, phone: event.target.value })
+                  }
+                />
+                {formErrors.phone && (
+                  <span className="admin-users-field-error">
+                    {formErrors.phone}
+                  </span>
+                )}
+              </label>
+              <label>
+                Email Address
+                <input
+                  required
+                  type="email"
+                  value={newUser.email}
+                  aria-invalid={Boolean(formErrors.email)}
+                  onChange={(event) =>
+                    setNewUser({ ...newUser, email: event.target.value })
+                  }
+                />
+                {formErrors.email && (
+                  <span className="admin-users-field-error">
+                    {formErrors.email}
+                  </span>
+                )}
+              </label>
+              <label>
+                Role
+                <select
+                  value={newUser.role}
+                  onChange={(event) =>
+                    setNewUser({ ...newUser, role: event.target.value })
+                  }
+                >
+                  <option value="member">Member</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </label>
+              <label>
+                Status
+                <select
+                  value={newUser.status}
+                  onChange={(event) =>
+                    setNewUser({ ...newUser, status: event.target.value })
+                  }
+                >
+                  <option value="active">Active</option>
+                  <option value="suspended">Suspended</option>
+                </select>
+              </label>
+            </div>
+            {submitError && (
+              <p className="admin-users-form-error" role="alert">
+                {submitError}
+              </p>
+            )}
+            <button
+              type="submit"
+              className="admin-users-primary-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating..." : "Create User"}
             </button>
           </form>
         </div>

@@ -383,7 +383,7 @@
 
 .admin-users-modal {
   display: grid;
-  width: min(100%, 440px);
+  width: min(100%, 560px);
   gap: 16px;
   padding: 24px;
   border: 1px solid var(--color-border-faint);
@@ -410,6 +410,64 @@
   color: var(--color-on-surface-variant);
   font-size: 0.85rem;
   font-weight: 700;
+}
+
+.admin-users-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-users-modal-grid label {
+  display: grid;
+  gap: 6px;
+  color: var(--color-on-surface-variant);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.admin-users-field-span-2 {
+  grid-column: 1 / -1;
+}
+
+.admin-users-name-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 520px) {
+  .admin-users-name-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-users-field-error {
+  color: #ff6b6b;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.admin-users-form-error {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.admin-users-modal input[aria-invalid="true"],
+.admin-users-modal select[aria-invalid="true"] {
+  border-color: #ff6b6b;
+}
+
+@media (max-width: 520px) {
+  .admin-users-modal-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .admin-users-modal input,
