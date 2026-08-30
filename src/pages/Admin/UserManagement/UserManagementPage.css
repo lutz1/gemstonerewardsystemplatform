@@ -377,6 +377,7 @@
   display: grid;
   place-items: center;
   padding: 20px;
+  overflow-y: auto;
   background: rgba(4, 10, 6, 0.76);
   backdrop-filter: blur(8px);
 }
@@ -384,12 +385,14 @@
 .admin-users-modal {
   display: grid;
   width: min(100%, 560px);
+  max-height: calc(100vh - 40px);
   gap: 16px;
   padding: 24px;
   border: 1px solid var(--color-border-faint);
   border-radius: 12px;
   background: var(--surface-container);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
 }
 
 .admin-users-modal-header {

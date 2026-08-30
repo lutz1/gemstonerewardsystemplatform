@@ -1,5 +1,5 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import BottomNav from "../../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../../components/TopBar/TopBar";
 import { app } from "../../../firebase";
@@ -70,6 +70,42 @@ export default function UserManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+
+  const loadUsers = async () => {
+    try {
+      const getUsers = httpsCallable(
+        getFunctions(app, "asia-southeast1"),
+        "getUsers",
+      );
+      const result = await getUsers();
+      const users = (result.data || []).map((user) => {
+        const fullName = [user.firstName, user.middleName, user.lastName]
+          .filter(Boolean)
+          .join(" ")
+          .trim();
+
+        return {
+          id: user.id,
+          ...user,
+          name: user.name || fullName,
+          email: user.email || "",
+          role: user.role || "member",
+          status: user.status || "active",
+          totalSpent: Number(user.totalSpent ?? 0),
+        };
+      });
+
+      setUserList(users);
+    } catch (error) {
+      console.error("Failed to load users:", error);
+      setUserList([]);
+    }
+  };
+
+  useEffect(() => {
+    void loadUsers();
+  }, []);
+
   const emptyNewUser = {
     lastName: "",
     firstName: "",
@@ -91,9 +127,11 @@ export default function UserManagementPage() {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     return userList.filter((user) => {
-      const matchesSearch = [user.name ?? "", user.email ?? "", user.id ?? ""].some((value) =>
-        value.toLowerCase().includes(normalizedSearch),
-      );
+      const matchesSearch = [
+        user.name ?? "",
+        user.email ?? "",
+        user.id ?? "",
+      ].some((value) => value.toLowerCase().includes(normalizedSearch));
       const matchesStatus =
         statusFilter === "all" || user.status === statusFilter;
       const matchesRole =
@@ -174,30 +212,9 @@ export default function UserManagementPage() {
         role: newUser.role,
         status: newUser.status,
       });
-      const created = result.data;
-
-      setUserList((currentUsers) => [
-        ...currentUsers,
-        {
-          id: created.id,
-          name: created.name,
-          lastName,
-          firstName,
-          middleName,
-          birthdate,
-          civilStatus: newUser.civilStatus,
-          address,
-          phone,
-          email,
-          walletAddress: created.walletAddress,
-          joinDate: created.joinDate,
-          status: newUser.status,
-          role: newUser.role,
-          totalSpent: 0,
-        },
-      ]);
       closeAddUserModal();
       setCurrentPage(1);
+      await loadUsers();
     } catch (error) {
       setSubmitError(
         error?.message || "Failed to create user. Please try again.",
