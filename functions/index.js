@@ -139,6 +139,52 @@ exports.verifyMpin = onCall({ region: 'asia-southeast1' }, async (request) => {
   return { verified: true };
 });
 
+exports.promoteMemberToLeader = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+
+  await assertIsAdmin(request.auth.uid);
+
+  const userId = typeof request.data?.userId === 'string' ? request.data.userId.trim() : '';
+  if (!userId) {
+    throw new HttpsError('invalid-argument', 'A user must be selected to promote.');
+  }
+
+  if (userId === request.auth.uid) {
+    throw new HttpsError('invalid-argument', 'You cannot promote yourself.');
+  }
+
+  const targetUser = await getAuth().getUser(userId).catch(() => {
+    throw new HttpsError('not-found', 'Selected user was not found.');
+  });
+
+  if (targetUser.customClaims?.role === 'admin') {
+    throw new HttpsError('permission-denied', 'Admins cannot be promoted to leader.');
+  }
+
+  const updatedClaims = {
+    ...(targetUser.customClaims || {}),
+    role: 'leader',
+  };
+
+  await getAuth().setCustomUserClaims(userId, updatedClaims);
+
+  await db().collection('users').doc(userId).set(
+    {
+      role: 'leader',
+      updatedAt: new Date().toISOString(),
+    },
+    { merge: true },
+  );
+
+  return {
+    success: true,
+    userId,
+    role: 'leader',
+  };
+});
+
 exports.createUser = onCall({ region: 'asia-southeast1' }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Authentication is required.');

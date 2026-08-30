@@ -236,29 +236,23 @@
 .admin-users-table-section {
   width: 100%;
   border-top: 1px solid var(--color-border-faint);
-  overflow: hidden;
+  overflow: visible;
 }
 
-/* This panel scrolls horizontally only — vertical scrolling is left to
-   the page itself, with a sticky header so columns stay labeled while
-   scrolling sideways. */
+/* Leave page scrolling native so the table does not trap the browser scroll.
+   Horizontal table overflow remains available without intercepting vertical page behavior. */
 .admin-users-table-scroll-panel {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overscroll-behavior: auto;
   touch-action: pan-y;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
-  cursor: grab;
-  user-select: none;
-}
-
-.admin-users-table-scroll-panel:active {
-  cursor: grabbing;
-  user-select: none;
+  cursor: default;
+  user-select: auto;
 }
 
 .admin-users-table-scroll-panel::-webkit-scrollbar {

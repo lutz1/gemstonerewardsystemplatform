@@ -1,5 +1,5 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import BottomNav from "../../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../../components/TopBar/TopBar";
 import { app } from "../../../firebase";
@@ -68,87 +68,13 @@ function FilterDropdown({ label, value, options, onChange }) {
 export default function UserManagementPage() {
   const [userList, setUserList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchDraft, setSearchDraft] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isPromotionOpen, setIsPromotionOpen] = useState(false);
-
-  // The table's scroll panel can scroll both horizontally (extra columns)
-  // and vertically (extra rows). Without axis locking, a drag/swipe that's
-  // even slightly diagonal moves both at once, which feels broken. So we
-  // watch the first few pixels of movement, decide "this gesture is
-  // horizontal" or "this gesture is vertical", and commit to only that
-  // axis for the rest of the gesture.
-  const tableScrollRef = useRef(null);
-  const dragStateRef = useRef({
-    pointerId: null,
-    axis: null, // 'x' | 'y' | null (undecided)
-    startX: 0,
-    startY: 0,
-    startScrollLeft: 0,
-  });
-
-  const AXIS_LOCK_THRESHOLD = 6; // px of movement before we commit to an axis
-
-  const handleTablePointerDown = (event) => {
-    const panel = tableScrollRef.current;
-    if (!panel) return;
-    panel.setPointerCapture?.(event.pointerId);
-    dragStateRef.current = {
-      pointerId: event.pointerId,
-      axis: null,
-      startX: event.clientX,
-      startY: event.clientY,
-      startScrollLeft: panel.scrollLeft,
-    };
-  };
-
-  const handleTablePointerMove = (event) => {
-    const panel = tableScrollRef.current;
-    const drag = dragStateRef.current;
-    if (!panel || drag.pointerId !== event.pointerId) return;
-
-    const deltaX = event.clientX - drag.startX;
-    const deltaY = event.clientY - drag.startY;
-
-    if (!drag.axis) {
-      if (
-        Math.abs(deltaX) < AXIS_LOCK_THRESHOLD &&
-        Math.abs(deltaY) < AXIS_LOCK_THRESHOLD
-      ) {
-        return; // not enough movement yet to know which way this is going
-      }
-      // Whichever direction has moved further wins the whole gesture.
-      drag.axis = Math.abs(deltaX) > Math.abs(deltaY) ? "x" : "y";
-    }
-
-    if (drag.axis === "x") {
-      // We own horizontal scrolling manually, so stop the browser from
-      // also trying to scroll the page/panel vertically for this drag.
-      event.preventDefault();
-      panel.scrollLeft = drag.startScrollLeft - deltaX;
-    }
-    // If axis is "y", we do nothing here and let native vertical
-    // scrolling (touch-action: pan-y) handle it — that keeps vertical
-    // scrolling smooth and untouched by our horizontal logic.
-  };
-
-  const handleTablePointerEnd = (event) => {
-    const panel = tableScrollRef.current;
-    const drag = dragStateRef.current;
-    if (panel && drag.pointerId === event.pointerId) {
-      panel.releasePointerCapture?.(event.pointerId);
-    }
-    dragStateRef.current = {
-      pointerId: null,
-      axis: null,
-      startX: 0,
-      startY: 0,
-      startScrollLeft: 0,
-    };
-  };
 
   const loadUsers = async () => {
     try {
@@ -241,12 +167,21 @@ export default function UserManagementPage() {
               <input
                 type="search"
                 placeholder="Search by name, email, or ID"
-                value={searchTerm}
+                value={searchDraft}
                 onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
+                onBlur={() => {
+                  setIsSearchFocused(false);
+                  setSearchTerm(searchDraft.trim());
+                }}
                 onChange={(event) => {
-                  setSearchTerm(event.target.value);
-                  setCurrentPage(1);
+                  setSearchDraft(event.target.value);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    setSearchTerm(searchDraft.trim());
+                    setCurrentPage(1);
+                  }
                 }}
               />
             </label>
@@ -304,14 +239,7 @@ export default function UserManagementPage() {
           </div>
 
           <div className="admin-users-table-section">
-            <div
-              className="admin-users-table-scroll-panel"
-              ref={tableScrollRef}
-              onPointerDown={handleTablePointerDown}
-              onPointerMove={handleTablePointerMove}
-              onPointerUp={handleTablePointerEnd}
-              onPointerCancel={handleTablePointerEnd}
-            >
+            <div className="admin-users-table-scroll-panel">
               <div className="admin-users-table-wrap">
                 <table className="admin-users-table">
                   <thead>

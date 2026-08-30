@@ -20,22 +20,26 @@ export default function PromoteToLeaderModal({
   onPromoted,
 }) {
   const [promotionSearch, setPromotionSearch] = useState("");
+  const [promotionDraft, setPromotionDraft] = useState("");
   const [selectedPromotionUserId, setSelectedPromotionUserId] = useState("");
+  const [isConfirmingPromotion, setIsConfirmingPromotion] = useState(false);
   const [isPromoting, setIsPromoting] = useState(false);
   const [promotionError, setPromotionError] = useState("");
   const [promotionSuccess, setPromotionSuccess] = useState(false);
 
   const promotionMatches = useMemo(() => {
     const normalized = promotionSearch.trim().toLowerCase();
-    if (!normalized) return userList.filter((user) => user.role !== "leader");
+    const eligibleUsers = userList.filter(
+      (user) => user.role !== "leader" && user.role !== "admin",
+    );
 
-    return userList.filter((user) => {
+    if (!normalized) return eligibleUsers;
+
+    return eligibleUsers.filter((user) => {
       const searchable = [user.name, user.email, user.id]
         .filter(Boolean)
         .join(" ");
-      return (
-        user.role !== "leader" && searchable.toLowerCase().includes(normalized)
-      );
+      return searchable.toLowerCase().includes(normalized);
     });
   }, [promotionSearch, userList]);
 
@@ -43,18 +47,31 @@ export default function PromoteToLeaderModal({
 
   const closePromotionModal = () => {
     setPromotionSearch("");
+    setPromotionDraft("");
     setSelectedPromotionUserId("");
+    setIsConfirmingPromotion(false);
     setPromotionError("");
     setPromotionSuccess(false);
     setIsPromoting(false);
     onClose();
   };
 
+  const selectedPromotionUser = userList.find(
+    (user) => user.id === selectedPromotionUserId,
+  );
+
+  const handleOpenPromotionConfirmation = () => {
+    if (!selectedPromotionUser) {
+      setPromotionError("Please select a member to promote.");
+      return;
+    }
+
+    setPromotionError("");
+    setIsConfirmingPromotion(true);
+  };
+
   const handlePromoteMember = async () => {
-    const selectedUser = userList.find(
-      (user) => user.id === selectedPromotionUserId,
-    );
-    if (!selectedUser) {
+    if (!selectedPromotionUser) {
       setPromotionError("Please select a member to promote.");
       return;
     }
@@ -68,10 +85,11 @@ export default function PromoteToLeaderModal({
         "promoteMemberToLeader",
       );
 
-      await promoteMemberToLeader({ userId: selectedUser.id });
+      await promoteMemberToLeader({ userId: selectedPromotionUser.id });
 
-      onPromoted?.(selectedUser.id);
+      onPromoted?.(selectedPromotionUser.id);
       setPromotionSuccess(true);
+      setIsConfirmingPromotion(false);
 
       setTimeout(() => {
         closePromotionModal();
@@ -128,11 +146,17 @@ export default function PromoteToLeaderModal({
               Search member by name or email
               <input
                 type="search"
-                value={promotionSearch}
+                value={promotionDraft}
                 placeholder="Search member name"
                 onChange={(event) => {
-                  setPromotionSearch(event.target.value);
+                  setPromotionDraft(event.target.value);
                   setSelectedPromotionUserId("");
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    setPromotionSearch(promotionDraft.trim());
+                  }
                 }}
               />
             </label>
@@ -182,11 +206,60 @@ export default function PromoteToLeaderModal({
               type="button"
               className="admin-users-primary-button"
               disabled={!selectedPromotionUserId || isPromoting}
-              onClick={handlePromoteMember}
+              onClick={handleOpenPromotionConfirmation}
             >
               {isPromoting ? "Promoting..." : "Confirm Promotion"}
             </button>
           </>
+        )}
+
+        {isConfirmingPromotion && selectedPromotionUser && (
+          <div
+            className="admin-users-confirmation-backdrop"
+            role="presentation"
+            onMouseDown={() => setIsConfirmingPromotion(false)}
+          >
+            <div
+              className="admin-users-confirmation-modal"
+              onMouseDown={(event) => event.stopPropagation()}
+            >
+              <div className="admin-users-modal-header">
+                <h2>Confirm Promotion</h2>
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmingPromotion(false)}
+                  aria-label="Close confirmation modal"
+                >
+                  <span className="material-symbols-outlined" aria-hidden="true">
+                    close
+                  </span>
+                </button>
+              </div>
+
+              <p className="admin-users-confirmation-message">
+                Are you sure you want to promote {selectedPromotionUser.name} to
+                leader?
+              </p>
+
+              <div className="admin-users-confirmation-actions">
+                <button
+                  type="button"
+                  className="admin-users-secondary-button"
+                  onClick={() => setIsConfirmingPromotion(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="admin-users-primary-button"
+                  disabled={isPromoting}
+                  onClick={handlePromoteMember}
+                >
+                  {isPromoting ? "Promoting..." : "Confirm"}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
