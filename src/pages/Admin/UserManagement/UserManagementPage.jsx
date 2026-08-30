@@ -1,5 +1,5 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import BottomNav from "../../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../../components/TopBar/TopBar";
 import { app } from "../../../firebase";
@@ -70,6 +70,87 @@ export default function UserManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [isPromotionOpen, setIsPromotionOpen] = useState(false);
+  const [promotionSearch, setPromotionSearch] = useState("");
+  const [selectedPromotionUserId, setSelectedPromotionUserId] = useState("");
+  const [isPromoting, setIsPromoting] = useState(false);
+  const [promotionError, setPromotionError] = useState("");
+  const [promotionSuccess, setPromotionSuccess] = useState(false);
+
+  // The table's scroll panel can scroll both horizontally (extra columns)
+  // and vertically (extra rows). Without axis locking, a drag/swipe that's
+  // even slightly diagonal moves both at once, which feels broken. So we
+  // watch the first few pixels of movement, decide "this gesture is
+  // horizontal" or "this gesture is vertical", and commit to only that
+  // axis for the rest of the gesture.
+  const tableScrollRef = useRef(null);
+  const dragStateRef = useRef({
+    pointerId: null,
+    axis: null, // 'x' | 'y' | null (undecided)
+    startX: 0,
+    startY: 0,
+    startScrollLeft: 0,
+  });
+
+  const AXIS_LOCK_THRESHOLD = 6; // px of movement before we commit to an axis
+
+  const handleTablePointerDown = (event) => {
+    const panel = tableScrollRef.current;
+    if (!panel) return;
+    panel.setPointerCapture?.(event.pointerId);
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      axis: null,
+      startX: event.clientX,
+      startY: event.clientY,
+      startScrollLeft: panel.scrollLeft,
+    };
+  };
+
+  const handleTablePointerMove = (event) => {
+    const panel = tableScrollRef.current;
+    const drag = dragStateRef.current;
+    if (!panel || drag.pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+
+    if (!drag.axis) {
+      if (
+        Math.abs(deltaX) < AXIS_LOCK_THRESHOLD &&
+        Math.abs(deltaY) < AXIS_LOCK_THRESHOLD
+      ) {
+        return; // not enough movement yet to know which way this is going
+      }
+      // Whichever direction has moved further wins the whole gesture.
+      drag.axis = Math.abs(deltaX) > Math.abs(deltaY) ? "x" : "y";
+    }
+
+    if (drag.axis === "x") {
+      // We own horizontal scrolling manually, so stop the browser from
+      // also trying to scroll the page/panel vertically for this drag.
+      event.preventDefault();
+      panel.scrollLeft = drag.startScrollLeft - deltaX;
+    }
+    // If axis is "y", we do nothing here and let native vertical
+    // scrolling (touch-action: pan-y) handle it — that keeps vertical
+    // scrolling smooth and untouched by our horizontal logic.
+  };
+
+  const handleTablePointerEnd = (event) => {
+    const panel = tableScrollRef.current;
+    const drag = dragStateRef.current;
+    if (panel && drag.pointerId === event.pointerId) {
+      panel.releasePointerCapture?.(event.pointerId);
+    }
+    dragStateRef.current = {
+      pointerId: null,
+      axis: null,
+      startX: 0,
+      startY: 0,
+      startScrollLeft: 0,
+    };
+  };
 
   const loadUsers = async () => {
     try {
@@ -105,6 +186,68 @@ export default function UserManagementPage() {
   useEffect(() => {
     void loadUsers();
   }, []);
+
+  const promotionMatches = useMemo(() => {
+    const normalized = promotionSearch.trim().toLowerCase();
+    if (!normalized) return userList.filter((user) => user.role !== "leader");
+
+    return userList.filter((user) => {
+      const searchable = [user.name, user.email, user.id]
+        .filter(Boolean)
+        .join(" ");
+      return (
+        user.role !== "leader" && searchable.toLowerCase().includes(normalized)
+      );
+    });
+  }, [promotionSearch, userList]);
+
+  const closePromotionModal = () => {
+    setIsPromotionOpen(false);
+    setPromotionSearch("");
+    setSelectedPromotionUserId("");
+    setPromotionError("");
+    setPromotionSuccess(false);
+    setIsPromoting(false);
+  };
+
+  const handlePromoteMember = async () => {
+    const selectedUser = userList.find(
+      (user) => user.id === selectedPromotionUserId,
+    );
+    if (!selectedUser) {
+      setPromotionError("Please select a member to promote.");
+      return;
+    }
+
+    setIsPromoting(true);
+    setPromotionError("");
+
+    try {
+      const promoteMemberToLeader = httpsCallable(
+        getFunctions(app, "asia-southeast1"),
+        "promoteMemberToLeader",
+      );
+
+      await promoteMemberToLeader({ userId: selectedUser.id });
+
+      setUserList((currentUsers) =>
+        currentUsers.map((user) =>
+          user.id === selectedUser.id ? { ...user, role: "leader" } : user,
+        ),
+      );
+      setPromotionSuccess(true);
+
+      setTimeout(() => {
+        closePromotionModal();
+      }, 1500);
+    } catch (error) {
+      setPromotionError(
+        error?.message || "Failed to promote member. Please try again.",
+      );
+    } finally {
+      setIsPromoting(false);
+    }
+  };
 
   const emptyNewUser = {
     lastName: "",
@@ -323,6 +466,7 @@ export default function UserManagementPage() {
                 options={[
                   { value: "all", label: "All roles" },
                   { value: "member", label: "Member" },
+                  { value: "leader", label: "Leader" },
                   { value: "admin", label: "Admin" },
                 ]}
               />
@@ -346,6 +490,16 @@ export default function UserManagementPage() {
               <button
                 type="button"
                 className="admin-users-primary-button"
+                onClick={() => setIsPromotionOpen(true)}
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  supervisor_account
+                </span>
+                Promote to Leader
+              </button>
+              <button
+                type="button"
+                className="admin-users-primary-button"
                 onClick={() => setIsAddUserOpen(true)}
               >
                 <span className="material-symbols-outlined" aria-hidden="true">
@@ -357,53 +511,64 @@ export default function UserManagementPage() {
           </div>
 
           <div className="admin-users-table-section">
-            <div className="admin-users-table-wrap">
-              <table className="admin-users-table">
-                <thead>
-                  <tr>
-                    <th scope="col">User</th>
-                    <th scope="col">Member since</th>
-                    <th scope="col">Role</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Total spent</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleUsers.map((user) => (
-                    <tr key={user.id}>
-                      <td>
-                        <div className="admin-user-identity">
-                          <span className="admin-user-avatar">
-                            {user.name
-                              .split(" ")
-                              .map((part) => part[0])
-                              .join("")
-                              .slice(0, 2)}
-                          </span>
-                          <span>
-                            <strong>{user.name}</strong>
-                            <small>
-                              {user.email} · {user.id}
-                            </small>
-                          </span>
-                        </div>
-                      </td>
-                      <td>{formatJoinDate(user.joinDate)}</td>
-                      <td>
-                        <span className="admin-user-role">
-                          {user.role || "member"}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`admin-user-status ${user.status}`}>
-                          {user.status}
-                        </span>
-                      </td>
-                      <td>{formatPeso(user.totalSpent)}</td>
+            <div
+              className="admin-users-table-scroll-panel"
+              ref={tableScrollRef}
+              onPointerDown={handleTablePointerDown}
+              onPointerMove={handleTablePointerMove}
+              onPointerUp={handleTablePointerEnd}
+              onPointerCancel={handleTablePointerEnd}
+            >
+              <div className="admin-users-table-wrap">
+                <table className="admin-users-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Avatar</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Member Since</th>
+                      <th scope="col">Phone Number</th>
+                      <th scope="col">Role</th>
+                      <th scope="col">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {visibleUsers.map((user) => (
+                      <tr key={user.id}>
+                        <td>
+                          <div className="admin-user-identity">
+                            <span className="admin-user-avatar">
+                              {(user.name || user.email || "U")
+                                .split(" ")
+                                .map((part) => part[0])
+                                .join("")
+                                .slice(0, 2)
+                                .toUpperCase() || "U"}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="admin-user-name-block">
+                            <strong>{user.name}</strong>
+                            <small>{user.email}</small>
+                          </div>
+                        </td>
+                        <td>{formatJoinDate(user.joinDate)}</td>
+                        <td>{user.phone || "—"}</td>
+                        <td>
+                          <span className="admin-user-role">
+                            {user.role || "member"}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`admin-user-status ${user.status}`}>
+                            {user.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               {visibleUsers.length === 0 && (
                 <p className="admin-users-empty">No users match your search.</p>
               )}
@@ -439,6 +604,118 @@ export default function UserManagementPage() {
         </section>
       </main>
       <BottomNav activeItem="users" variant="admin" />
+      {isPromotionOpen && (
+        <div
+          className="admin-users-modal-backdrop"
+          role="presentation"
+          onMouseDown={closePromotionModal}
+        >
+          <div
+            className="admin-users-modal admin-users-promotion-modal"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="admin-users-modal-header">
+              <h2>Promote Member</h2>
+              <button
+                type="button"
+                onClick={closePromotionModal}
+                aria-label="Close promotion modal"
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  close
+                </span>
+              </button>
+            </div>
+
+            {promotionSuccess ? (
+              <div className="admin-users-success-state" aria-live="polite">
+                <div className="admin-users-success-check">
+                  <span
+                    className="material-symbols-outlined"
+                    aria-hidden="true"
+                  >
+                    check
+                  </span>
+                </div>
+                <h3>Promotion successful</h3>
+                <p>
+                  {userList.find((user) => user.id === selectedPromotionUserId)
+                    ?.name || "Member"}{" "}
+                  is now a leader.
+                </p>
+              </div>
+            ) : (
+              <>
+                <label className="admin-users-field-span-2">
+                  Search member by name or email
+                  <input
+                    type="search"
+                    value={promotionSearch}
+                    placeholder="Search member name"
+                    onChange={(event) => {
+                      setPromotionSearch(event.target.value);
+                      setSelectedPromotionUserId("");
+                    }}
+                  />
+                </label>
+
+                <div className="admin-users-promotion-list">
+                  {promotionMatches.length === 0 ? (
+                    <p className="admin-users-promotion-empty">
+                      No member found.
+                    </p>
+                  ) : (
+                    promotionMatches.map((user) => (
+                      <button
+                        key={user.id}
+                        type="button"
+                        className={`admin-users-promotion-option ${
+                          selectedPromotionUserId === user.id ? "selected" : ""
+                        }`}
+                        onClick={() => setSelectedPromotionUserId(user.id)}
+                      >
+                        <div className="admin-user-identity">
+                          <span className="admin-user-avatar">
+                            {(user.name || user.email || "U")
+                              .split(" ")
+                              .map((part) => part[0])
+                              .join("")
+                              .slice(0, 2)
+                              .toUpperCase() || "U"}
+                          </span>
+                          <span>
+                            <strong>{user.name}</strong>
+                            <small>{user.email}</small>
+                          </span>
+                        </div>
+                        <span className="admin-user-role">
+                          {user.role || "member"}
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+
+                {promotionError && (
+                  <p className="admin-users-form-error" role="alert">
+                    {promotionError}
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  className="admin-users-primary-button"
+                  disabled={!selectedPromotionUserId || isPromoting}
+                  onClick={handlePromoteMember}
+                >
+                  {isPromoting ? "Promoting..." : "Confirm Promotion"}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {isAddUserOpen && (
         <div
           className="admin-users-modal-backdrop"
@@ -598,6 +875,7 @@ export default function UserManagementPage() {
                   }
                 >
                   <option value="member">Member</option>
+                  <option value="leader">Leader</option>
                   <option value="admin">Admin</option>
                 </select>
               </label>
