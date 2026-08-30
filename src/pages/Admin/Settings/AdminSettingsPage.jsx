@@ -3,15 +3,33 @@ import BottomNav from "../../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../../components/TopBar/TopBar";
 import "./AdminSettingsPage.css";
 
+// Persisted to localStorage so edits survive a page refresh. If this page
+// ever talks to a real backend (Supabase, etc.), swap loadStoredConfig /
+// the save handler below for the API calls and drop the localStorage bits.
+const STORAGE_KEY = "admin-settings-config";
+
 const defaultConfig = {
-  defaultGemValue: 12.5,
-  valueMode: "Auto-calculated",
+  defaultGemValue: 0,
   currency: "PHP",
   minExchangeValue: 100,
   approvalRequired: true,
   maintenanceMode: false,
   systemEmail: "support@gemstonecode.com",
 };
+
+function loadStoredConfig() {
+  if (typeof window === "undefined") return defaultConfig;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultConfig;
+    const parsed = JSON.parse(raw);
+    // Merge over defaultConfig so a previously-stored blob missing a
+    // field (e.g. after this page's shape changes) still fills in safely.
+    return { ...defaultConfig, ...parsed };
+  } catch {
+    return defaultConfig;
+  }
+}
 
 function ToggleRow({ label, caption, checked, onToggle }) {
   return (
@@ -35,7 +53,7 @@ function ToggleRow({ label, caption, checked, onToggle }) {
 }
 
 export default function AdminSettingsPage() {
-  const [config, setConfig] = useState(defaultConfig);
+  const [config, setConfig] = useState(loadStoredConfig);
   const [saved, setSaved] = useState(false);
 
   const updateField = (field, value) => {
@@ -44,7 +62,23 @@ export default function AdminSettingsPage() {
   };
 
   const handleSave = () => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    } catch {
+      // Storage can fail (private browsing, quota, disabled storage) —
+      // the form still works in-session even if persistence doesn't.
+    }
     setSaved(true);
+  };
+
+  const handleReset = () => {
+    setConfig(defaultConfig);
+    setSaved(false);
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore — same reasoning as above
+    }
   };
 
   return (
@@ -108,21 +142,6 @@ export default function AdminSettingsPage() {
                   }
                 />
               </div>
-            </div>
-
-            <div className="admin-settings-field-group">
-              <label htmlFor="valueMode">Value calculation mode</label>
-              <select
-                id="valueMode"
-                value={config.valueMode}
-                onChange={(event) =>
-                  updateField("valueMode", event.target.value)
-                }
-              >
-                <option>Auto-calculated</option>
-                <option>Manual override</option>
-                <option>Market based</option>
-              </select>
             </div>
           </article>
 
@@ -226,7 +245,7 @@ export default function AdminSettingsPage() {
           <button
             type="button"
             className="admin-settings-secondary-button"
-            onClick={() => setConfig(defaultConfig)}
+            onClick={handleReset}
           >
             Reset
           </button>
