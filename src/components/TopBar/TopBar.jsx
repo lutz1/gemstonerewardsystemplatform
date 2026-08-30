@@ -37,6 +37,18 @@ export default function TopBar({
     }
   };
 
+  const handleNotifClick = () => {
+    if (onNotifClick) {
+      onNotifClick();
+      return;
+    }
+
+    const notificationsPath = profilePath.includes("/admin")
+      ? "/admin/notifications"
+      : "/notifications";
+    navigate(notificationsPath);
+  };
+
   return (
     <header className="tb-topbar">
       <div className="tb-topbar-inner">
@@ -52,7 +64,7 @@ export default function TopBar({
           <button
             className="tb-notif-btn"
             aria-label="Notifications"
-            onClick={onNotifClick}
+            onClick={handleNotifClick}
           >
             <span className="material-symbols-outlined">notifications</span>
             {showNotifDot && <span className="tb-notif-dot" />}
