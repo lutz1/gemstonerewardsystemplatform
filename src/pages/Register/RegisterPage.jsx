@@ -1,13 +1,14 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { auth } from "../../firebase";
+import { app } from "../../firebase";
 import "./RegisterPage.css";
 
 export default function RegisterPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [form, setForm] = useState({
+    username: "",
     name: "",
     email: "",
     phone: "",
@@ -33,6 +34,7 @@ export default function RegisterPage() {
     setError("");
     setSuccess("");
     if (
+      !form.username.trim() ||
       !form.name.trim() ||
       !form.email.trim() ||
       !form.phone.trim() ||
@@ -44,11 +46,19 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      await createUserWithEmailAndPassword(
-        auth,
-        form.email.trim(),
-        form.password,
+      const registerMembership = httpsCallable(
+        getFunctions(app, "asia-southeast1"),
+        "registerMembership",
       );
+      await registerMembership({
+        username: form.username.trim(),
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        tin: form.tin.trim(),
+        password: form.password,
+        referralCode: form.referralCode.trim(),
+      });
       setSuccess("Account created successfully. Redirecting to login...");
       setTimeout(() => navigate("/login"), 1400);
     } catch (registrationError) {
@@ -86,6 +96,16 @@ export default function RegisterPage() {
             </p>
           )}
           <form onSubmit={handleSubmit}>
+            <label>
+              Username
+              <input
+                required
+                placeholder="e.g. alexisrivera"
+                autoComplete="username"
+                value={form.username}
+                onChange={updateField("username")}
+              />
+            </label>
             <label>
               Full Name
               <input
