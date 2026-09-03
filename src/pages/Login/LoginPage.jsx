@@ -1,8 +1,10 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import bgImage from "../../assets/login_bg.png";
 import bgImageLandscape from "../../assets/login_bg_landscape.jpeg";
+import { app } from "../../firebase";
 import "./LoginPage.css";
 
 const BG_IMAGE = bgImage;
@@ -11,7 +13,7 @@ const BG_IMAGE_LANDSCAPE = bgImageLandscape;
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [email, setEmail] = useState("");
+  const [loginIdentifier, setLoginIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,12 +35,21 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!email || !password) {
+    if (!loginIdentifier || !password) {
       setError("Credentials incomplete. Please fill in all fields.");
       return;
     }
     setLoading(true);
     try {
+      let email = loginIdentifier.trim();
+      if (!email.includes("@")) {
+        const resolveUsername = httpsCallable(
+          getFunctions(app, "asia-southeast1"),
+          "resolveUsername",
+        );
+        const result = await resolveUsername({ username: email });
+        email = result.data?.email || "";
+      }
       await login(email, password);
       navigate("/pin-verification");
     } catch (err) {
@@ -76,8 +87,8 @@ export default function LoginPage() {
             {error && <p className="lp-error">{error}</p>}
 
             <div className="lp-field">
-              <label className="lp-field-label" htmlFor="email">
-                Email
+              <label className="lp-field-label" htmlFor="login-identifier">
+                Email or Username
               </label>
               <div className="lp-input-wrap">
                 <span
@@ -87,13 +98,13 @@ export default function LoginPage() {
                   mail
                 </span>
                 <input
-                  id="email"
-                  type="email"
+                  id="login-identifier"
+                  type="text"
                   className="lp-input"
-                  placeholder="e.g. name@company.com"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="e.g. name@company.com or USERNAME"
+                  autoComplete="username"
+                  value={loginIdentifier}
+                  onChange={(e) => setLoginIdentifier(e.target.value)}
                 />
               </div>
             </div>

@@ -47,6 +47,22 @@ exports.healthCheck = onRequest({ region: 'asia-southeast1' }, (_request, respon
   response.status(200).json({ status: 'ok' });
 });
 
+exports.resolveUsername = onCall({ region: 'asia-southeast1' }, async (request) => {
+  const username = requireNonEmptyString(request.data?.username, 'Username').toUpperCase();
+  const snapshot = await db()
+    .collection('users')
+    .where('username', '==', username)
+    .limit(1)
+    .get();
+
+  const email = snapshot.docs[0]?.data()?.email;
+  if (!email) {
+    throw new HttpsError('not-found', 'Invalid username or password.');
+  }
+
+  return { email };
+});
+
 exports.getUsers = onCall({ region: 'asia-southeast1' }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Authentication is required.');
