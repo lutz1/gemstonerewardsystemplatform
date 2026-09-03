@@ -87,6 +87,105 @@ exports.resolveUsername = onCall({ region: 'asia-southeast1' }, async (request) 
   return { email };
 });
 
+exports.registerMembership = onCall({ region: 'asia-southeast1' }, async (request) => {
+  const data = request.data || {};
+  const username = requireNonEmptyString(data.username, 'Username').toUpperCase();
+  const firstName = requireNonEmptyString(data.firstName, 'First name').toUpperCase();
+  const lastName = requireNonEmptyString(data.lastName, 'Last name').toUpperCase();
+  const middleName = typeof data.middleName === 'string' ? data.middleName.trim().toUpperCase() : '';
+  const email = requireNonEmptyString(data.email, 'Email').toLowerCase();
+  const phone = requireNonEmptyString(data.phone, 'Phone');
+  const birthdate = requireNonEmptyString(data.birthdate, 'Birthdate');
+  const suppliedReferral = typeof data.referralCode === 'string' ? data.referralCode.trim() : '';
+  const civilStatus = ['single', 'married', 'widowed', 'separated'].includes(data.civilStatus)
+    ? data.civilStatus
+    : 'single';
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new HttpsError('invalid-argument', 'Enter a valid email address.');
+  }
+
+  const usernameSnapshot = await db().collection('users')
+    .where('username', '==', username)
+    .limit(1)
+    .get();
+  if (!usernameSnapshot.empty) {
+    throw new HttpsError('already-exists', 'A user with this username already exists.');
+  }
+
+  let uplineReferralCode = '';
+  let uplineUsername = '';
+  if (suppliedReferral) {
+    let referralSnapshot = await db().collection('users')
+      .where('referralCode', '==', suppliedReferral.toUpperCase())
+      .limit(1)
+      .get();
+
+    if (referralSnapshot.empty) {
+      referralSnapshot = await db().collection('users')
+        .where('username', '==', suppliedReferral.toUpperCase())
+        .limit(1)
+        .get();
+    }
+
+    if (referralSnapshot.empty && suppliedReferral.toUpperCase() !== suppliedReferral.toLowerCase()) {
+      referralSnapshot = await db().collection('users')
+        .where('username', '==', suppliedReferral.toLowerCase())
+        .limit(1)
+        .get();
+    }
+
+    if (referralSnapshot.empty) {
+      throw new HttpsError('invalid-argument', 'The referral code is invalid.');
+    }
+
+    const upline = referralSnapshot.docs[0].data() || {};
+    uplineReferralCode = upline.referralCode || suppliedReferral.toUpperCase();
+    uplineUsername = upline.username || '';
+  }
+
+  let userRecord;
+  try {
+    userRecord = await getAuth().createUser({
+      email,
+      password: DEFAULT_PASSWORD,
+      displayName: `${firstName} ${lastName}`,
+    });
+  } catch (error) {
+    if (error.code === 'auth/email-already-exists') {
+      throw new HttpsError('already-exists', 'A user with this email already exists.');
+    }
+    throw new HttpsError('internal', 'Failed to create the authentication account.');
+  }
+
+  const referralCode = await generateReferralCode();
+  const joinDate = new Date().toISOString();
+  const userDoc = {
+    username,
+    referralCode,
+    uplineReferralCode,
+    uplineUsername,
+    firstName,
+    lastName,
+    middleName,
+    name: `${firstName} ${lastName}`,
+    email,
+    phone,
+    birthdate,
+    civilStatus,
+    role: 'member',
+    status: 'active',
+    walletAddress: generateWalletAddress(),
+    totalSpent: 0,
+    mpinSetup: false,
+    joinDate,
+    createdAt: joinDate,
+  };
+
+  await db().collection('users').doc(userRecord.uid).set(userDoc);
+  return { id: userRecord.uid, ...userDoc };
+});
+
 exports.getUsers = onCall({ region: 'asia-southeast1' }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Authentication is required.');

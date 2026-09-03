@@ -65,6 +65,11 @@
   display: grid;
   gap: 18px;
 }
+.register-name-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
 .register-card label {
   display: grid;
   gap: 7px;
@@ -100,7 +105,20 @@
   color: var(--on-surface);
   font: 14px var(--font-hanken);
   letter-spacing: 0;
+  text-transform: uppercase;
+}
+.register-card input[type="email"] {
   text-transform: none;
+}
+.register-card select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: var(--surface-container-low);
+  color: var(--on-surface);
+  font: 14px var(--font-hanken);
 }
 .register-card input:focus {
   border-color: var(--primary);
@@ -176,5 +194,8 @@
   }
   .register-card {
     padding: 20px 16px;
+  }
+  .register-name-fields {
+    grid-template-columns: 1fr;
   }
 }

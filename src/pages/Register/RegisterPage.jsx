@@ -9,14 +9,15 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     username: "",
-    name: "",
+    lastName: "",
+    firstName: "",
+    middleName: "",
     email: "",
     phone: "",
-    tin: "",
-    password: "",
+    birthdate: "",
+    civilStatus: "single",
     referralCode: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -35,10 +36,11 @@ export default function RegisterPage() {
     setSuccess("");
     if (
       !form.username.trim() ||
-      !form.name.trim() ||
+      !form.lastName.trim() ||
+      !form.firstName.trim() ||
       !form.email.trim() ||
       !form.phone.trim() ||
-      !form.password
+      !form.birthdate.trim()
     ) {
       setError("Please fill in all required fields.");
       return;
@@ -52,11 +54,13 @@ export default function RegisterPage() {
       );
       await registerMembership({
         username: form.username.trim(),
-        name: form.name.trim(),
+        lastName: form.lastName.trim(),
+        firstName: form.firstName.trim(),
+        middleName: form.middleName.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
-        tin: form.tin.trim(),
-        password: form.password,
+        birthdate: form.birthdate,
+        civilStatus: form.civilStatus,
         referralCode: form.referralCode.trim(),
       });
       setSuccess("Account created successfully. Redirecting to login...");
@@ -106,15 +110,20 @@ export default function RegisterPage() {
                 onChange={updateField("username")}
               />
             </label>
-            <label>
-              Full Name
-              <input
-                required
-                placeholder="e.g. Alexis Rivera"
-                value={form.name}
-                onChange={updateField("name")}
-              />
-            </label>
+            <div className="register-name-fields">
+              <label>
+                Last Name
+                <input required value={form.lastName} onChange={updateField("lastName")} />
+              </label>
+              <label>
+                First Name
+                <input required value={form.firstName} onChange={updateField("firstName")} />
+              </label>
+              <label>
+                Middle Name <span className="register-optional">Optional</span>
+                <input value={form.middleName} onChange={updateField("middleName")} />
+              </label>
+            </div>
             <label>
               Email Address
               <input
@@ -137,37 +146,22 @@ export default function RegisterPage() {
               />
             </label>
             <label>
-              TIN Code <span className="register-optional">Optional</span>
+              Birthdate
               <input
-                placeholder="e.g. 123-456-789"
-                value={form.tin}
-                onChange={updateField("tin")}
+                required
+                type="date"
+                value={form.birthdate}
+                onChange={updateField("birthdate")}
               />
             </label>
             <label>
-              Password
-              <div className="register-password-field">
-                <input
-                  required
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••••••"
-                  autoComplete="new-password"
-                  value={form.password}
-                  onChange={updateField("password")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((visible) => !visible)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  <span
-                    className="material-symbols-outlined"
-                    aria-hidden="true"
-                  >
-                    {showPassword ? "visibility_off" : "visibility"}
-                  </span>
-                </button>
-              </div>
+              Civil Status
+              <select value={form.civilStatus} onChange={updateField("civilStatus")}>
+                <option value="single">Single</option>
+                <option value="married">Married</option>
+                <option value="widowed">Widowed</option>
+                <option value="separated">Separated</option>
+              </select>
             </label>
             <label>
               Referral Code <span className="register-optional">Optional</span>
