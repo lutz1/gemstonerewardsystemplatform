@@ -1,8 +1,9 @@
 import { useState } from "react";
-import "./PurchaseCodesPage.css";
+import { useAuth } from "../../../context/AuthContext";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
 import { getTransactions } from "../../utils/TransactionsData";
+import "./PurchaseCodesPage.css";
 
 const codes = [
   {
@@ -62,12 +63,15 @@ const ledgerStats = [
   },
 ];
 
-const REFERRAL_LINK = "https://gemstonecode.com/join?ref=arivera92";
-
 export default function PurchaseCodesPage() {
+  const { username, referralCode } = useAuth();
   const [search, setSearch] = useState("");
   const [transactions] = useState(() => getTransactions());
   const [copied, setCopied] = useState(false);
+  const referralIdentifier = referralCode || username;
+  const referralLink = referralIdentifier
+    ? `https://gemstonecode.store/register?ref=${encodeURIComponent(referralIdentifier)}`
+    : "";
 
   const filtered = codes.filter(
     (c) =>
@@ -77,7 +81,7 @@ export default function PurchaseCodesPage() {
 
   const handleCopyReferral = async () => {
     try {
-      await navigator.clipboard.writeText(REFERRAL_LINK);
+      await navigator.clipboard.writeText(referralLink);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -91,7 +95,7 @@ export default function PurchaseCodesPage() {
         await navigator.share({
           title: "Join Gemstone Code",
           text: "Join me on Gemstone Code and get access to executive networking codes.",
-          url: REFERRAL_LINK,
+          url: referralLink,
         });
       } catch (err) {
         // User cancelled the share sheet — nothing to do.
@@ -123,7 +127,7 @@ export default function PurchaseCodesPage() {
                 <input
                   type="text"
                   readOnly
-                  value={REFERRAL_LINK}
+                  value={referralLink}
                   className="pc-referral-input"
                   onFocus={(e) => e.target.select()}
                   aria-label="Your direct referral link"

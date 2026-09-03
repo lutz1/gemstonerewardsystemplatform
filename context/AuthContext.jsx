@@ -28,15 +28,24 @@ async function getAccountStatus() {
     return {
       mpinSetup: result.data?.mpinSetup === true,
       role: result.data?.role || "member",
+      username: result.data?.username || "",
+      referralCode: result.data?.referralCode || "",
     };
   } catch {
-    return { mpinSetup: false, role: "member" };
+    return {
+      mpinSetup: false,
+      role: "member",
+      username: "",
+      referralCode: "",
+    };
   }
 }
 
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
+  const [username, setUsername] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [pinVerified, setPinVerified] = useState(() => readStoredPinVerified());
   const [mpinSetup, setMpinSetup] = useState(false);
   const [authReady, setAuthReady] = useState(false);
@@ -47,6 +56,8 @@ export function AuthProvider({ children }) {
 
       if (!user) {
         setRole(null);
+        setUsername("");
+        setReferralCode("");
         setMpinSetup(false);
         setPinVerified(false);
         writeStoredPinVerified(false);
@@ -60,6 +71,8 @@ export function AuthProvider({ children }) {
       const hasValidatedPin = readStoredPinVerified();
 
       setRole(nextRole);
+      setUsername(status.username || "");
+      setReferralCode(status.referralCode || "");
       setMpinSetup(status.mpinSetup);
       setPinVerified(hasValidatedPin);
       setAuthReady(true);
@@ -74,6 +87,8 @@ export function AuthProvider({ children }) {
     const status = await getAccountStatus();
     const nextRole = status.role || token.claims.role || token.claims.userRole || "member";
     setRole(nextRole);
+    setUsername(status.username || "");
+    setReferralCode(status.referralCode || "");
     setMpinSetup(status.mpinSetup);
     setPinVerified(readStoredPinVerified());
   };
@@ -97,7 +112,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, role, pinVerified, mpinSetup, authReady, login, verifyPin, completeMpinSetup, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, role, username, referralCode, pinVerified, mpinSetup, authReady, login, verifyPin, completeMpinSetup, logout }}>
       {children}
     </AuthContext.Provider>
   );

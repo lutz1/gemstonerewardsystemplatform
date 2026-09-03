@@ -29,6 +29,21 @@ function generateWalletAddress() {
   return `0x${crypto.randomBytes(20).toString('hex')}`;
 }
 
+async function generateReferralCode() {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const code = `GSC-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+    const snapshot = await db()
+      .collection('users')
+      .where('referralCode', '==', code)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) return code;
+  }
+
+  throw new HttpsError('internal', 'Failed to generate a unique referral code.');
+}
+
 async function assertIsAdmin(uid) {
   const snapshot = await db().collection('users').doc(uid).get();
   if (snapshot.data()?.role !== 'admin') {
@@ -182,13 +197,25 @@ exports.getMpinStatus = onCall({ region: 'asia-southeast1' }, async (request) =>
       .doc(request.auth.uid)
       .get();
 
+    const userData = userSnapshot.data() || {};
+    const referralCode = userData.referralCode || await generateReferralCode();
+
+    if (!userData.referralCode) {
+      await db()
+        .collection('users')
+        .doc(request.auth.uid)
+        .set({ referralCode }, { merge: true });
+    }
+
     return {
-      mpinSetup: userSnapshot.data()?.mpinSetup === true,
-      role: userSnapshot.data()?.role || 'member',
+      mpinSetup: userData.mpinSetup === true,
+      role: userData.role || 'member',
+      username: userData.username || '',
+      referralCode,
     };
   } catch (error) {
     if (error.code === 5) {
-      return { mpinSetup: false, role: 'member' };
+      return { mpinSetup: false, role: 'member', username: '', referralCode: '' };
     }
 
     throw error;
@@ -357,10 +384,12 @@ exports.createUser = onCall({ region: 'asia-southeast1' }, async (request) => {
   await getAuth().setCustomUserClaims(userRecord.uid, { role });
 
   const walletAddress = generateWalletAddress();
+  const referralCode = await generateReferralCode();
   const joinDate = new Date().toISOString();
 
   const userDoc = {
     username,
+    referralCode,
     firstName,
     lastName,
     middleName,

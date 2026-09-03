@@ -1,15 +1,15 @@
 import {
-    MdAccountBalanceWallet,
-    MdArrowForward,
-    MdCampaign,
-    MdChevronRight,
-    MdDiamond,
-    MdErrorOutline,
-    MdGroup,
-    MdQrCode,
-    MdReceiptLong,
-    MdSwapHoriz,
-    MdTrendingUp,
+  MdAccountBalanceWallet,
+  MdArrowForward,
+  MdCampaign,
+  MdChevronRight,
+  MdDiamond,
+  MdErrorOutline,
+  MdGroup,
+  MdQrCode,
+  MdReceiptLong,
+  MdSwapHoriz,
+  MdTrendingUp,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import guideImage from "../../assets/bg_belowdashboard.png";
@@ -115,8 +115,8 @@ export default function Dashboard() {
               <MdCampaign size={20} color="var(--color-primary)" />
             </div>
             <div className="dash-referral-text">
-              <p className="dash-referral-title">Referral Hub</p>
-              <p className="dash-referral-sub">Earn 500 Gems per sign-up</p>
+              <p className="dash-referral-title">Invite Friends</p>
+              <p className="dash-referral-sub">Earn Gems if your friends sign up and purchase</p>
             </div>
           </div>
           <div className="dash-chevron-btn">
