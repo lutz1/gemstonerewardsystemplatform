@@ -4,6 +4,7 @@ import { app } from "../../../../firebase";
 import "./AddUserModal.css";
 
 const emptyNewUser = {
+  username: "",
   lastName: "",
   firstName: "",
   middleName: "",
@@ -48,6 +49,7 @@ export default function AddUserModal({
 
   const handleAddUser = async (event) => {
     event.preventDefault();
+    const username = newUser.username.trim();
     const lastName = newUser.lastName.trim();
     const firstName = newUser.firstName.trim();
     const middleName = newUser.middleName.trim();
@@ -59,6 +61,16 @@ export default function AddUserModal({
     const phonePattern = /^[0-9+\-()\s]{7,15}$/;
 
     const errors = {};
+    if (!username) {
+      errors.username = "Username is required.";
+    } else if (
+      (existingUsers || []).some(
+        (user) =>
+          (user.username || "").toLowerCase() === username.toLowerCase(),
+      )
+    ) {
+      errors.username = "A user with this username already exists.";
+    }
     if (!lastName) errors.lastName = "Last name is required.";
     if (!firstName) errors.firstName = "First name is required.";
     if (!middleName) errors.middleName = "Middle name is required.";
@@ -94,6 +106,7 @@ export default function AddUserModal({
         "createUser",
       );
       await createUser({
+        username,
         lastName,
         firstName,
         middleName,
@@ -141,6 +154,23 @@ export default function AddUserModal({
           </button>
         </div>
         <div className="admin-users-modal-grid">
+          <label className="admin-users-field-span-2">
+            Username
+            <input
+              required
+              autoComplete="username"
+              value={newUser.username}
+              aria-invalid={Boolean(formErrors.username)}
+              onChange={(event) =>
+                setNewUser({ ...newUser, username: event.target.value })
+              }
+            />
+            {formErrors.username && (
+              <span className="admin-users-field-error">
+                {formErrors.username}
+              </span>
+            )}
+          </label>
           <label className="admin-users-field-span-2">
             Last Name, First Name, Middle Name
             <div className="admin-users-name-fields">
