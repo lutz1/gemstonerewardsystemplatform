@@ -14,6 +14,7 @@ import {
 } from "react-icons/md";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import GemValueChart from "../../components/GemValueChart/GemValueChart";
+import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import TopBar from "../../components/TopBar/TopBar";
 import { app } from "../../firebase";
 import "./AdminPage.css";
@@ -38,6 +39,7 @@ const emptyDashboard = {
 export default function AdminPage() {
   const [dashboard, setDashboard] = useState(emptyDashboard);
   const [showSalesDetails, setShowSalesDetails] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -51,6 +53,8 @@ export default function AdminPage() {
       } catch (error) {
         console.error("Failed to load admin dashboard:", error);
         setDashboard(emptyDashboard);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -79,6 +83,10 @@ export default function AdminPage() {
     ? gemBurnRate.reduce((sum, point) => sum + point.amount, 0) /
       gemBurnRate.length
     : 0;
+
+  if (isLoading) {
+    return <LoadingScreen label="Loading dashboard..." />;
+  }
 
   return (
     <div className="admin-root">

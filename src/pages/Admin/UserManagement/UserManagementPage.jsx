@@ -1,6 +1,7 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useMemo, useState } from "react";
 import BottomNav from "../../../components/BottomNavigationBar/BottomNav";
+import LoadingScreen from "../../../components/LoadingScreen/LoadingScreen";
 import TopBar from "../../../components/TopBar/TopBar";
 import { app } from "../../../firebase";
 import AddUserModal from "./adduser/AddUserModal";
@@ -75,6 +76,7 @@ export default function UserManagementPage() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isPromotionOpen, setIsPromotionOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadUsers = async () => {
     try {
@@ -104,6 +106,8 @@ export default function UserManagementPage() {
     } catch (error) {
       console.error("Failed to load users:", error);
       setUserList([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -136,6 +140,10 @@ export default function UserManagementPage() {
     (safeCurrentPage - 1) * pageSize,
     safeCurrentPage * pageSize,
   );
+
+  if (isLoading) {
+    return <LoadingScreen label="Loading users..." />;
+  }
 
   return (
     <div
