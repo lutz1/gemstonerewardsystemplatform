@@ -1,67 +1,66 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useEffect, useState } from "react";
 import {
-    MdArrowForward,
-    MdCheckCircle,
-    MdGroup,
-    MdPayments,
-    MdPendingActions,
-    MdPersonAdd,
-    MdReceiptLong,
-    MdTrendingUp,
+  MdArrowForward,
+  MdCheckCircle,
+  MdGroup,
+  MdPayments,
+  MdPendingActions,
+  MdReceiptLong,
+  MdTrendingUp
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import {
-    formatPeso,
-    pendingApprovals,
-    purchaseTotalsByTier,
-    users,
-} from "../../../utils/AdminMockData";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import GemValueChart from "../../components/GemValueChart/GemValueChart";
 import TopBar from "../../components/TopBar/TopBar";
+import { app } from "../../firebase";
 import "./AdminPage.css";
+
+function formatPeso(value) {
+  return `₱${Number(value ?? 0).toLocaleString("en-PH")}`;
+}
+
+const emptyDashboard = {
+  totalSales: 0,
+  totalCodes: 0,
+  activeUsers: 0,
+  userCount: 0,
+  pendingApprovals: 0,
+  purchaseTotalsByTier: [],
+  activities: [],
+};
 
 export default function AdminPage() {
   const navigate = useNavigate();
-  const totalSales = purchaseTotalsByTier.reduce(
-    (total, tier) => total + tier.total,
-    0,
-  );
-  const totalCodes = purchaseTotalsByTier.reduce(
-    (total, tier) => total + tier.count,
-    0,
-  );
-  const activeUsers = users.filter((user) => user.status === "active").length;
+  const [dashboard, setDashboard] = useState(emptyDashboard);
 
-  const activityItems = [
-    {
-      icon: MdPersonAdd,
-      title: "New member registered",
-      detail: "Sophia Tan joined the platform",
-      time: "2h ago",
-      tone: "green",
-    },
-    {
-      icon: MdCheckCircle,
-      title: "Purchase approved",
-      detail: "PA-1042 · Marcus Villareal",
-      time: "4h ago",
-      tone: "green",
-    },
-    {
-      icon: MdPendingActions,
-      title: "Approval awaiting review",
-      detail: `${pendingApprovals.length} purchase requests pending`,
-      time: "Today",
-      tone: "amber",
-    },
-    {
-      icon: MdReceiptLong,
-      title: "Purchase code generated",
-      detail: "Diamond package · 31 codes issued",
-      time: "Yesterday",
-      tone: "blue",
-    },
-  ];
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        const getAdminDashboard = httpsCallable(
+          getFunctions(app, "asia-southeast1"),
+          "getAdminDashboard",
+        );
+        const result = await getAdminDashboard();
+        setDashboard({ ...emptyDashboard, ...(result.data || {}) });
+      } catch (error) {
+        console.error("Failed to load admin dashboard:", error);
+        setDashboard(emptyDashboard);
+      }
+    };
+
+    void loadDashboard();
+  }, []);
+
+  const {
+    totalSales,
+    totalCodes,
+    activeUsers,
+    userCount,
+    pendingApprovals,
+    purchaseTotalsByTier,
+    activities,
+  } = dashboard;
 
   return (
     <div className="admin-root">
@@ -99,7 +98,7 @@ export default function AdminPage() {
             <div>
               <p>Active users</p>
               <strong>{activeUsers}</strong>
-              <span>{users.length} registered accounts</span>
+              <span>{userCount} registered accounts</span>
             </div>
           </article>
           <article className="admin-summary-card">
@@ -118,7 +117,7 @@ export default function AdminPage() {
             </div>
             <div>
               <p>Pending approvals</p>
-              <strong>{pendingApprovals.length}</strong>
+              <strong>{pendingApprovals}</strong>
               <span>Requires your review</span>
             </div>
           </article>
@@ -154,7 +153,9 @@ export default function AdminPage() {
                     </div>
                     <div className="admin-sales-track">
                       <span
-                        style={{ width: `${(tier.total / totalSales) * 100}%` }}
+                        style={{
+                          width: `${totalSales ? (tier.total / totalSales) * 100 : 0}%`,
+                        }}
                       />
                     </div>
                     <strong>{formatPeso(tier.total)}</strong>
@@ -171,9 +172,10 @@ export default function AdminPage() {
                 <span className="admin-live-indicator">Live</span>
               </div>
               <div className="admin-activity-list">
-                {activityItems.map(
-                  ({ icon: Icon, title, detail, time, tone }) => (
-                    <div className="admin-activity-row" key={title}>
+                {activities.map(({ title, detail, time, tone, id }) => {
+                  const Icon = tone === "amber" ? MdPendingActions : MdCheckCircle;
+                  return (
+                    <div className="admin-activity-row" key={id}>
                       <div className={`admin-activity-icon ${tone}`}>
                         <Icon />
                       </div>
@@ -183,7 +185,10 @@ export default function AdminPage() {
                       </div>
                       <time>{time}</time>
                     </div>
-                  ),
+                  );
+                })}
+                {activities.length === 0 && (
+                  <p className="admin-users-empty">No activity recorded yet.</p>
                 )}
               </div>
             </section>
@@ -199,7 +204,7 @@ export default function AdminPage() {
                 <MdPendingActions className="admin-heading-icon" />
               </div>
               <div className="admin-review-count">
-                <strong>{pendingApprovals.length}</strong>
+                <strong>{pendingApprovals}</strong>
                 <span>purchase requests are waiting for review</span>
               </div>
               <button type="button" className="admin-review-button">

@@ -80,6 +80,72 @@ exports.getUsers = onCall({ region: 'asia-southeast1' }, async (request) => {
   });
 });
 
+exports.getAdminDashboard = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+
+  await assertIsAdmin(request.auth.uid);
+
+  const [usersSnapshot, purchasesSnapshot, approvalsSnapshot, codesSnapshot] = await Promise.all([
+    db().collection('users').get(),
+    db().collection('purchases').get(),
+    db().collection('purchaseRequests').get(),
+    db().collection('purchaseCodes').get(),
+  ]);
+
+  const getDate = (data) => data.createdAt || data.date || data.updatedAt || null;
+  const getAmount = (data) => Number(data.amount ?? data.total ?? data.price ?? 0);
+  const getTier = (data) => data.tier || data.packageTier || data.packageName || 'Uncategorized';
+  const getName = (data) => data.customerName || data.userName || data.name || data.email || 'Unknown user';
+  const users = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const purchases = purchasesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const pendingApprovals = approvalsSnapshot.docs.filter((doc) => {
+    const status = String(doc.data()?.status || '').toLowerCase();
+    return !status || ['pending', 'awaiting_review', 'awaiting review'].includes(status);
+  });
+  const tierTotals = purchases.reduce((totals, purchase) => {
+    const tier = getTier(purchase);
+    const current = totals.get(tier) || { tier, count: 0, total: 0 };
+    current.count += Number(purchase.quantity ?? purchase.count ?? 1);
+    current.total += getAmount(purchase);
+    totals.set(tier, current);
+    return totals;
+  }, new Map());
+  const activities = [
+    ...purchases.slice(-3).map((purchase) => ({
+      id: purchase.id,
+      title: 'Purchase recorded',
+      detail: `${getTier(purchase)} · ${getName(purchase)}`,
+      time: getDate(purchase),
+      tone: 'green',
+    })),
+    ...pendingApprovals.slice(-2).map((doc) => {
+      const data = doc.data() || {};
+      return {
+        id: doc.id,
+        title: 'Approval awaiting review',
+        detail: `${getTier(data)} · ${getName(data)}`,
+        time: getDate(data),
+        tone: 'amber',
+      };
+    }),
+  ];
+
+  return {
+    totalSales: purchases.reduce((total, purchase) => total + getAmount(purchase), 0),
+    totalCodes: codesSnapshot.size || purchases.reduce(
+      (total, purchase) => total + Number(purchase.quantity ?? purchase.count ?? 0),
+      0,
+    ),
+    activeUsers: users.filter((user) => (user.status || 'active') === 'active').length,
+    userCount: users.length,
+    pendingApprovals: pendingApprovals.length,
+    purchaseTotalsByTier: Array.from(tierTotals.values()),
+    activities: activities.sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0)),
+  };
+});
+
 exports.getMpinStatus = onCall({ region: 'asia-southeast1' }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Authentication is required.');
