@@ -1,15 +1,17 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import {
+  MdAccountBalanceWallet,
   MdArrowForward,
   MdCheckCircle,
+  MdClose,
   MdGroup,
+  MdLocalFireDepartment,
   MdPayments,
   MdPendingActions,
-  MdReceiptLong,
-  MdTrendingUp
+  MdTrendingUp,
+  MdWorkspacePremium,
 } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import GemValueChart from "../../components/GemValueChart/GemValueChart";
 import TopBar from "../../components/TopBar/TopBar";
@@ -22,17 +24,20 @@ function formatPeso(value) {
 
 const emptyDashboard = {
   totalSales: 0,
-  totalCodes: 0,
+  totalGemValueAccumulated: 0,
   activeUsers: 0,
   userCount: 0,
   pendingApprovals: 0,
   purchaseTotalsByTier: [],
   activities: [],
+  // Each point: { label: "Mon", amount: 1234 } — GEM value redeemed/spent
+  // on that day. Powers the burn-rate panel below.
+  gemBurnRate: [],
 };
 
 export default function AdminPage() {
-  const navigate = useNavigate();
   const [dashboard, setDashboard] = useState(emptyDashboard);
+  const [showSalesDetails, setShowSalesDetails] = useState(false);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -54,13 +59,26 @@ export default function AdminPage() {
 
   const {
     totalSales,
-    totalCodes,
+    totalGemValueAccumulated,
     activeUsers,
     userCount,
-    pendingApprovals,
+    // Renamed at the destructure level only — the backend function still
+    // returns this under the `pendingApprovals` key, so the field name in
+    // emptyDashboard/result.data stays untouched. This is just the label
+    // used from here down in the component.
+    pendingApprovals: pendingWithdrawals,
     purchaseTotalsByTier,
     activities,
+    gemBurnRate,
   } = dashboard;
+
+  const maxBurn = gemBurnRate.length
+    ? Math.max(...gemBurnRate.map((point) => point.amount))
+    : 0;
+  const currentBurnRate = gemBurnRate.length
+    ? gemBurnRate.reduce((sum, point) => sum + point.amount, 0) /
+      gemBurnRate.length
+    : 0;
 
   return (
     <div className="admin-root">
@@ -103,22 +121,22 @@ export default function AdminPage() {
           </article>
           <article className="admin-summary-card">
             <div className="admin-summary-icon">
-              <MdReceiptLong />
+              <MdWorkspacePremium />
             </div>
             <div>
-              <p>Codes sold</p>
-              <strong>{totalCodes}</strong>
-              <span>Across all membership tiers</span>
+              <p>GEM value accumulated</p>
+              <strong>{formatPeso(totalGemValueAccumulated)}</strong>
+              <span>Total value earned across all members</span>
             </div>
           </article>
           <article className="admin-summary-card">
             <div className="admin-summary-icon">
-              <MdPendingActions />
+              <MdAccountBalanceWallet />
             </div>
             <div>
-              <p>Pending approvals</p>
-              <strong>{pendingApprovals}</strong>
-              <span>Requires your review</span>
+              <p>Pending withdrawals</p>
+              <strong>{pendingWithdrawals}</strong>
+              <span>Awaiting your review</span>
             </div>
           </article>
         </section>
@@ -131,10 +149,7 @@ export default function AdminPage() {
                   <p className="admin-panel-eyebrow">Performance</p>
                   <h2>Sales summary</h2>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => navigate("/purchase-codes")}
-                >
+                <button type="button" onClick={() => setShowSalesDetails(true)}>
                   View details <MdArrowForward />
                 </button>
               </div>
@@ -173,7 +188,8 @@ export default function AdminPage() {
               </div>
               <div className="admin-activity-list">
                 {activities.map(({ title, detail, time, tone, id }) => {
-                  const Icon = tone === "amber" ? MdPendingActions : MdCheckCircle;
+                  const Icon =
+                    tone === "amber" ? MdPendingActions : MdCheckCircle;
                   return (
                     <div className="admin-activity-row" key={id}>
                       <div className={`admin-activity-icon ${tone}`}>
@@ -195,25 +211,100 @@ export default function AdminPage() {
           </div>
           <div className="admin-dashboard-column">
             <GemValueChart />
-            <section className="admin-dashboard-panel admin-review-panel">
+            <section className="admin-dashboard-panel admin-burn-panel">
               <div className="admin-panel-heading">
                 <div>
-                  <p className="admin-panel-eyebrow">Action needed</p>
-                  <h2>Pending approvals</h2>
+                  <p className="admin-panel-eyebrow">GEM panel</p>
+                  <h2>GEM burn rate</h2>
                 </div>
-                <MdPendingActions className="admin-heading-icon" />
+                <MdLocalFireDepartment className="admin-heading-icon" />
               </div>
-              <div className="admin-review-count">
-                <strong>{pendingApprovals}</strong>
-                <span>purchase requests are waiting for review</span>
+              <div className="admin-burn-summary">
+                <strong>{formatPeso(currentBurnRate)}</strong>
+                <span>GEM value redeemed per day, 7-day average</span>
               </div>
-              <button type="button" className="admin-review-button">
-                Review requests <MdArrowForward />
-              </button>
+              <div
+                className="admin-burn-chart"
+                role="img"
+                aria-label="GEM burn rate over recent days"
+              >
+                {gemBurnRate.map((point) => (
+                  <div className="admin-burn-bar" key={point.label}>
+                    <span
+                      style={{
+                        height: `${maxBurn ? (point.amount / maxBurn) * 100 : 0}%`,
+                      }}
+                    />
+                    <small>{point.label}</small>
+                  </div>
+                ))}
+                {gemBurnRate.length === 0 && (
+                  <p className="admin-users-empty">No burn rate data yet.</p>
+                )}
+              </div>
             </section>
           </div>
         </section>
       </main>
+
+      {showSalesDetails && (
+        <div
+          className="admin-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Sales details"
+          onClick={() => setShowSalesDetails(false)}
+        >
+          <div
+            className="admin-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="admin-modal-header">
+              <h2>Sales details</h2>
+              <button
+                type="button"
+                className="admin-modal-close"
+                onClick={() => setShowSalesDetails(false)}
+                aria-label="Close"
+              >
+                <MdClose />
+              </button>
+            </div>
+            <div className="admin-modal-body">
+              <div className="admin-sales-total">
+                <strong>{formatPeso(totalSales)}</strong>
+                <span>
+                  <MdTrendingUp /> 12.4% vs last month
+                </span>
+              </div>
+              <div className="admin-sales-bars">
+                {purchaseTotalsByTier.map((tier) => (
+                  <div className="admin-sales-bar-row" key={tier.tier}>
+                    <div>
+                      <span>{tier.tier}</span>
+                      <small>{tier.count} codes</small>
+                    </div>
+                    <div className="admin-sales-track">
+                      <span
+                        style={{
+                          width: `${totalSales ? (tier.total / totalSales) * 100 : 0}%`,
+                        }}
+                      />
+                    </div>
+                    <strong>{formatPeso(tier.total)}</strong>
+                  </div>
+                ))}
+                {purchaseTotalsByTier.length === 0 && (
+                  <p className="admin-users-empty">
+                    No sales data recorded yet.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <BottomNav activeItem="dashboard" variant="admin" />
     </div>
   );
