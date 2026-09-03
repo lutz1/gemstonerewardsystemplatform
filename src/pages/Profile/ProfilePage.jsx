@@ -1,6 +1,7 @@
 import { signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
 import { auth } from "../../firebase";
@@ -15,13 +16,6 @@ const profile = {
   memberSince: "Mar 2022",
   tier: "Executive Tier",
   initials: "AR",
-};
-
-const tierProgress = {
-  current: "Executive",
-  next: "Platinum",
-  gemsToNext: 7150,
-  percent: 68,
 };
 
 const profileStats = [
@@ -41,49 +35,8 @@ const profileStats = [
   },
 ];
 
-const preferenceToggles = [
-  {
-    key: "email-updates",
-    label: "Email notifications",
-    caption: "Purchase receipts, code activity, and balance alerts.",
-    defaultOn: true,
-  },
-  {
-    key: "marketing",
-    label: "Product announcements",
-    caption: "New tiers, packages, and feature releases.",
-    defaultOn: false,
-  },
-  {
-    key: "security-alerts",
-    label: "Security alerts",
-    caption: "Sign-ins from new devices or locations.",
-    defaultOn: true,
-  },
-];
-
-function ToggleRow({ label, caption, defaultOn }) {
-  const [on, setOn] = useState(defaultOn);
-  return (
-    <div className="prof-toggle-row">
-      <div>
-        <p className="prof-toggle-label">{label}</p>
-        <p className="prof-toggle-caption">{caption}</p>
-      </div>
-      <button
-        className={`prof-switch${on ? " on" : ""}`}
-        role="switch"
-        aria-checked={on}
-        aria-label={label}
-        onClick={() => setOn((v) => !v)}
-      >
-        <span className="prof-switch-knob" />
-      </button>
-    </div>
-  );
-}
-
 export default function ProfilePage() {
+  const { username } = useAuth();
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -130,9 +83,10 @@ export default function ProfilePage() {
               <div>
                 <div className="prof-name-row">
                   <h2 className="prof-name">{profile.name}</h2>
-                  <span className="prof-tier-badge">{profile.tier}</span>
                 </div>
-                <p className="prof-handle">{profile.handle}</p>
+                <p className="prof-handle">
+                  @{username || profile.handle.replace(/^@/, "")}
+                </p>
                 <p className="prof-meta">
                   <span className="material-symbols-outlined prof-meta-icon">
                     mail
@@ -149,38 +103,6 @@ export default function ProfilePage() {
               <span className="material-symbols-outlined">edit</span>
               Edit Profile
             </button>
-          </section>
-
-          {/* ── Tier progress ──────────────────────────────── */}
-          <section className="prof-glass-panel prof-progress-card">
-            <div className="prof-progress-top">
-              <div>
-                <p className="prof-progress-label">Tier Progress</p>
-                <p className="prof-progress-title">
-                  {tierProgress.current}{" "}
-                  <span className="material-symbols-outlined prof-progress-arrow">
-                    arrow_forward
-                  </span>{" "}
-                  {tierProgress.next}
-                </p>
-              </div>
-              <p className="prof-progress-remaining">
-                <span className="material-symbols-outlined prof-progress-diamond">
-                  diamond
-                </span>
-                {tierProgress.gemsToNext.toLocaleString()} GEMS to go
-              </p>
-            </div>
-            <div className="prof-progress-track">
-              <div
-                className="prof-progress-fill"
-                style={{ width: `${tierProgress.percent}%` }}
-              />
-            </div>
-            <p className="prof-progress-caption">
-              Reach {tierProgress.next} Tier to unlock priority code drops and
-              higher batch limits.
-            </p>
           </section>
 
           {/* ── Quick stats ────────────────────────────────── */}
@@ -254,30 +176,19 @@ export default function ProfilePage() {
             </div>
             <div className="prof-security-row">
               <div className="prof-security-icon">
-                <span className="material-symbols-outlined">verified_user</span>
+                <span className="material-symbols-outlined">badge</span>
               </div>
               <div className="prof-security-info">
-                <p className="prof-security-label">Two-Factor Authentication</p>
-                <p className="prof-security-caption">
-                  Adds an extra step when signing in
-                </p>
+                <p className="prof-security-label">TIN Code</p>
+                <p className="prof-security-caption">•••-•••-789</p>
               </div>
-              <span className="prof-status-pill enabled">Enabled</span>
-            </div>
-          </section>
-
-          {/* ── Preferences ─────────────────────────────────── */}
-          <section className="prof-glass-panel prof-panel">
-            <div className="prof-panel-header">
-              <h3 className="prof-panel-title">Notification Preferences</h3>
-              <p className="prof-panel-sub">
-                Choose what you hear from us, and how.
-              </p>
-            </div>
-            <div className="prof-toggle-list">
-              {preferenceToggles.map((t) => (
-                <ToggleRow key={t.key} {...t} />
-              ))}
+              <button
+                className="prof-outline-btn"
+                type="button"
+                onClick={() => navigate("/change-tin")}
+              >
+                Change
+              </button>
             </div>
           </section>
 

@@ -4,7 +4,7 @@ import emeraldCard from "../../assets/emerald_card_products.png";
 import sapphireCard from "../../assets/sapphire_card_products.png";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
-import { formatCurrency, packages } from "../../utils/PackagesData";
+import { packages } from "../../utils/PackagesData";
 import "./ProductsPage.css";
 
 const tierImages = {
@@ -12,6 +12,8 @@ const tierImages = {
   sapphire: sapphireCard,
   diamond: diamondCard,
 };
+
+const fallbackTierImages = [emeraldCard, sapphireCard, diamondCard];
 
 function FeatureRow({ children }) {
   return (
@@ -38,14 +40,14 @@ export default function ProductsPage() {
               <div>
                 <h2 className="prod-page-title">Products</h2>
                 <p className="prod-page-sub">
-                  Choose the code package that matches your networking tier.
+                  Choose the membership tier that matches your networking goals.
                 </p>
               </div>
             </div>
 
             {/* Packages grid */}
             <section className="prod-packages-grid">
-              {packages.map((pkg) => (
+              {packages.map((pkg, index) => (
                 <button
                   key={pkg.id}
                   className="prod-glass-panel prod-package-card"
@@ -57,16 +59,20 @@ export default function ProductsPage() {
                 >
                   <img
                     className="prod-package-image"
-                    src={tierImages[pkg.tierColor]}
+                    src={
+                      tierImages[pkg.tierColor] ||
+                      fallbackTierImages[index % fallbackTierImages.length]
+                    }
                     alt=""
                   />
                   <span className="prod-package-vignette" />
                   <span className="prod-package-content">
                     <span className="prod-package-top-row">
                       <span className="prod-tier-tag">{pkg.tier}</span>
-                      <span className="prod-price-tag">
-                        {formatCurrency(pkg.price)}
-                      </span>
+                      <span
+                        className="prod-price-tag"
+                        aria-label="Price configured by backend"
+                      />
                     </span>
                     <span className="prod-package-bottom">
                       <span className="prod-package-membership">
@@ -77,9 +83,10 @@ export default function ProductsPage() {
                         <FeatureRow>
                           {pkg.dailyGems} GEMS Daily Rewards
                         </FeatureRow>
-                        {pkg.features.map((feature) => (
-                          <FeatureRow key={feature}>{feature}</FeatureRow>
-                        ))}
+                        {Array.isArray(pkg.features) &&
+                          pkg.features.map((feature) => (
+                            <FeatureRow key={feature}>{feature}</FeatureRow>
+                          ))}
                       </span>
                     </span>
                   </span>

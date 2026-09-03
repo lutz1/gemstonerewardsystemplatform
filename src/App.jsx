@@ -21,6 +21,7 @@ import PackageDetailPage from "./pages/PackageDetail/ProductsPage";
 import DirectReferralsPage from "./pages/Products/ProductsPage";
 import TransactionHistoryPage from "./pages/Profile/ProfilePage";
 import ChangePasswordPage from "./pages/ProfileAccount/ChangePasswordPage";
+import ChangeTinPage from "./pages/ProfileAccount/ChangeTinPage";
 import EditProfilePage from "./pages/ProfileAccount/EditProfilePage";
 import PurchaseCodesPage from "./pages/PurchaseCodes/PurchaseCodesPage";
 import QrPaymentPage from "./pages/QrPayment/QrPaymentPage";
@@ -82,7 +83,9 @@ export default function App() {
           </Route>
 
           <Route
-            element={<ProtectedRoute allowedRoles={["member", "ceo", "admin"]} />}
+            element={
+              <ProtectedRoute allowedRoles={["member", "ceo", "admin"]} />
+            }
           >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
@@ -93,6 +96,7 @@ export default function App() {
             <Route path="/transactions" element={<TransactionHistoryPage />} />
             <Route path="/edit-profile" element={<EditProfilePage />} />
             <Route path="/change-password" element={<ChangePasswordPage />} />
+            <Route path="/change-tin" element={<ChangeTinPage />} />
             <Route path="/exchange" element={<ExchangePage />} />
             <Route path="/exchange/:mode" element={<ExchangePage />} />
 

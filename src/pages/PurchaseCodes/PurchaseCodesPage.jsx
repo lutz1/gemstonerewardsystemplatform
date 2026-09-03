@@ -4,6 +4,7 @@ import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
 import { getTransactions } from "../../utils/TransactionsData";
 import "./PurchaseCodesPage.css";
+import ReferralActionsModal from "./ReferralActions/ReferralActionsModal";
 
 const codes = [
   {
@@ -63,20 +64,62 @@ const ledgerStats = [
   },
 ];
 
+const referralHistory = [
+  {
+    id: "r1",
+    name: "Jamie Cruz",
+    date: "Jul 14, 2026",
+    source: "direct",
+    purchased: true,
+  },
+  {
+    id: "r2",
+    name: "Patricia Alonzo",
+    date: "Jul 09, 2026",
+    source: "link",
+    purchased: true,
+  },
+  {
+    id: "r3",
+    name: "Miguel Santos",
+    date: "Jun 28, 2026",
+    source: "direct",
+    purchased: false,
+  },
+  {
+    id: "r4",
+    name: "Renz Villareal",
+    date: "Jun 20, 2026",
+    source: "link",
+    purchased: false,
+  },
+  {
+    id: "r5",
+    name: "Denise Ocampo",
+    date: "Jun 11, 2026",
+    source: "direct",
+    purchased: true,
+  },
+];
+
 export default function PurchaseCodesPage() {
   const { username, referralCode } = useAuth();
   const [search, setSearch] = useState("");
   const [transactions] = useState(() => getTransactions());
   const [copied, setCopied] = useState(false);
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
   const referralIdentifier = referralCode || username;
   const referralLink = referralIdentifier
     ? `https://gemstonecode.store/register?ref=${encodeURIComponent(referralIdentifier)}`
     : "";
+  const activeReferrals = referralHistory.filter(
+    (referral) => referral.purchased,
+  ).length;
 
   const filtered = codes.filter(
     (c) =>
       c.id.toLowerCase().includes(search.toLowerCase()) ||
-      c.tier.toLowerCase().includes(search.toLowerCase())
+      c.tier.toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleCopyReferral = async () => {
@@ -105,6 +148,16 @@ export default function PurchaseCodesPage() {
     }
   };
 
+  const handleInvite = () => setIsReferralModalOpen(true);
+
+  const handleRegisterMember = () => {
+    setIsReferralModalOpen(false);
+    const referralParam = referralIdentifier || "";
+    window.location.assign(
+      `/register${referralParam ? `?ref=${encodeURIComponent(referralParam)}` : ""}`,
+    );
+  };
+
   return (
     <div className="pc-root">
       {/* ── Atmosphere glows ─────────────────────────────────── */}
@@ -117,40 +170,94 @@ export default function PurchaseCodesPage() {
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="pc-main">
         <div className="pc-content">
-
-          {/* ── Direct referral link ────────────────────────── */}
+          {/* ── Direct referral ────────────────────────────── */}
           <section className="pc-glass-panel pc-referral-box">
-            <label className="pc-referral-label">Your Direct Referral Link</label>
-            <div className="pc-referral-row">
-              <div className="pc-referral-input-wrap">
-                <span className="material-symbols-outlined">link</span>
-                <input
-                  type="text"
-                  readOnly
-                  value={referralLink}
-                  className="pc-referral-input"
-                  onFocus={(e) => e.target.select()}
-                  aria-label="Your direct referral link"
-                />
+            <label className="pc-referral-label">Direct Referral</label>
+            <p className="pc-referral-intro">
+              Share your link or register a new member yourself - both count
+              toward your referrals.
+            </p>
+            <button className="pc-invite-button" onClick={handleInvite}>
+              <span className="material-symbols-outlined" aria-hidden="true">
+                person_add
+              </span>
+              {copied ? "Referral Link Copied" : "Invite Gem Buddy"}
+            </button>
+          </section>
+
+          <section className="pc-referral-summary">
+            <div className="pc-glass-panel pc-reward-card">
+              <p className="pc-referral-summary-label">Referral Rewards</p>
+              <p className="pc-referral-summary-sub">
+                Gem Points accumulate when a member you referred makes a
+                purchase.
+              </p>
+              <div className="pc-referral-gems-row">
+                <span className="material-symbols-outlined">diamond</span>
+                <strong>41,850</strong>
               </div>
-              <div className="pc-referral-actions">
-                <button className="pc-referral-copy-btn" onClick={handleCopyReferral}>
-                  {copied ? "Copied!" : "Copy Link"}
-                </button>
-                <button
-                  className="pc-referral-share-btn"
-                  onClick={handleShareReferral}
-                  aria-label="Share referral link"
-                >
-                  <span className="material-symbols-outlined">ios_share</span>
-                </button>
+              <p className="pc-referral-summary-caption">
+                +500 GEMS earned per referral's first purchase · 3 of 5
+                referrals have bought so far
+              </p>
+            </div>
+            <div className="pc-glass-panel pc-referral-stats">
+              <div>
+                <span className="material-symbols-outlined">verified</span>
+                <p>Active Referrals</p>
+                <strong>{activeReferrals}</strong>
+                <small>Joined and purchased</small>
               </div>
+              <div>
+                <span className="material-symbols-outlined">groups</span>
+                <p>Total Referrals</p>
+                <strong>{referralHistory.length}</strong>
+                <small>All members joined</small>
+              </div>
+            </div>
+          </section>
+
+          <section className="pc-glass-panel pc-referral-history">
+            <div className="pc-referral-history-heading">
+              <div>
+                <h3>Direct Referral History</h3>
+                <p>
+                  Everyone who joined through your link or was registered
+                  directly.
+                </p>
+              </div>
+            </div>
+            <div className="pc-referral-history-list">
+              {referralHistory.map((referral) => (
+                <div className="pc-referral-history-row" key={referral.id}>
+                  <div
+                    className={`pc-referral-history-icon${referral.purchased ? "" : " muted"}`}
+                  >
+                    <span className="material-symbols-outlined">
+                      {referral.source === "direct" ? "person_add" : "link"}
+                    </span>
+                  </div>
+                  <div className="pc-referral-history-person">
+                    <strong>{referral.name}</strong>
+                    <span>
+                      {referral.source === "direct"
+                        ? "Registered directly"
+                        : "Joined via your link"}
+                    </span>
+                  </div>
+                  <div className="pc-referral-history-result">
+                    <strong>
+                      {referral.purchased ? "+500 GEMS" : "Pending purchase"}
+                    </strong>
+                    <span>{referral.date}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 
           {/* ── Hero bento ─────────────────────────────────── */}
           <section className="pc-hero-grid">
-
             {/* Balance / header card */}
             <div className="pc-glass-panel pc-balance-card">
               <div>
@@ -204,13 +311,14 @@ export default function PurchaseCodesPage() {
 
           {/* ── Code batches table ──────────────────────────── */}
           <section className="pc-glass-panel pc-table-section">
-
             {/* Table toolbar */}
             <div className="pc-table-toolbar">
               <h3 className="pc-table-title">Purchased Code Batches</h3>
               <div className="pc-toolbar-right">
                 <div className="pc-search-wrap">
-                  <span className="material-symbols-outlined pc-search-icon">search</span>
+                  <span className="material-symbols-outlined pc-search-icon">
+                    search
+                  </span>
                   <input
                     type="text"
                     placeholder="Search ID..."
@@ -255,19 +363,31 @@ export default function PurchaseCodesPage() {
                       <td className="pc-td pc-td-date">{code.date}</td>
 
                       <td className="pc-td">
-                        <span className={`pc-status-badge${code.status === "used" ? " used" : ""}`}>
+                        <span
+                          className={`pc-status-badge${code.status === "used" ? " used" : ""}`}
+                        >
                           {code.status === "used" ? "Used" : "Active"}
                         </span>
                       </td>
 
                       <td className="pc-td pc-td-right">
                         {code.status === "active" ? (
-                          <button className="pc-action-btn" aria-label="Copy code">
-                            <span className="material-symbols-outlined">content_copy</span>
+                          <button
+                            className="pc-action-btn"
+                            aria-label="Copy code"
+                          >
+                            <span className="material-symbols-outlined">
+                              content_copy
+                            </span>
                           </button>
                         ) : (
-                          <span className="pc-action-done" aria-label="Already used">
-                            <span className="material-symbols-outlined">check_circle</span>
+                          <span
+                            className="pc-action-done"
+                            aria-label="Already used"
+                          >
+                            <span className="material-symbols-outlined">
+                              check_circle
+                            </span>
                           </span>
                         )}
                       </td>
@@ -279,9 +399,13 @@ export default function PurchaseCodesPage() {
 
             {/* Pagination */}
             <div className="pc-pagination">
-              <span className="pc-pagination-count">Showing 4 of 24 batches</span>
+              <span className="pc-pagination-count">
+                Showing 4 of 24 batches
+              </span>
               <div className="pc-pagination-buttons">
-                <button className="pc-page-btn" disabled>Previous</button>
+                <button className="pc-page-btn" disabled>
+                  Previous
+                </button>
                 <button className="pc-page-btn active">Next Page</button>
               </div>
             </div>
@@ -289,7 +413,6 @@ export default function PurchaseCodesPage() {
 
           {/* ── Activity ledger (merged from Transaction History) ── */}
           <section className="pcl-section">
-
             <div className="pcl-section-header">
               <div>
                 <h3 className="pcl-section-title">Activity Ledger</h3>
@@ -322,7 +445,9 @@ export default function PurchaseCodesPage() {
                   <div>
                     <span className="pcl-stat-label">{s.label}</span>
                     <p className="pcl-stat-value">{s.value}</p>
-                    <p className={`pcl-stat-caption ${s.captionClass}`}>{s.caption}</p>
+                    <p className={`pcl-stat-caption ${s.captionClass}`}>
+                      {s.caption}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -344,7 +469,8 @@ export default function PurchaseCodesPage() {
                     {transactions.length === 0 && (
                       <tr className="pcl-tbody-row">
                         <td className="pcl-td pcl-empty-row" colSpan={4}>
-                          No transactions yet — completed purchases will show up here.
+                          No transactions yet — completed purchases will show up
+                          here.
                         </td>
                       </tr>
                     )}
@@ -352,12 +478,16 @@ export default function PurchaseCodesPage() {
                       <tr className="pcl-tbody-row" key={tx.id}>
                         <td className="pcl-td">
                           <div className="pcl-tx-member">
-                            <div className={`pcl-tx-icon-wrap${tx.positive ? "" : " muted"}`}>
+                            <div
+                              className={`pcl-tx-icon-wrap${tx.positive ? "" : " muted"}`}
+                            >
                               <span
                                 className="material-symbols-outlined"
-                                style={tx.iconFill
-                                  ? { fontVariationSettings: "'FILL' 1" }
-                                  : {}}
+                                style={
+                                  tx.iconFill
+                                    ? { fontVariationSettings: "'FILL' 1" }
+                                    : {}
+                                }
                               >
                                 {tx.icon}
                               </span>
@@ -370,7 +500,9 @@ export default function PurchaseCodesPage() {
                         </td>
                         <td className="pcl-td pcl-td-date">{tx.date}</td>
                         <td className="pcl-td">
-                          <p className={`pcl-tx-amount${tx.positive ? "" : " muted"}`}>
+                          <p
+                            className={`pcl-tx-amount${tx.positive ? "" : " muted"}`}
+                          >
                             {tx.amount}
                           </p>
                           <p className="pcl-tx-amount-sub">{tx.amountSub}</p>
@@ -395,12 +527,16 @@ export default function PurchaseCodesPage() {
                 {transactions.map((tx) => (
                   <div className="pcl-tx-card" key={tx.id}>
                     <div className="pcl-tx-card-top">
-                      <div className={`pcl-tx-icon-wrap${tx.positive ? "" : " muted"}`}>
+                      <div
+                        className={`pcl-tx-icon-wrap${tx.positive ? "" : " muted"}`}
+                      >
                         <span
                           className="material-symbols-outlined"
-                          style={tx.iconFill
-                            ? { fontVariationSettings: "'FILL' 1" }
-                            : {}}
+                          style={
+                            tx.iconFill
+                              ? { fontVariationSettings: "'FILL' 1" }
+                              : {}
+                          }
                         >
                           {tx.icon}
                         </span>
@@ -410,7 +546,9 @@ export default function PurchaseCodesPage() {
                         <p className="pcl-tx-sub">{tx.sub}</p>
                       </div>
                       <div className="pcl-tx-card-amount">
-                        <p className={`pcl-tx-amount${tx.positive ? "" : " muted"}`}>
+                        <p
+                          className={`pcl-tx-amount${tx.positive ? "" : " muted"}`}
+                        >
                           {tx.amount}
                         </p>
                         <p className="pcl-tx-amount-sub">{tx.amountSub}</p>
@@ -433,34 +571,54 @@ export default function PurchaseCodesPage() {
                 </span>
                 <div className="pcl-pagination-buttons">
                   <button className="pcl-page-btn" aria-label="Previous page">
-                    <span className="material-symbols-outlined">chevron_left</span>
+                    <span className="material-symbols-outlined">
+                      chevron_left
+                    </span>
                   </button>
                   <button className="pcl-page-btn current">1</button>
                   <button className="pcl-page-btn">2</button>
                   <button className="pcl-page-btn">3</button>
                   <button className="pcl-page-btn" aria-label="Next page">
-                    <span className="material-symbols-outlined">chevron_right</span>
+                    <span className="material-symbols-outlined">
+                      chevron_right
+                    </span>
                   </button>
                 </div>
               </div>
             </div>
           </section>
-
         </div>
 
         {/* Footer */}
         <footer className="pc-footer">
           <div className="pc-footer-inner">
-            <p className="pc-footer-copy">© 2024 Gemstone Code. All rights reserved.</p>
+            <p className="pc-footer-copy">
+              © 2024 Gemstone Code. All rights reserved.
+            </p>
             <div className="pc-footer-links">
-              <a className="pc-footer-link" href="#">Privacy Policy</a>
-              <a className="pc-footer-link" href="#">Terms of Service</a>
-              <a className="pc-footer-link" href="#">Help Center</a>
+              <a className="pc-footer-link" href="#">
+                Privacy Policy
+              </a>
+              <a className="pc-footer-link" href="#">
+                Terms of Service
+              </a>
+              <a className="pc-footer-link" href="#">
+                Help Center
+              </a>
             </div>
           </div>
         </footer>
       </main>
       <BottomNav activeItem="codes" />
+      <ReferralActionsModal
+        isOpen={isReferralModalOpen}
+        referralLink={referralLink}
+        copied={copied}
+        onCopy={handleCopyReferral}
+        onShare={handleShareReferral}
+        onRegister={handleRegisterMember}
+        onClose={() => setIsReferralModalOpen(false)}
+      />
     </div>
   );
 }

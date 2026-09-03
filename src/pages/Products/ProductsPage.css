@@ -65,30 +65,22 @@
 /* ─── Page shell ──────────────────────────────────────────────── */
 
 .prod-shell {
-  display: flex;
-  padding-top: 80px;
-  padding-bottom: 96px;
+  display: block;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 80px 16px 96px;
   min-height: 100vh;
 }
 
 .prod-main {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px 16px;
-}
-
-@media (min-width: 768px) {
-  .prod-main {
-    padding: 24px 48px;
-  }
+  padding: 0;
 }
 
 .prod-content {
-  max-width: 1024px;
-  margin: 0 auto;
+  max-width: none;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 /* ─── Page header ─────────────────────────────────────────────── */
@@ -96,15 +88,7 @@
 .prod-page-header {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .prod-page-header {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
+  gap: 4px;
 }
 
 .prod-page-title {
@@ -132,13 +116,7 @@
 .prod-packages-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
-}
-
-@media (min-width: 640px) {
-  .prod-packages-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  gap: 18px;
 }
 
 .prod-package-card {
