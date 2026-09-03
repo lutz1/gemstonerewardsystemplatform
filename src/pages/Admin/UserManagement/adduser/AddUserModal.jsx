@@ -1,5 +1,5 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { app } from "../../../../firebase";
 import "./AddUserModal.css";
 
@@ -36,25 +36,34 @@ export default function AddUserModal({
   const [newUser, setNewUser] = useState(emptyNewUser);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const submissionLock = useRef(false);
 
   if (!isOpen) return null;
 
-  const closeAddUserModal = () => {
+  const closeAddUserModal = (force = false) => {
+    if (!force && (isSubmitting || isSuccess)) return;
+
+    submissionLock.current = false;
     setNewUser(emptyNewUser);
     setFormErrors({});
     setSubmitError("");
+    setIsSubmitting(false);
+    setIsSuccess(false);
     onClose();
   };
 
   const handleAddUser = async (event) => {
     event.preventDefault();
-    const username = newUser.username.trim();
-    const lastName = newUser.lastName.trim();
-    const firstName = newUser.firstName.trim();
-    const middleName = newUser.middleName.trim();
+    if (submissionLock.current) return;
+
+    const username = newUser.username.trim().toUpperCase();
+    const lastName = newUser.lastName.trim().toUpperCase();
+    const firstName = newUser.firstName.trim().toUpperCase();
+    const middleName = newUser.middleName.trim().toUpperCase();
     const birthdate = newUser.birthdate.trim();
-    const address = newUser.address.trim();
+    const address = newUser.address.trim().toUpperCase();
     const phone = newUser.phone.trim();
     const email = newUser.email.trim();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -73,7 +82,6 @@ export default function AddUserModal({
     }
     if (!lastName) errors.lastName = "Last name is required.";
     if (!firstName) errors.firstName = "First name is required.";
-    if (!middleName) errors.middleName = "Middle name is required.";
     if (!birthdate) errors.birthdate = "Birthdate is required.";
     if (!address) errors.address = "Address is required.";
     if (!phone) {
@@ -99,6 +107,7 @@ export default function AddUserModal({
     }
 
     setSubmitError("");
+    submissionLock.current = true;
     setIsSubmitting(true);
     try {
       const createUser = httpsCallable(
@@ -118,9 +127,11 @@ export default function AddUserModal({
         role: newUser.role,
         status: newUser.status,
       });
-      closeAddUserModal();
+      setIsSuccess(true);
       await onUserCreated?.();
+      window.setTimeout(() => closeAddUserModal(true), 1200);
     } catch (error) {
+      submissionLock.current = false;
       setSubmitError(
         error?.message || "Failed to create user. Please try again.",
       );
@@ -153,6 +164,23 @@ export default function AddUserModal({
             </span>
           </button>
         </div>
+        {(isSubmitting || isSuccess) && (
+          <div className="admin-users-submit-status" role="status" aria-live="polite">
+            {isSuccess ? (
+              <>
+                <span className="admin-users-success-check" aria-hidden="true">
+                  <span className="material-symbols-outlined">check</span>
+                </span>
+                <strong>Account created successfully</strong>
+              </>
+            ) : (
+              <>
+                <span className="admin-users-loading-spinner" aria-hidden="true" />
+                <strong>Creating account...</strong>
+              </>
+            )}
+          </div>
+        )}
         <div className="admin-users-modal-grid">
           <label className="admin-users-field-span-2">
             Username
@@ -195,8 +223,7 @@ export default function AddUserModal({
                 }
               />
               <input
-                required
-                placeholder="Middle name"
+                placeholder="Middle name (optional)"
                 aria-label="Middle name"
                 value={newUser.middleName}
                 aria-invalid={Boolean(formErrors.middleName)}
@@ -305,7 +332,7 @@ export default function AddUserModal({
               }
             >
               <option value="member">Member</option>
-              <option value="leader">Leader</option>
+              <option value="ceo">CEO</option>
               <option value="admin">Admin</option>
             </select>
           </label>

@@ -18,6 +18,7 @@
 }
 
 .admin-users-modal {
+  position: relative;
   display: grid;
   width: min(100%, 560px);
   max-height: calc(100vh - 40px);
@@ -28,6 +29,79 @@
   background: var(--surface-container);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   overflow-y: auto;
+}
+
+.admin-users-submit-status {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-container) 96%, transparent);
+  color: var(--color-on-surface);
+  text-align: center;
+}
+
+.admin-users-submit-status strong {
+  font-family: var(--font-jakarta);
+  font-size: 1rem;
+}
+
+.admin-users-loading-spinner {
+  width: 42px;
+  height: 42px;
+  border: 3px solid var(--outline-variant);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: admin-users-spin 0.8s linear infinite;
+}
+
+.admin-users-success-check {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  color: var(--color-primary);
+  animation: admin-users-success-pop 0.35s ease-out both;
+}
+
+.admin-users-success-check .material-symbols-outlined {
+  font-size: 32px;
+  animation: admin-users-check-draw 0.35s 0.18s ease-out both;
+}
+
+@keyframes admin-users-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes admin-users-success-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes admin-users-check-draw {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .admin-users-modal-header {
@@ -109,6 +183,14 @@
   background: var(--surface-container-high);
   color: var(--color-on-surface);
   font: inherit;
+}
+
+.admin-users-modal input {
+  text-transform: uppercase;
+}
+
+.admin-users-modal input[type="email"] {
+  text-transform: none;
 }
 
 /* ---------------------------------------------------------------------

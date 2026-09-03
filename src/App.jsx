@@ -82,7 +82,7 @@ export default function App() {
           </Route>
 
           <Route
-            element={<ProtectedRoute allowedRoles={["member", "admin"]} />}
+            element={<ProtectedRoute allowedRoles={["member", "ceo", "admin"]} />}
           >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />

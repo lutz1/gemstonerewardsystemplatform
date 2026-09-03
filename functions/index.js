@@ -295,11 +295,12 @@ exports.createUser = onCall({ region: 'asia-southeast1' }, async (request) => {
   await assertIsAdmin(request.auth.uid);
 
   const data = request.data || {};
-  const firstName = requireNonEmptyString(data.firstName, 'First name');
-  const lastName = requireNonEmptyString(data.lastName, 'Last name');
-  const middleName = requireNonEmptyString(data.middleName, 'Middle name');
+  const username = requireNonEmptyString(data.username, 'Username').toUpperCase();
+  const firstName = requireNonEmptyString(data.firstName, 'First name').toUpperCase();
+  const lastName = requireNonEmptyString(data.lastName, 'Last name').toUpperCase();
+  const middleName = typeof data.middleName === 'string' ? data.middleName.trim().toUpperCase() : '';
   const birthdate = requireNonEmptyString(data.birthdate, 'Birthdate');
-  const address = requireNonEmptyString(data.address, 'Address');
+  const address = requireNonEmptyString(data.address, 'Address').toUpperCase();
   const phone = requireNonEmptyString(data.phone, 'Phone');
   const email = requireNonEmptyString(data.email, 'Email').toLowerCase();
 
@@ -307,7 +308,7 @@ exports.createUser = onCall({ region: 'asia-southeast1' }, async (request) => {
     throw new HttpsError('invalid-argument', 'Enter a valid email address.');
   }
 
-  const role = data.role === 'admin' ? 'admin' : 'member';
+  const role = ['member', 'ceo', 'admin'].includes(data.role) ? data.role : 'member';
   const status = data.status === 'suspended' ? 'suspended' : 'active';
   const civilStatus = ['single', 'married', 'widowed', 'separated'].includes(data.civilStatus)
     ? data.civilStatus
@@ -334,6 +335,7 @@ exports.createUser = onCall({ region: 'asia-southeast1' }, async (request) => {
   const joinDate = new Date().toISOString();
 
   const userDoc = {
+    username,
     firstName,
     lastName,
     middleName,
