@@ -50,10 +50,22 @@ export default function LoginPage() {
         const result = await resolveUsername({ username: email });
         email = result.data?.email || "";
       }
+      if (!email) {
+        throw new Error("Invalid username or password.");
+      }
       await login(email, password);
       navigate("/pin-verification");
     } catch (err) {
-      setError(err?.message || "Authentication failed. Please try again.");
+      const errorCode = err?.code || "";
+      if (
+        errorCode === "auth/invalid-credential" ||
+        errorCode === "auth/wrong-password" ||
+        errorCode === "auth/user-not-found"
+      ) {
+        setError("Invalid username/email or password.");
+      } else {
+        setError(err?.message || "Authentication failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

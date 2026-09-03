@@ -48,12 +48,21 @@ exports.healthCheck = onRequest({ region: 'asia-southeast1' }, (_request, respon
 });
 
 exports.resolveUsername = onCall({ region: 'asia-southeast1' }, async (request) => {
-  const username = requireNonEmptyString(request.data?.username, 'Username').toUpperCase();
-  const snapshot = await db()
+  const username = requireNonEmptyString(request.data?.username, 'Username');
+  const normalizedUsername = username.toUpperCase();
+  let snapshot = await db()
     .collection('users')
-    .where('username', '==', username)
+    .where('username', '==', normalizedUsername)
     .limit(1)
     .get();
+
+  if (snapshot.empty && normalizedUsername !== username.toLowerCase()) {
+    snapshot = await db()
+      .collection('users')
+      .where('username', '==', username.toLowerCase())
+      .limit(1)
+      .get();
+  }
 
   const email = snapshot.docs[0]?.data()?.email;
   if (!email) {
