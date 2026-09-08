@@ -52,30 +52,39 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
-      setIsLoggedIn(Boolean(user));
+      try {
+        setIsLoggedIn(Boolean(user));
 
-      if (!user) {
-        setRole(null);
+        if (!user) {
+          setRole(null);
+          setUsername("");
+          setReferralCode("");
+          setMpinSetup(false);
+          setPinVerified(false);
+          writeStoredPinVerified(false);
+          return;
+        }
+
+        const token = await user.getIdTokenResult();
+        const status = await getAccountStatus();
+        const nextRole = status.role || token.claims.role || token.claims.userRole || "member";
+        const hasValidatedPin = readStoredPinVerified();
+
+        setRole(nextRole);
+        setUsername(status.username || "");
+        setReferralCode(status.referralCode || "");
+        setMpinSetup(status.mpinSetup);
+        setPinVerified(hasValidatedPin);
+      } catch {
+        setRole(user ? "member" : null);
         setUsername("");
         setReferralCode("");
         setMpinSetup(false);
         setPinVerified(false);
         writeStoredPinVerified(false);
+      } finally {
         setAuthReady(true);
-        return;
       }
-
-      const token = await user.getIdTokenResult();
-      const status = await getAccountStatus();
-      const nextRole = status.role || token.claims.role || token.claims.userRole || "member";
-      const hasValidatedPin = readStoredPinVerified();
-
-      setRole(nextRole);
-      setUsername(status.username || "");
-      setReferralCode(status.referralCode || "");
-      setMpinSetup(status.mpinSetup);
-      setPinVerified(hasValidatedPin);
-      setAuthReady(true);
     });
 
     return unsubscribe;

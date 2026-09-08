@@ -14,11 +14,12 @@ import AdminProfilePage from "./pages/Admin/Profile/AdminProfilePage";
 import AdminSettingsPage from "./pages/Admin/Settings/AdminSettingsPage";
 import UserManagementPage from "./pages/Admin/UserManagement/UserManagementPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
+import DirectReferralsPage from "./pages/DirectReferrals/DirectReferralsPage";
 import ExchangePage from "./pages/Exchange/ExchangePage";
 import LoginPage from "./pages/Login/LoginPage";
 import NotificationsPage from "./pages/Notifications/NotificationsPage";
 import PackageDetailPage from "./pages/PackageDetail/ProductsPage";
-import DirectReferralsPage from "./pages/Products/ProductsPage";
+import ProductsPage from "./pages/Products/ProductsPage";
 import TransactionHistoryPage from "./pages/Profile/ProfilePage";
 import ChangePasswordPage from "./pages/ProfileAccount/ChangePasswordPage";
 import EditProfilePage from "./pages/ProfileAccount/EditProfilePage";
@@ -30,7 +31,9 @@ function ProtectedRoute({ children, allowedRoles, requirePin = true }) {
   const location = useLocation();
   const { isLoggedIn, role, pinVerified, authReady } = useAuth();
 
-  if (!authReady) return null;
+  if (!authReady) {
+    return <main className="auth-loading" role="status">Loading your account...</main>;
+  }
 
   if (!isLoggedIn) {
     return <Navigate to="/login" replace state={{ from: location }} />;
@@ -82,12 +85,16 @@ export default function App() {
           </Route>
 
           <Route
-            element={<ProtectedRoute allowedRoles={["member", "ceo", "admin"]} />}
+            element={<ProtectedRoute allowedRoles={["member", "leader", "ceo", "admin"]} />}
           >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/products" element={<DirectReferralsPage />} />
+            <Route path="/products" element={<ProductsPage />} />
             <Route path="/direct-referrals" element={<DirectReferralsPage />} />
+            <Route
+              path="/network-referrals"
+              element={<DirectReferralsPage referralType="network" />}
+            />
             <Route path="/purchase-codes" element={<PurchaseCodesPage />} />
             <Route path="/profile" element={<TransactionHistoryPage />} />
             <Route path="/transactions" element={<TransactionHistoryPage />} />

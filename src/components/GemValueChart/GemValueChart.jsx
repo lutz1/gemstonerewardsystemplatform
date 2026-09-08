@@ -1,50 +1,38 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useRef, useState } from "react";
 import { MdDiamond, MdNorthEast, MdSouthEast } from "react-icons/md";
+import { app } from "../../firebase";
 import "./GemValueChart.css";
 
-const RANGES = ["1D", "1W", "1M", "3M", "1Y", "5Y"];
-const POINT_COUNTS = {
-  "1D": 20,
-  "1W": 28,
-  "1M": 30,
-  "3M": 45,
-  "1Y": 52,
-  "5Y": 60,
-};
+const RANGES = ["15M", "1H", "6H", "12H", "1D", "1W", "1M"];
 
-// TEMP: placeholder conversion rate until the backend exposes a real
-// GEMS-to-peso rate. This is what drives the "≈ ₱x.xx" line under the
-// big GEMS number.
-const GEM_TO_PHP_RATE = 1.4;
+function formatCurrency(value, currency) {
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
 
-function formatPeso(value) {
-  return (
-    "₱" +
-    value.toLocaleString("en-PH", {
+function formatPoint(value, currency) {
+  return value == null
+    ? "—"
+    : formatCurrency(value, currency);
+}
+
+function formatCompactValue(value) {
+  return value == null
+    ? "—"
+    : value.toLocaleString("en-PH", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    })
-  );
+    });
 }
 
 const CHART_H = 160;
 const CHART_PAD_TOP = 34; // room for the high-value label overlay
 const CHART_PAD_BOTTOM = 30; // room for the low-value label overlay
-
-// TEMP: replace this with a real API call keyed by `range` once gem value
-// history exists on the backend. Keeping this async-shaped (returns a
-// Promise) means swapping it out later is a one-function change --
-// nothing in the component below needs to know the difference.
-function fetchGemValueHistory(range) {
-  const points = POINT_COUNTS[range];
-  const data = [50];
-  for (let i = 1; i < points; i++) {
-    const drift = Math.sin(i / 4) * 3.6;
-    const noise = (Math.random() - 0.5) * 6;
-    data.push(Math.max(10, Math.round(data[i - 1] + drift + noise)));
-  }
-  return Promise.resolve(data);
-}
 
 // chartW is the MEASURED pixel width of the chart area, not a fixed
 // constant -- that's what makes the label/touch overlay line up
@@ -53,11 +41,11 @@ function buildChartGeometry(data, chartW) {
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
-  const stepX = chartW / (data.length - 1);
+  const stepX = data.length > 1 ? chartW / (data.length - 1) : 0;
   const usableH = CHART_H - CHART_PAD_TOP - CHART_PAD_BOTTOM;
 
   const points = data.map((v, i) => ({
-    x: i * stepX,
+    x: data.length > 1 ? i * stepX : chartW / 2,
     y: CHART_PAD_TOP + usableH - ((v - min) / range) * usableH,
     value: v,
   }));
@@ -89,6 +77,8 @@ function labelAlignStyle(x, chartW) {
 export default function GemValueChart({ onScrubbingChange }) {
   const [range, setRange] = useState("1M");
   const [data, setData] = useState(null);
+  const [currency, setCurrency] = useState("PHP");
+  const [error, setError] = useState("");
   const [chartW, setChartW] = useState(0);
   const [touchIndex, setTouchIndex] = useState(null); // scrub state, null when not touching
 
@@ -112,15 +102,28 @@ export default function GemValueChart({ onScrubbingChange }) {
   useEffect(() => {
     let cancelled = false;
     setTouchIndex(null); // clear any scrub state when the range changes
-    fetchGemValueHistory(range).then((result) => {
-      if (!cancelled) setData(result);
-    });
+    setError("");
+    setData(null);
+    const getGemValueHistory = httpsCallable(
+      getFunctions(app, "asia-southeast1"),
+      "getGemValueHistory",
+    );
+
+    getGemValueHistory({ range })
+      .then(({ data: result }) => {
+        if (cancelled) return;
+        setCurrency(result?.currency || "PHP");
+        setData((result?.points || []).map((point) => point.value));
+      })
+      .catch(() => {
+        if (!cancelled) setError("Unable to load GEM value history.");
+      });
     return () => {
       cancelled = true;
     };
   }, [range]);
 
-  const showChart = data && chartW > 0;
+  const showChart = data?.length > 0 && chartW > 0;
   const geometry = showChart ? buildChartGeometry(data, chartW) : null;
   geometryRef.current = geometry;
   const sameValue =
@@ -132,7 +135,7 @@ export default function GemValueChart({ onScrubbingChange }) {
     const g = geometryRef.current;
     if (!g || !data) return null;
     const clampedX = Math.max(0, Math.min(chartW, x));
-    const idx = Math.round(clampedX / g.stepX);
+    const idx = g.stepX === 0 ? 0 : Math.round(clampedX / g.stepX);
     return Math.max(0, Math.min(data.length - 1, idx));
   };
 
@@ -166,9 +169,11 @@ export default function GemValueChart({ onScrubbingChange }) {
   const touchPoint =
     touchIndex !== null && geometry ? geometry.points[touchIndex] : null;
 
-  const current = data ? data[data.length - 1] : null;
-  const change = data ? current - data[0] : 0;
-  const pct = data ? ((change / data[0]) * 100).toFixed(1) : "0.0";
+  const current = data?.length ? data[data.length - 1] : null;
+  const change = data?.length ? current - data[0] : 0;
+  const pct = data?.length && data[0] !== 0
+    ? ((change / data[0]) * 100).toFixed(1)
+    : "0.0";
   const positive = change >= 0;
   const changeColorVar = positive
     ? "var(--color-primary)"
@@ -177,15 +182,12 @@ export default function GemValueChart({ onScrubbingChange }) {
   // While scrubbing, the big value swaps to whatever point is being
   // touched, same as most stock/price apps -- reverts once released.
   const displayValue = touchPoint ? touchPoint.value : current;
-  const estimatedValue =
-    displayValue !== null ? formatPeso(displayValue * GEM_TO_PHP_RATE) : null;
-
   return (
     <div className="gem-chart">
       <div className="gem-chart__header">
         <div>
           <span className="gem-chart__eyebrow">Gems</span>
-          <h3 className="gem-chart__title">Gem value</h3>
+          <h3 className="gem-chart__title">GEM value</h3>
         </div>
         <MdDiamond size={22} color="#fff" />
       </div>
@@ -199,6 +201,8 @@ export default function GemValueChart({ onScrubbingChange }) {
         onPointerCancel={endScrub}
         onPointerLeave={endScrub}
       >
+        {error && <p className="gem-chart__message">{error}</p>}
+        {!error && !showChart && <p className="gem-chart__message">Loading value history...</p>}
         {showChart && (
           <>
             <svg width={chartW} height={CHART_H} className="gem-chart__svg">
@@ -255,7 +259,7 @@ export default function GemValueChart({ onScrubbingChange }) {
                 >
                   <div className="gem-chart__point-label-chip">
                     <span className="gem-chart__point-label-text">
-                      {geometry.maxPoint.value} GEMS
+                      {formatPoint(geometry.maxPoint.value, currency)}
                     </span>
                   </div>
                 </div>
@@ -270,7 +274,7 @@ export default function GemValueChart({ onScrubbingChange }) {
                   >
                     <div className="gem-chart__point-label-chip">
                       <span className="gem-chart__point-label-text">
-                        {geometry.minPoint.value} GEMS
+                        {formatPoint(geometry.minPoint.value, currency)}
                       </span>
                     </div>
                   </div>
@@ -289,7 +293,7 @@ export default function GemValueChart({ onScrubbingChange }) {
               >
                 <div className="gem-chart__point-label-chip gem-chart__touch-chip">
                   <span className="gem-chart__point-label-text">
-                    {touchPoint.value} GEMS
+                    {formatPoint(touchPoint.value, currency)}
                   </span>
                 </div>
               </div>
@@ -313,14 +317,9 @@ export default function GemValueChart({ onScrubbingChange }) {
 
       <div className="gem-chart__stat-panel">
         <p className="gem-chart__big-value">
-          {displayValue ?? "--"}{" "}
-          <span className="gem-chart__big-value-unit">GEMS</span>
+          {formatCompactValue(displayValue)}{" "}
+          <span className="gem-chart__big-value-unit">{currency}</span>
         </p>
-        {estimatedValue && (
-          <p className="gem-chart__estimated-value">
-            ≈ {estimatedValue} estimated value
-          </p>
-        )}
 
         {touchPoint ? (
           <p className="gem-chart__range-label gem-chart__standalone-range-label">

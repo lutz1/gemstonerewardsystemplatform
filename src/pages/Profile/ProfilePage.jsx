@@ -1,45 +1,11 @@
 import { signOut } from "firebase/auth";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
-import { auth } from "../../firebase";
+import { app, auth } from "../../firebase";
 import "./ProfilePage.css";
-
-const profile = {
-  name: "Alexis Rivera",
-  handle: "@arivera",
-  email: "alexis.rivera@example.com",
-  phone: "+1 (555) 214-7788",
-  location: "Austin, TX",
-  memberSince: "Mar 2022",
-  tier: "Executive Tier",
-  initials: "AR",
-};
-
-const tierProgress = {
-  current: "Executive",
-  next: "Platinum",
-  gemsToNext: 7150,
-  percent: 68,
-};
-
-const profileStats = [
-  { key: "codes", icon: "token", label: "Codes Purchased", value: "168" },
-  {
-    key: "referrals",
-    icon: "diversity_3",
-    label: "Active Referrals",
-    value: "9",
-  },
-  { key: "gems", icon: "diamond", label: "GEMS Balance", value: "42,850" },
-  {
-    key: "age",
-    icon: "calendar_month",
-    label: "Member Since",
-    value: profile.memberSince,
-  },
-];
 
 const preferenceToggles = [
   {
@@ -83,10 +49,97 @@ function ToggleRow({ label, caption, defaultOn }) {
   );
 }
 
+function formatDate(value) {
+  if (!value) return "—";
+  const date = typeof value.toDate === "function" ? value.toDate() : new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+function formatTier(value) {
+  if (!value) return "Member";
+  const tier = String(value)
+    .replace(/\s+tier$/i, "")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return `${tier} Tier`;
+}
+
+function getInitials(name) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
+}
+
+function buildProfile(data, currentUser) {
+  const name =
+    data.name ||
+    [data.firstName, data.middleName, data.lastName].filter(Boolean).join(" ") ||
+    currentUser.displayName ||
+    currentUser.email ||
+    "Member";
+
+  return {
+    name,
+    handle: data.username ? `@${data.username}` : "—",
+    email: data.email || currentUser.email || "—",
+    phone: data.phone || "—",
+    location: data.address || "—",
+    memberSince: formatDate(data.joinDate || data.createdAt),
+    tier: formatTier(data.tier || data.membershipTier || data.role),
+    initials: getInitials(name),
+    currentTier: data.tier || data.membershipTier || data.role || "Member",
+    nextTier: data.nextTier || "—",
+    gemsToNext: data.gemsToNext,
+    progressPercent: Number(data.tierProgress ?? data.progressPercent ?? 0),
+    stats: [
+      { key: "codes", icon: "token", label: "Codes Purchased", value: data.codesPurchased ?? data.totalCodes ?? "—" },
+      { key: "referrals", icon: "diversity_3", label: "Active Referrals", value: data.activeReferrals ?? data.referrals ?? "—" },
+      { key: "gems", icon: "diamond", label: "GEMS Balance", value: data.gemPoints ?? data.gemsBalance ?? data.gemBalance ?? data.gems ?? "—" },
+      { key: "age", icon: "calendar_month", label: "Member Since", value: formatDate(data.joinDate || data.createdAt) },
+    ],
+  };
+}
+
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [profileError, setProfileError] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      setProfileError("Unable to load your profile.");
+      return undefined;
+    }
+
+    let isMounted = true;
+    const getUserProfile = httpsCallable(
+      getFunctions(app, "asia-southeast1"),
+      "getUserProfile",
+    );
+
+    getUserProfile()
+      .then(({ data }) => {
+        if (!isMounted) return;
+        if (!data) {
+          setProfileError("Your profile could not be found.");
+          return;
+        }
+        setProfile(buildProfile(data, currentUser));
+      })
+      .catch(() => {
+        if (isMounted) setProfileError("Unable to load your profile.");
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!showLogoutModal) return undefined;
@@ -111,6 +164,21 @@ export default function ProfilePage() {
     }
   };
 
+  if (!profile) {
+    return (
+      <div className="prof-root">
+        <TopBar userName="Member" userRole="Member" />
+        <main className="prof-main">
+          <div className="prof-content">
+            <p role={profileError ? "alert" : "status"}>
+              {profileError || "Loading profile..."}
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="prof-root">
       {/* ── Atmosphere glows ─────────────────────────────────── */}
@@ -118,7 +186,7 @@ export default function ProfilePage() {
       <div className="prof-glow prof-glow-bl" />
 
       {/* ── Top App Bar ──────────────────────────────────────── */}
-      <TopBar />
+      <TopBar userName={profile.name} userRole={profile.tier} />
 
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="prof-main">
@@ -157,35 +225,37 @@ export default function ProfilePage() {
               <div>
                 <p className="prof-progress-label">Tier Progress</p>
                 <p className="prof-progress-title">
-                  {tierProgress.current}{" "}
+                  {profile.currentTier}{" "}
                   <span className="material-symbols-outlined prof-progress-arrow">
                     arrow_forward
                   </span>{" "}
-                  {tierProgress.next}
+                  {profile.nextTier}
                 </p>
               </div>
               <p className="prof-progress-remaining">
                 <span className="material-symbols-outlined prof-progress-diamond">
                   diamond
                 </span>
-                {tierProgress.gemsToNext.toLocaleString()} GEMS to go
+                {profile.gemsToNext == null
+                  ? "—"
+                  : `${Number(profile.gemsToNext).toLocaleString()} GEMS to go`}
               </p>
             </div>
             <div className="prof-progress-track">
               <div
                 className="prof-progress-fill"
-                style={{ width: `${tierProgress.percent}%` }}
+                style={{ width: `${profile.progressPercent}%` }}
               />
             </div>
             <p className="prof-progress-caption">
-              Reach {tierProgress.next} Tier to unlock priority code drops and
+              Reach {profile.nextTier} to unlock priority code drops and
               higher batch limits.
             </p>
           </section>
 
           {/* ── Quick stats ────────────────────────────────── */}
           <section className="prof-stats-grid">
-            {profileStats.map((s) => (
+              {profile.stats.map((s) => (
               <div className="prof-glass-panel prof-stat-card" key={s.key}>
                 <div className="prof-stat-icon">
                   <span className="material-symbols-outlined">{s.icon}</span>

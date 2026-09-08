@@ -37,6 +37,17 @@
   touch-action: none; /* let pointer events drive scrubbing instead of the browser's scroll/zoom gestures */
 }
 
+.gem-chart__message {
+  min-height: 160px;
+  display: grid;
+  place-items: center;
+  margin: 0 16px;
+  color: rgba(255, 255, 255, 0.58);
+  font-family: var(--font-hanken);
+  font-size: 12px;
+  text-align: center;
+}
+
 .gem-chart__svg {
   display: block;
   pointer-events: none;

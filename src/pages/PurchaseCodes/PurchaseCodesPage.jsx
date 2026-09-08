@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
+import { app } from "../../firebase";
 import { getTransactions } from "../../utils/TransactionsData";
 import "./PurchaseCodesPage.css";
 
@@ -65,6 +67,7 @@ const ledgerStats = [
 
 export default function PurchaseCodesPage() {
   const { username, referralCode } = useAuth();
+  const [profile, setProfile] = useState(null);
   const [search, setSearch] = useState("");
   const [transactions] = useState(() => getTransactions());
   const [copied, setCopied] = useState(false);
@@ -72,6 +75,14 @@ export default function PurchaseCodesPage() {
   const referralLink = referralIdentifier
     ? `https://gemstonecode.store/register?ref=${encodeURIComponent(referralIdentifier)}`
     : "";
+
+  useEffect(() => {
+    const getUserProfile = httpsCallable(
+      getFunctions(app, "asia-southeast1"),
+      "getUserProfile",
+    );
+    getUserProfile().then(({ data }) => setProfile(data || {})).catch(() => {});
+  }, []);
 
   const filtered = codes.filter(
     (c) =>
@@ -112,7 +123,10 @@ export default function PurchaseCodesPage() {
       <div className="pc-glow pc-glow-bl" />
 
       {/* ── Top App Bar ──────────────────────────────────────── */}
-      <TopBar />
+      <TopBar
+        userName={profile?.name || username || "Member"}
+        userRole={profile?.tier || profile?.membershipTier || profile?.role || "Member"}
+      />
 
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="pc-main">

@@ -1,31 +1,36 @@
-// Dummy package catalog for the purchase flow.
-// Swap this for a real API call once the backend endpoint exists —
-// everything downstream just expects an object shaped like one of these.
-
 export const packages = [
   {
-    id: "package-1",
-    name: "Package 1",
-    tier: "Standard Tier",
-    tierColor: "muted",
-    quantity: 5,
-    price: 99.0,
+    id: "emerald",
+    name: "Emerald Membership",
+    tier: "EMERALD",
+    tierColor: "emerald",
+    quantity: 1,
+    price: 1650,
+    totalGems: 90,
+    dailyGems: 2,
+    features: ["Access to Trainings", "Community Access"],
   },
   {
-    id: "package-2",
-    name: "Package 2",
-    tier: "Executive Tier",
-    tierColor: "primary",
-    quantity: 10,
-    price: 149.0,
+    id: "sapphire",
+    name: "Sapphire Membership",
+    tier: "SAPPHIRE",
+    tierColor: "sapphire",
+    quantity: 1,
+    price: 7790,
+    totalGems: 270,
+    dailyGems: 6,
+    features: ["Access to Trainings", "Community Access"],
   },
   {
-    id: "package-3",
-    name: "Package 3",
-    tier: "Platinum Tier",
-    tierColor: "platinum",
-    quantity: 20,
-    price: 249.0,
+    id: "diamond",
+    name: "Diamond Membership",
+    tier: "DIAMOND",
+    tierColor: "diamond",
+    quantity: 1,
+    price: 14350,
+    totalGems: 450,
+    dailyGems: 10,
+    features: ["VIP Support", "Access to Trainings", "Community Access"],
   },
 ];
 
@@ -38,8 +43,5 @@ export function calcTotal(pkg) {
 }
 
 export function formatCurrency(amount) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
+  return "₱" + amount.toLocaleString("en-PH");
 }

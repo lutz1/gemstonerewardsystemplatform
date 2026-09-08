@@ -1,9 +1,12 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import diamondCard from "../../assets/diamond_card_products.png";
 import emeraldCard from "../../assets/emerald_card_products.png";
 import sapphireCard from "../../assets/sapphire_card_products.png";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
+import { app } from "../../firebase";
 import { formatCurrency, packages } from "../../utils/PackagesData";
 import "./ProductsPage.css";
 
@@ -11,6 +14,9 @@ const tierImages = {
   emerald: emeraldCard,
   sapphire: sapphireCard,
   diamond: diamondCard,
+  muted: emeraldCard,
+  primary: sapphireCard,
+  platinum: diamondCard,
 };
 
 function FeatureRow({ children }) {
@@ -24,11 +30,23 @@ function FeatureRow({ children }) {
 
 export default function ProductsPage() {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const getUserProfile = httpsCallable(
+      getFunctions(app, "asia-southeast1"),
+      "getUserProfile",
+    );
+    getUserProfile().then(({ data }) => setProfile(data || {})).catch(() => {});
+  }, []);
 
   return (
     <div className="prod-root">
       {/* ── Top App Bar ──────────────────────────────────────── */}
-      <TopBar />
+      <TopBar
+        userName={profile?.name || "Member"}
+        userRole={profile?.tier || profile?.membershipTier || profile?.role || "Member"}
+      />
 
       <div className="prod-shell">
         <main className="prod-main">
@@ -38,7 +56,7 @@ export default function ProductsPage() {
               <div>
                 <h2 className="prod-page-title">Products</h2>
                 <p className="prod-page-sub">
-                  Choose the code package that matches your networking tier.
+                  Choose a membership package to unlock exclusive features and benefits.
                 </p>
               </div>
             </div>
@@ -73,11 +91,11 @@ export default function ProductsPage() {
                         MEMBERSHIP
                       </span>
                       <span className="prod-feature-list">
-                        <FeatureRow>{pkg.totalGems} Total GEMS</FeatureRow>
+                        <FeatureRow>{pkg.totalGems} Total Gems</FeatureRow>
                         <FeatureRow>
-                          {pkg.dailyGems} GEMS Daily Rewards
+                          {pkg.dailyGems} Gems Daily Rewards
                         </FeatureRow>
-                        {pkg.features.map((feature) => (
+                        {(pkg.features || []).map((feature) => (
                           <FeatureRow key={feature}>{feature}</FeatureRow>
                         ))}
                       </span>
