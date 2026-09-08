@@ -262,8 +262,10 @@ export default function Dashboard() {
         {/* Transaction summary */}
         <h2 className="dash-insights-title">Transaction Logs Summary</h2>
         <div className="dash-glass-card dash-insights-card">
-          {dashboard.recentTransactions?.length ? (
-            dashboard.recentTransactions.map((transaction) => (
+          {[...(dashboard.recentTransactions || []), ...(dashboard.gemTransactions || [])].length ? (
+            [...(dashboard.recentTransactions || []), ...(dashboard.gemTransactions || [])]
+              .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+              .map((transaction) => (
               <div className="dash-insight-row" key={transaction.id}>
                 <MdReceiptLong
                   size={22}
@@ -280,7 +282,7 @@ export default function Dashboard() {
                   {displayNumber(transaction.amount)}
                 </strong>
               </div>
-            ))
+              ))
           ) : (
             <p className="dash-insight-empty">No transactions yet.</p>
           )}

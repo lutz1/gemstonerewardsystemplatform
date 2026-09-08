@@ -632,7 +632,7 @@ exports.getUserDashboard = onCall({ region: 'asia-southeast1' }, async (request)
 
   const userData = userSnapshot.data() || {};
   const referralCode = userData.referralCode || '';
-  const [referralsSnapshot, purchasesSnapshot, codesSnapshot, settingsSnapshot, usersSnapshot] = await Promise.all([
+  const [referralsSnapshot, purchasesSnapshot, codesSnapshot, settingsSnapshot, usersSnapshot, gemTransactionsSnapshot] = await Promise.all([
     referralCode
       ? db().collection('users').where('uplineReferralCode', '==', referralCode).get()
       : Promise.resolve({ size: 0, docs: [] }),
@@ -640,6 +640,7 @@ exports.getUserDashboard = onCall({ region: 'asia-southeast1' }, async (request)
     db().collection('purchaseCodes').get(),
     db().collection('settings').doc('admin').get(),
     db().collection('users').get(),
+    db().collection('users').doc(request.auth.uid).collection('gemTransactions').get(),
   ]);
 
   const usersByUplineCode = new Map();
@@ -701,6 +702,25 @@ exports.getUserDashboard = onCall({ region: 'asia-southeast1' }, async (request)
     })
     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
     .slice(0, 3);
+  const gemTransactions = gemTransactionsSnapshot.docs
+    .map((document) => {
+      const data = document.data() || {};
+      const labelByType = {
+        daily_membership_reward: 'Daily GEM Reward',
+        membership_activation_reward: 'Membership GEM Reward',
+        purchase_distribution: 'Referral GEM Reward',
+      };
+      return {
+        id: document.id,
+        label: labelByType[data.type] || 'GEM Transaction',
+        detail: data.tier ? `${data.tier} · ${data.type || 'reward'}` : data.type || 'reward',
+        amount: Number(data.amount ?? 0),
+        createdAt: data.createdAt || data.date || null,
+        status: 'completed',
+      };
+    })
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+    .slice(0, 3);
 
   return {
     name: userData.name || [userData.firstName, userData.lastName].filter(Boolean).join(' '),
@@ -715,6 +735,7 @@ exports.getUserDashboard = onCall({ region: 'asia-southeast1' }, async (request)
     membershipExpiry: userData.membershipExpiry || userData.membershipExpiresAt || null,
     gemValueChangePercent: userData.gemValueChangePercent ?? userData.gemValueChange ?? null,
     recentTransactions,
+    gemTransactions,
     hasNotifications: userData.hasNotifications === true,
   };
 });

@@ -6,7 +6,8 @@ import emeraldCard from "../../assets/emerald_card_products.png";
 import sapphireCard from "../../assets/sapphire_card_products.png";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
-import { packages } from "../../utils/PackagesData";
+import { app } from "../../firebase";
+import { formatCurrency, packages } from "../../utils/PackagesData";
 import "./ProductsPage.css";
 
 const tierImages = {
@@ -88,8 +89,10 @@ export default function ProductsPage() {
                       <span className="prod-tier-tag">{pkg.tier}</span>
                       <span
                         className="prod-price-tag"
-                        aria-label="Price configured by backend"
-                      />
+                        aria-label={`${formatCurrency(pkg.price)} product price`}
+                      >
+                        {formatCurrency(pkg.price)}
+                      </span>
                     </span>
                     <span className="prod-package-bottom">
                       <span className="prod-package-membership">
