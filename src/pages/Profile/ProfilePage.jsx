@@ -8,7 +8,6 @@ import TopBar from "../../components/TopBar/TopBar";
 import { app, auth } from "../../firebase";
 import "./ProfilePage.css";
 
-<<<<<<< HEAD
 const preferenceToggles = [
   {
     key: "email-updates",
@@ -105,36 +104,6 @@ function buildProfile(data, currentUser) {
   };
 }
 
-=======
-const profile = {
-  name: "Alexis Rivera",
-  handle: "@arivera",
-  email: "alexis.rivera@example.com",
-  phone: "+1 (555) 214-7788",
-  location: "Austin, TX",
-  memberSince: "Mar 2022",
-  tier: "Executive Tier",
-  initials: "AR",
-};
-
-const profileStats = [
-  { key: "codes", icon: "token", label: "Codes Purchased", value: "168" },
-  {
-    key: "referrals",
-    icon: "diversity_3",
-    label: "Active Referrals",
-    value: "9",
-  },
-  { key: "gems", icon: "diamond", label: "GEMS Balance", value: "42,850" },
-  {
-    key: "age",
-    icon: "calendar_month",
-    label: "Member Since",
-    value: profile.memberSince,
-  },
-];
-
->>>>>>> aead1989c638676b9b0021ff4664953b397839c3
 export default function ProfilePage() {
   const { username } = useAuth();
   const navigate = useNavigate();
@@ -253,7 +222,6 @@ export default function ProfilePage() {
             </button>
           </section>
 
-<<<<<<< HEAD
           {/* ── Tier progress ──────────────────────────────── */}
           <section className="prof-glass-panel prof-progress-card">
             <div className="prof-progress-top">
@@ -288,8 +256,6 @@ export default function ProfilePage() {
             </p>
           </section>
 
-=======
->>>>>>> aead1989c638676b9b0021ff4664953b397839c3
           {/* ── Quick stats ────────────────────────────────── */}
           <section className="prof-stats-grid">
               {profile.stats.map((s) => (
