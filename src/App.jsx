@@ -1,10 +1,10 @@
 import {
-    BrowserRouter,
-    Navigate,
-    Outlet,
-    Route,
-    Routes,
-    useLocation,
+  BrowserRouter,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import ComingSoonPage from "./components/ComingSoonPage";
@@ -86,13 +86,7 @@ export default function App() {
           </Route>
 
           <Route
-<<<<<<< HEAD
             element={<ProtectedRoute allowedRoles={["member", "leader", "ceo", "admin"]} />}
-=======
-            element={
-              <ProtectedRoute allowedRoles={["member", "ceo", "admin"]} />
-            }
->>>>>>> aead1989c638676b9b0021ff4664953b397839c3
           >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
