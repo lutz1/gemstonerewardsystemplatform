@@ -1,4 +1,8 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 /* ─── Root ────────────────────────────────────────────────────── */
 
@@ -6,7 +10,11 @@
   min-height: 100vh;
   background-color: var(--background);
   color: var(--on-surface);
-  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Hanken Grotesk",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   overflow-x: hidden;
   background-image:
     radial-gradient(at 0% 0%, rgba(0, 168, 107, 0.05) 0px, transparent 50%),
@@ -17,24 +25,24 @@
 
 .prof-glow {
   position: fixed;
-  width: 600px;
-  height: 600px;
+  width: 320px;
+  height: 320px;
   border-radius: 50%;
-  filter: blur(120px);
   pointer-events: none;
   z-index: 0;
+  opacity: 0.5;
 }
 
 .prof-glow-tr {
-  top: 25%;
-  right: -25%;
-  background: rgba(0, 168, 107, 0.05);
+  top: 60px;
+  right: -140px;
+  background: rgba(0, 168, 107, 0.1);
 }
 
 .prof-glow-bl {
-  bottom: 25%;
-  left: -25%;
-  background: rgba(0, 168, 107, 0.05);
+  bottom: 120px;
+  left: -140px;
+  background: rgba(0, 168, 107, 0.1);
 }
 
 /* ─── Glass panel ─────────────────────────────────────────────── */
@@ -48,42 +56,42 @@
   border-right: 1px solid rgba(198, 198, 198, 0.03);
   border-bottom: 1px solid rgba(198, 198, 198, 0.03);
   border-radius: 12px;
-  transition: box-shadow 0.25s ease, background 0.2s;
+  transition:
+    box-shadow 0.25s ease,
+    background 0.2s;
   transform: none !important;
 }
 
 .prof-glass-panel:hover {
   background: rgba(47, 54, 49, 0.55);
-  box-shadow: 0 0 24px rgba(0, 168, 107, 0.18), 0 4px 30px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 0 24px rgba(0, 168, 107, 0.18),
+    0 4px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* ─── Main ────────────────────────────────────────────────────── */
 
 .prof-main {
-  padding-top: 80px;
-  padding-bottom: 96px;
+  width: min(100%, 480px);
+  margin: 0 auto;
+  padding: 80px 16px 96px;
   min-height: 100vh;
   position: relative;
   z-index: 1;
 }
 
 .prof-content {
-  max-width: 1024px;
-  margin: 0 auto;
-  padding: 32px 16px 24px;
+  max-width: none;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
-
-@media (min-width: 768px) {
-  .prof-content { padding: 32px 48px 24px; }
+  gap: 20px;
 }
 
 /* ─── Identity hero ───────────────────────────────────────────── */
 
 .prof-hero {
-  padding: 28px 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -100,12 +108,12 @@
 .prof-hero-identity {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 .prof-avatar {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   flex-shrink: 0;
   display: flex;
@@ -113,8 +121,8 @@
   justify-content: center;
   background: linear-gradient(135deg, var(--primary-container), var(--primary));
   color: var(--on-primary-container);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 24px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 20px;
   font-weight: 700;
   box-shadow: 0 0 20px rgba(0, 168, 107, 0.35);
 }
@@ -127,8 +135,8 @@
 }
 
 .prof-name {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 24px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 20px;
   font-weight: 600;
   color: var(--on-surface);
   letter-spacing: -0.01em;
@@ -138,7 +146,7 @@
   display: inline-block;
   padding: 3px 10px;
   border-radius: 9999px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -149,7 +157,7 @@
 }
 
 .prof-handle {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 13px;
   color: var(--secondary);
   margin-top: 2px;
@@ -159,7 +167,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 13px;
   color: var(--on-surface-variant);
   margin-top: 6px;
@@ -173,12 +181,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
+  padding: 10px 18px;
   border-radius: 8px;
   border: 1px solid rgba(61, 74, 65, 0.4);
   background: rgba(47, 54, 49, 0.4);
   color: var(--on-surface);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -187,9 +195,13 @@
   align-self: flex-start;
 }
 
-.prof-edit-btn:hover { background: rgba(47, 54, 49, 0.7); }
+.prof-edit-btn:hover {
+  background: rgba(47, 54, 49, 0.7);
+}
 
-.prof-edit-btn .material-symbols-outlined { font-size: 18px; }
+.prof-edit-btn .material-symbols-outlined {
+  font-size: 18px;
+}
 
 /* ─── Tier progress ───────────────────────────────────────────── */
 
@@ -215,7 +227,7 @@
 }
 
 .prof-progress-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -228,7 +240,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--on-surface);
@@ -243,7 +255,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 13px;
   font-weight: 600;
   color: var(--primary);
@@ -264,12 +276,16 @@
 .prof-progress-fill {
   height: 100%;
   border-radius: 9999px;
-  background: linear-gradient(to right, var(--primary-container), var(--primary));
+  background: linear-gradient(
+    to right,
+    var(--primary-container),
+    var(--primary)
+  );
   box-shadow: 0 0 12px rgba(0, 168, 107, 0.5);
 }
 
 .prof-progress-caption {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 13px;
   color: var(--on-surface-variant);
 }
@@ -278,28 +294,20 @@
 
 .prof-stats-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
-@media (min-width: 640px) {
-  .prof-stats-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (min-width: 900px) {
-  .prof-stats-grid { grid-template-columns: repeat(4, 1fr); }
-}
-
 .prof-stat-card {
-  padding: 18px;
+  padding: 14px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .prof-stat-icon {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: 8px;
   flex-shrink: 0;
   display: flex;
@@ -309,10 +317,12 @@
   color: var(--primary);
 }
 
-.prof-stat-icon .material-symbols-outlined { font-size: 24px; }
+.prof-stat-icon .material-symbols-outlined {
+  font-size: 22px;
+}
 
 .prof-stat-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -322,8 +332,8 @@
 }
 
 .prof-stat-value {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 20px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 17px;
   font-weight: 600;
   color: var(--on-surface);
 }
@@ -331,7 +341,7 @@
 /* ─── Generic panel ───────────────────────────────────────────── */
 
 .prof-panel {
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -344,15 +354,15 @@
 }
 
 .prof-panel-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 18px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 16px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .prof-panel-sub {
-  font-family: 'Hanken Grotesk', sans-serif;
-  font-size: 13px;
+  font-family: "Hanken Grotesk", sans-serif;
+  font-size: 12px;
   color: var(--on-surface-variant);
 }
 
@@ -365,7 +375,9 @@
 }
 
 @media (min-width: 640px) {
-  .prof-field-grid { grid-template-columns: repeat(2, 1fr); }
+  .prof-field-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .prof-field {
@@ -375,7 +387,7 @@
 }
 
 .prof-field-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.07em;
@@ -388,7 +400,7 @@
   border-radius: 8px;
   background: rgba(26, 33, 28, 0.5);
   border: 1px solid rgba(61, 74, 65, 0.3);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   color: var(--on-surface);
 }
@@ -403,7 +415,9 @@
   border-top: 1px solid rgba(61, 74, 65, 0.15);
 }
 
-.prof-security-row:first-of-type { border-top: none; }
+.prof-security-row:first-of-type {
+  border-top: none;
+}
 
 .prof-security-icon {
   width: 40px;
@@ -417,17 +431,20 @@
   color: var(--primary);
 }
 
-.prof-security-info { flex: 1; min-width: 0; }
+.prof-security-info {
+  flex: 1;
+  min-width: 0;
+}
 
 .prof-security-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .prof-security-caption {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
@@ -439,11 +456,13 @@
   border: 1px solid rgba(61, 74, 65, 0.4);
   background: none;
   color: var(--on-surface);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   flex-shrink: 0;
 }
 
@@ -455,7 +474,7 @@
 .prof-status-pill {
   padding: 4px 12px;
   border-radius: 9999px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -485,17 +504,19 @@
   border-top: 1px solid rgba(61, 74, 65, 0.15);
 }
 
-.prof-toggle-row:first-child { border-top: none; }
+.prof-toggle-row:first-child {
+  border-top: none;
+}
 
 .prof-toggle-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .prof-toggle-caption {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
@@ -511,7 +532,9 @@
   cursor: pointer;
   flex-shrink: 0;
   padding: 2px;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .prof-switch-knob {
@@ -520,7 +543,9 @@
   height: 18px;
   border-radius: 50%;
   background: var(--on-surface-variant);
-  transition: transform 0.15s, background 0.15s;
+  transition:
+    transform 0.15s,
+    background 0.15s;
 }
 
 .prof-switch.on {
@@ -552,14 +577,14 @@
 }
 
 .prof-danger-title {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .prof-danger-caption {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
@@ -574,11 +599,14 @@
   border: 1px solid rgba(61, 74, 65, 0.4);
   background: none;
   color: var(--on-surface);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
   flex-shrink: 0;
   align-self: flex-start;
 }
@@ -589,7 +617,9 @@
   color: #e08585;
 }
 
-.prof-signout-btn .material-symbols-outlined { font-size: 18px; }
+.prof-signout-btn .material-symbols-outlined {
+  font-size: 18px;
+}
 
 /* Logout confirmation modal */
 
@@ -628,10 +658,12 @@
   color: #e08585;
 }
 
-.prof-modal-icon .material-symbols-outlined { font-size: 24px; }
+.prof-modal-icon .material-symbols-outlined {
+  font-size: 24px;
+}
 
 .prof-modal-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 22px;
   font-weight: 600;
   color: var(--on-surface);
@@ -640,7 +672,7 @@
 .prof-modal-copy {
   margin-top: 8px;
   color: var(--on-surface-variant);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   line-height: 1.5;
 }
@@ -657,7 +689,7 @@
   min-width: 104px;
   padding: 10px 18px;
   border-radius: 8px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -675,16 +707,29 @@
   color: #fff;
 }
 
-.prof-modal-cancel:hover:not(:disabled) { background: rgba(89, 222, 155, 0.1); }
-.prof-modal-confirm:hover:not(:disabled) { background: #d17b7b; }
+.prof-modal-cancel:hover:not(:disabled) {
+  background: rgba(89, 222, 155, 0.1);
+}
+.prof-modal-confirm:hover:not(:disabled) {
+  background: #d17b7b;
+}
 .prof-modal-cancel:disabled,
-.prof-modal-confirm:disabled { cursor: wait; opacity: 0.65; }
+.prof-modal-confirm:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
 
 @media (max-width: 420px) {
-  .prof-logout-modal { padding: 24px; }
-  .prof-modal-actions { flex-direction: column-reverse; }
+  .prof-logout-modal {
+    padding: 24px;
+  }
+  .prof-modal-actions {
+    flex-direction: column-reverse;
+  }
   .prof-modal-cancel,
-  .prof-modal-confirm { width: 100%; }
+  .prof-modal-confirm {
+    width: 100%;
+  }
 }
 
 /* ─── Footer ──────────────────────────────────────────────────── */
@@ -717,7 +762,7 @@
 }
 
 .prof-footer-copy {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
 }
@@ -728,7 +773,7 @@
 }
 
 .prof-footer-link {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--secondary);
   text-decoration: none;

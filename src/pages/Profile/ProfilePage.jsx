@@ -2,11 +2,13 @@ import { signOut } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
 import { app, auth } from "../../firebase";
 import "./ProfilePage.css";
 
+<<<<<<< HEAD
 const preferenceToggles = [
   {
     key: "email-updates",
@@ -103,7 +105,38 @@ function buildProfile(data, currentUser) {
   };
 }
 
+=======
+const profile = {
+  name: "Alexis Rivera",
+  handle: "@arivera",
+  email: "alexis.rivera@example.com",
+  phone: "+1 (555) 214-7788",
+  location: "Austin, TX",
+  memberSince: "Mar 2022",
+  tier: "Executive Tier",
+  initials: "AR",
+};
+
+const profileStats = [
+  { key: "codes", icon: "token", label: "Codes Purchased", value: "168" },
+  {
+    key: "referrals",
+    icon: "diversity_3",
+    label: "Active Referrals",
+    value: "9",
+  },
+  { key: "gems", icon: "diamond", label: "GEMS Balance", value: "42,850" },
+  {
+    key: "age",
+    icon: "calendar_month",
+    label: "Member Since",
+    value: profile.memberSince,
+  },
+];
+
+>>>>>>> aead1989c638676b9b0021ff4664953b397839c3
 export default function ProfilePage() {
+  const { username } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState("");
@@ -198,9 +231,10 @@ export default function ProfilePage() {
               <div>
                 <div className="prof-name-row">
                   <h2 className="prof-name">{profile.name}</h2>
-                  <span className="prof-tier-badge">{profile.tier}</span>
                 </div>
-                <p className="prof-handle">{profile.handle}</p>
+                <p className="prof-handle">
+                  @{username || profile.handle.replace(/^@/, "")}
+                </p>
                 <p className="prof-meta">
                   <span className="material-symbols-outlined prof-meta-icon">
                     mail
@@ -219,6 +253,7 @@ export default function ProfilePage() {
             </button>
           </section>
 
+<<<<<<< HEAD
           {/* ── Tier progress ──────────────────────────────── */}
           <section className="prof-glass-panel prof-progress-card">
             <div className="prof-progress-top">
@@ -253,6 +288,8 @@ export default function ProfilePage() {
             </p>
           </section>
 
+=======
+>>>>>>> aead1989c638676b9b0021ff4664953b397839c3
           {/* ── Quick stats ────────────────────────────────── */}
           <section className="prof-stats-grid">
               {profile.stats.map((s) => (
@@ -324,30 +361,19 @@ export default function ProfilePage() {
             </div>
             <div className="prof-security-row">
               <div className="prof-security-icon">
-                <span className="material-symbols-outlined">verified_user</span>
+                <span className="material-symbols-outlined">badge</span>
               </div>
               <div className="prof-security-info">
-                <p className="prof-security-label">Two-Factor Authentication</p>
-                <p className="prof-security-caption">
-                  Adds an extra step when signing in
-                </p>
+                <p className="prof-security-label">TIN Code</p>
+                <p className="prof-security-caption">•••-•••-789</p>
               </div>
-              <span className="prof-status-pill enabled">Enabled</span>
-            </div>
-          </section>
-
-          {/* ── Preferences ─────────────────────────────────── */}
-          <section className="prof-glass-panel prof-panel">
-            <div className="prof-panel-header">
-              <h3 className="prof-panel-title">Notification Preferences</h3>
-              <p className="prof-panel-sub">
-                Choose what you hear from us, and how.
-              </p>
-            </div>
-            <div className="prof-toggle-list">
-              {preferenceToggles.map((t) => (
-                <ToggleRow key={t.key} {...t} />
-              ))}
+              <button
+                className="prof-outline-btn"
+                type="button"
+                onClick={() => navigate("/change-tin")}
+              >
+                Change
+              </button>
             </div>
           </section>
 
