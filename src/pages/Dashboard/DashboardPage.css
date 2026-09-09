@@ -477,14 +477,17 @@ button.dash-glass-card,
 }
 .dash-insight-row {
   display: flex;
-  gap: 14px;
+  gap: 10px;
 }
 .dash-insight-row-border {
   padding-top: 20px;
   border-top: 1px solid var(--color-border-faint);
 }
 .dash-insight-icon {
-  margin-top: 2px;
+  width: 28px;
+  height: 28px;
+  margin: 6px 0 0 -4px;
+  object-fit: contain;
   flex-shrink: 0;
 }
 .dash-insight-body {

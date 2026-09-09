@@ -14,6 +14,7 @@ import {
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import bgImage from "../../assets/bg_dashboard.jpg";
+import emeraldIcon from "../../assets/emerald_icon.png";
 import gemVideo from "../../assets/gemvideo.mp4";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav.jsx";
 import GemValueChart from "../../components/GemValueChart/GemValueChart.jsx";
@@ -37,6 +38,11 @@ function formatDate(value) {
   return Number.isNaN(date.getTime())
     ? "—"
     : date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function formatTransactionAmount(transaction) {
+  const amount = displayNumber(transaction.amount);
+  return transaction.label?.includes("GEM") ? `+ ${amount}` : `- ${amount}`;
 }
 
 export default function Dashboard() {
@@ -315,9 +321,9 @@ export default function Dashboard() {
                   )
                   .map((transaction) => (
                     <div className="dash-insight-row" key={transaction.id}>
-                      <MdReceiptLong
-                        size={22}
-                        color="var(--color-primary)"
+                      <img
+                        src={emeraldIcon}
+                        alt=""
                         className="dash-insight-icon"
                       />
                       <div className="dash-insight-body">
@@ -330,7 +336,7 @@ export default function Dashboard() {
                         </p>
                       </div>
                       <strong className="dash-transaction-amount">
-                        {displayNumber(transaction.amount)}
+                        {formatTransactionAmount(transaction)}
                       </strong>
                     </div>
                   ))
