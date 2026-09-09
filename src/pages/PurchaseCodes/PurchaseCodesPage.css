@@ -1,4 +1,8 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 /* ─── Root ────────────────────────────────────────────────────── */
 
@@ -6,9 +10,17 @@
   min-height: 100vh;
   background-color: var(--background);
   color: var(--on-surface);
-  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Hanken Grotesk",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   overflow-x: hidden;
-  background-image: radial-gradient(circle at 2px 2px, rgba(89, 222, 155, 0.05) 1px, transparent 0);
+  background-image: radial-gradient(
+    circle at 2px 2px,
+    rgba(89, 222, 155, 0.05) 1px,
+    transparent 0
+  );
   background-size: 40px 40px;
 }
 
@@ -46,7 +58,9 @@
   border: 1px solid rgba(198, 198, 198, 0.1);
   position: relative;
   overflow: hidden;
-  transition: box-shadow 0.25s ease, background 0.2s;
+  transition:
+    box-shadow 0.25s ease,
+    background 0.2s;
   transform: none !important;
 }
 
@@ -58,13 +72,20 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(198, 198, 198, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(198, 198, 198, 0.3),
+    transparent
+  );
   pointer-events: none;
 }
 
 .pc-glass-panel:hover {
   background: rgba(47, 54, 49, 0.55);
-  box-shadow: 0 0 24px rgba(0, 168, 107, 0.18), 0 4px 30px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 0 24px rgba(0, 168, 107, 0.18),
+    0 4px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* ─── Direct referral link ────────────────────────────────────── */
@@ -75,7 +96,7 @@
 
 .pc-referral-label {
   display: block;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.07em;
@@ -91,7 +112,9 @@
 }
 
 @media (min-width: 768px) {
-  .pc-referral-row { flex-direction: row; }
+  .pc-referral-row {
+    flex-direction: row;
+  }
 }
 
 .pc-referral-input-wrap {
@@ -115,7 +138,7 @@
   background: transparent;
   border: none;
   outline: none;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   color: var(--on-surface);
   width: 100%;
@@ -136,16 +159,22 @@
   border: none;
   padding: 10px 32px;
   border-radius: 8px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  transition: opacity 0.15s, transform 0.1s;
+  transition:
+    opacity 0.15s,
+    transform 0.1s;
 }
 
-.pc-referral-copy-btn:hover  { opacity: 0.9; }
-.pc-referral-copy-btn:active { transform: scale(0.95); }
+.pc-referral-copy-btn:hover {
+  opacity: 0.9;
+}
+.pc-referral-copy-btn:active {
+  transform: scale(0.95);
+}
 
 .pc-referral-share-btn {
   width: 40px;
@@ -158,7 +187,9 @@
   background: none;
   color: var(--on-surface-variant);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   flex-shrink: 0;
 }
 
@@ -167,27 +198,421 @@
   color: var(--primary);
 }
 
+/* ─── Referral rewards and history ───────────────────────────── */
+
+.pc-referral-summary {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 24px;
+}
+
+.pc-reward-card,
+.pc-referral-stats,
+.pc-referral-history {
+  padding: 24px;
+}
+
+.pc-referral-summary-label,
+.pc-referral-history-heading h3 {
+  color: var(--on-surface);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.pc-referral-summary-sub,
+.pc-referral-history-heading p {
+  margin-top: 5px;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+}
+
+.pc-referral-gems-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 24px;
+  color: var(--primary);
+}
+
+.pc-referral-gems-row .material-symbols-outlined {
+  align-self: center;
+  font-size: 30px;
+}
+
+.pc-referral-gems-row strong {
+  color: var(--on-surface);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 38px;
+}
+
+.pc-referral-gems-row span:last-child {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.pc-referral-summary-caption,
+.pc-referral-history-result span,
+.pc-referral-history-person span {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+
+.pc-referral-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.pc-referral-stats > div {
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  padding: 0 18px;
+}
+
+.pc-referral-stats > div + div {
+  border-left: 1px solid rgba(61, 74, 65, 0.2);
+}
+
+.pc-referral-stats .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 25px;
+}
+
+.pc-referral-stats p {
+  color: var(--on-surface-variant);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pc-referral-stats strong {
+  color: var(--on-surface);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 26px;
+}
+
+.pc-referral-stats small {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+
+.pc-referral-history {
+  overflow: hidden;
+}
+
+.pc-referral-history-list {
+  margin-top: 20px;
+}
+
+.pc-referral-history-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid rgba(61, 74, 65, 0.15);
+}
+
+.pc-referral-history-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid rgba(89, 222, 155, 0.2);
+  border-radius: 50%;
+  background: rgba(0, 168, 107, 0.1);
+  color: var(--primary);
+}
+
+.pc-referral-history-icon.muted {
+  border-color: rgba(198, 198, 198, 0.15);
+  background: rgba(198, 198, 198, 0.08);
+  color: var(--secondary);
+}
+
+.pc-referral-history-person {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 3px;
+}
+
+.pc-referral-history-person strong {
+  color: var(--on-surface);
+  font-size: 14px;
+}
+
+.pc-referral-history-result {
+  display: grid;
+  gap: 3px;
+  text-align: right;
+}
+
+.pc-referral-history-result strong {
+  color: var(--primary);
+  font-size: 13px;
+}
+
+@media (max-width: 767px) {
+  .pc-referral-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .pc-referral-stats > div {
+    padding: 0 10px;
+  }
+
+  .pc-referral-gems-row strong {
+    font-size: 30px;
+  }
+}
+
+.pc-referral-box {
+  padding: 24px 20px;
+}
+
+.pc-referral-intro {
+  margin: 14px 0 22px;
+  color: var(--on-surface-variant);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.pc-invite-button {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--on-primary-container);
+  font-family: var(--font-hanken);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pc-invite-button:hover {
+  filter: brightness(1.06);
+}
+
+.pc-referral-summary {
+  display: block;
+}
+
+.pc-reward-card {
+  min-height: 250px;
+  padding: 28px 20px;
+}
+
+.pc-referral-summary-label {
+  color: var(--primary);
+  font-size: 24px;
+}
+
+.pc-referral-summary-sub {
+  max-width: 360px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.pc-referral-gems-row {
+  margin-top: 26px;
+}
+
+.pc-referral-gems-row strong {
+  font-size: 36px;
+}
+
+.pc-referral-gems-row span:last-child {
+  display: none;
+}
+
+.pc-referral-summary-caption {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.pc-referral-stats {
+  min-height: 148px;
+  margin-top: 24px;
+  padding: 0;
+}
+
+.pc-referral-stats > div {
+  padding: 18px 16px;
+}
+
+.pc-referral-history {
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.pc-referral-history-heading {
+  margin-bottom: 20px;
+}
+
+.pc-referral-history-heading h3 {
+  font-size: 28px;
+}
+
+.pc-referral-history-list {
+  margin-top: 0;
+  padding: 0 20px;
+  border: 1px solid rgba(198, 198, 198, 0.1);
+  border-radius: 12px;
+  background: rgba(47, 54, 49, 0.4);
+}
+
+.pc-hero-grid,
+.pc-table-section {
+  display: none;
+}
+
+/* ─── Referral action modal ──────────────────────────────────── */
+
+.pc-referral-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(4, 10, 6, 0.76);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.pc-referral-modal {
+  width: min(100%, 420px);
+  padding: 28px 20px 20px;
+  border: 1px solid rgba(198, 198, 198, 0.1);
+  border-radius: 12px;
+  background: #0e1510;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.pc-referral-modal h2 {
+  margin: 0 0 22px;
+  color: var(--on-surface);
+  font-family: var(--font-jakarta);
+  font-size: 24px;
+}
+
+.pc-referral-modal-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(61, 74, 65, 0.35);
+  border-radius: 8px;
+  color: var(--on-surface-variant);
+  font-size: 13px;
+}
+
+.pc-referral-modal-link .material-symbols-outlined {
+  color: var(--on-surface-variant);
+  flex-shrink: 0;
+}
+
+.pc-referral-modal-link span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pc-referral-actions-list {
+  display: grid;
+  gap: 8px;
+  margin: 28px 0 20px;
+}
+
+.pc-referral-action {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  color: var(--on-surface);
+  text-align: left;
+  cursor: pointer;
+}
+
+.pc-referral-action:hover .pc-referral-action-icon {
+  background: rgba(89, 222, 155, 0.2);
+}
+
+.pc-referral-action-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(89, 222, 155, 0.1);
+  color: var(--primary);
+}
+
+.pc-referral-action-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.pc-referral-action-copy strong {
+  font-family: var(--font-hanken);
+  font-size: 15px;
+}
+
+.pc-referral-action-copy small {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+
+.pc-referral-modal-cancel {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(47, 54, 49, 0.5);
+  color: var(--on-surface);
+  font-family: var(--font-hanken);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 /* ─── Main ────────────────────────────────────────────────────── */
 
 .pc-main {
-  padding-top: 80px;
-  padding-bottom: 96px;
+  width: min(100%, 480px);
+  margin: 0 auto;
+  padding: 80px 16px 96px;
   min-height: 100vh;
   position: relative;
   z-index: 1;
 }
 
 .pc-content {
-  max-width: 1024px;
-  margin: 0 auto;
-  padding: 32px 16px 24px;
+  max-width: none;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
-
-@media (min-width: 768px) {
-  .pc-content { padding: 32px 48px 24px; }
+  gap: 20px;
 }
 
 /* ─── Hero grid ───────────────────────────────────────────────── */
@@ -196,10 +621,6 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
-}
-
-@media (min-width: 768px) {
-  .pc-hero-grid { grid-template-columns: 2fr 1fr; }
 }
 
 /* Balance card */
@@ -212,7 +633,7 @@
 }
 
 .pc-balance-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 24px;
   font-weight: 600;
   color: var(--primary);
@@ -234,7 +655,7 @@
 }
 
 .pc-gems-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -256,8 +677,8 @@
 }
 
 .pc-gems-value {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 48px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 32px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--on-surface);
@@ -268,21 +689,115 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 10px 16px;
   border-radius: 8px;
   border: none;
-  background: linear-gradient(to right, var(--primary-container), var(--primary));
+  background: linear-gradient(
+    to right,
+    var(--primary-container),
+    var(--primary)
+  );
   color: var(--on-primary-container);
-  font-family: 'Hanken Grotesk', sans-serif;
-  font-size: 15px;
+  font-family: "Hanken Grotesk", sans-serif;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 0 15px rgba(0, 168, 107, 0.4);
-  transition: opacity 0.15s, transform 0.1s;
+  transition:
+    opacity 0.15s,
+    transform 0.1s;
 }
 
-.pc-generate-btn:hover  { opacity: 0.92; }
-.pc-generate-btn:active { transform: scale(0.95); }
+/* Compact mobile scale for the referral and code summary cards. */
+.pc-referral-box {
+  padding: 20px;
+}
+
+.pc-referral-intro {
+  margin: 10px 0 16px;
+  font-size: 13px;
+}
+
+.pc-invite-button {
+  min-height: 42px;
+  font-size: 13px;
+}
+
+.pc-reward-card {
+  min-height: 205px;
+  padding: 22px 20px;
+}
+
+.pc-referral-summary-label {
+  font-size: 23px;
+}
+
+.pc-referral-summary-sub {
+  font-size: 13px;
+}
+
+.pc-referral-gems-row {
+  margin-top: 18px;
+}
+
+.pc-referral-gems-row strong {
+  font-size: 34px;
+}
+
+.pc-referral-summary-caption {
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.pc-referral-stats {
+  min-height: 116px;
+  margin-top: 18px;
+}
+
+.pc-referral-stats > div {
+  padding: 14px 12px;
+}
+
+.pc-referral-stats strong {
+  font-size: 22px;
+}
+
+.pc-referral-stats small {
+  font-size: 10px;
+}
+
+.pc-balance-card {
+  min-height: 190px;
+  padding: 20px;
+}
+
+.pc-balance-title {
+  font-size: 20px;
+}
+
+.pc-balance-sub {
+  font-size: 13px;
+}
+
+.pc-balance-bottom {
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.pc-gems-label {
+  font-size: 10px;
+}
+
+.pc-diamond-icon {
+  font-size: 28px;
+}
+
+.pc-generate-btn:hover {
+  opacity: 0.92;
+}
+.pc-generate-btn:active {
+  transform: scale(0.95);
+}
 
 /* Quick stats panel (merged, side-by-side) */
 .pc-stat-mini-panel {
@@ -315,10 +830,20 @@
 }
 
 @media (max-width: 380px) {
-  .pc-stat-mini-row { padding: 14px 10px; gap: 8px; }
-  .pc-stat-mini-icon { width: 34px; height: 34px; }
-  .pc-stat-mini-icon .material-symbols-outlined { font-size: 20px; }
-  .pc-stat-mini-value { font-size: 20px; }
+  .pc-stat-mini-row {
+    padding: 14px 10px;
+    gap: 8px;
+  }
+  .pc-stat-mini-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .pc-stat-mini-icon .material-symbols-outlined {
+    font-size: 20px;
+  }
+  .pc-stat-mini-value {
+    font-size: 20px;
+  }
 }
 
 .pc-stat-mini-icon.primary {
@@ -336,7 +861,7 @@
 }
 
 .pc-stat-mini-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -346,7 +871,7 @@
 }
 
 .pc-stat-mini-value {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 24px;
   font-weight: 600;
   color: var(--on-surface);
@@ -372,7 +897,7 @@
 }
 
 .pc-table-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 18px;
   font-weight: 600;
   color: var(--on-surface);
@@ -395,7 +920,9 @@
 }
 
 @media (min-width: 480px) {
-  .pc-search-wrap { display: flex; }
+  .pc-search-wrap {
+    display: flex;
+  }
 }
 
 .pc-search-icon {
@@ -407,7 +934,7 @@
   background: transparent;
   border: none;
   outline: none;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   color: var(--on-surface);
   width: 160px;
@@ -428,7 +955,9 @@
   background: none;
   color: var(--on-surface-variant);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .pc-filter-btn:hover {
@@ -441,8 +970,12 @@
   overflow-x: auto;
 }
 
-.pc-table-scroll::-webkit-scrollbar { height: 4px; }
-.pc-table-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); }
+.pc-table-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.pc-table-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
 .pc-table-scroll::-webkit-scrollbar-thumb {
   background: var(--primary-container);
   border-radius: 10px;
@@ -461,7 +994,7 @@
 
 .pc-th {
   padding: 12px 24px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -470,18 +1003,26 @@
   white-space: nowrap;
 }
 
-.pc-th-right { text-align: right; }
+.pc-th-right {
+  text-align: right;
+}
 
 .pc-tbody-row {
   border-bottom: 1px solid rgba(61, 74, 65, 0.1);
   transition: background 0.15s;
 }
 
-.pc-tbody-row:last-child { border-bottom: none; }
+.pc-tbody-row:last-child {
+  border-bottom: none;
+}
 
-.pc-tbody-row:hover { background: rgba(89, 222, 155, 0.04); }
+.pc-tbody-row:hover {
+  background: rgba(89, 222, 155, 0.04);
+}
 
-.pc-tbody-row.used { opacity: 0.65; }
+.pc-tbody-row.used {
+  opacity: 0.65;
+}
 
 .pc-td {
   padding: 20px 24px;
@@ -489,7 +1030,7 @@
 }
 
 .pc-td-id {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -501,13 +1042,15 @@
 }
 
 .pc-td-date {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   color: var(--on-surface-variant);
   white-space: nowrap;
 }
 
-.pc-td-right { text-align: right; }
+.pc-td-right {
+  text-align: right;
+}
 
 /* Tier cell */
 .pc-tier-cell {
@@ -523,12 +1066,18 @@
   flex-shrink: 0;
 }
 
-.pc-tier-dot.primary  { background: var(--primary); }
-.pc-tier-dot.platinum { background: #E5E4E2; }
-.pc-tier-dot.muted    { background: var(--outline); }
+.pc-tier-dot.primary {
+  background: var(--primary);
+}
+.pc-tier-dot.platinum {
+  background: #e5e4e2;
+}
+.pc-tier-dot.muted {
+  background: var(--outline);
+}
 
 .pc-tier-name {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 15px;
   font-weight: 700;
   color: var(--on-surface);
@@ -543,7 +1092,7 @@
   display: inline-block;
   padding: 4px 10px;
   border-radius: 4px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -572,7 +1121,9 @@
   transition: color 0.15s;
 }
 
-.pc-action-btn:hover { color: var(--primary); }
+.pc-action-btn:hover {
+  color: var(--primary);
+}
 
 .pc-action-done {
   display: flex;
@@ -595,7 +1146,7 @@
 }
 
 .pc-pagination-count {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--secondary);
 }
@@ -611,10 +1162,12 @@
   border: 1px solid rgba(61, 74, 65, 0.35);
   background: none;
   color: var(--on-surface-variant);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .pc-page-btn:disabled {
@@ -660,7 +1213,7 @@
 }
 
 .pcl-section-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 22px;
   font-weight: 600;
   color: var(--on-surface);
@@ -688,13 +1241,15 @@
   border: 1px solid rgba(61, 74, 65, 0.4);
   background: rgba(47, 54, 49, 0.4);
   color: var(--on-surface);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   cursor: pointer;
   transition: background 0.15s;
 }
 
-.pcl-filter-btn:hover { background: rgba(47, 54, 49, 0.7); }
+.pcl-filter-btn:hover {
+  background: rgba(47, 54, 49, 0.7);
+}
 
 .pcl-filter-btn .material-symbols-outlined {
   font-size: 18px;
@@ -707,17 +1262,27 @@
   padding: 8px 20px;
   border-radius: 8px;
   border: none;
-  background: linear-gradient(to right, var(--primary-container), var(--primary));
+  background: linear-gradient(
+    to right,
+    var(--primary-container),
+    var(--primary)
+  );
   color: var(--on-primary-container);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
+  transition:
+    opacity 0.15s,
+    transform 0.1s;
 }
 
-.pcl-export-btn:hover { opacity: 0.9; }
-.pcl-export-btn:active { transform: scale(0.97); }
+.pcl-export-btn:hover {
+  opacity: 0.9;
+}
+.pcl-export-btn:active {
+  transform: scale(0.97);
+}
 
 .pcl-export-btn .material-symbols-outlined {
   font-size: 18px;
@@ -750,7 +1315,7 @@
 }
 
 .pcl-stat-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -761,7 +1326,7 @@
 }
 
 .pcl-stat-value {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 17px;
   font-weight: 600;
   color: var(--on-surface);
@@ -770,22 +1335,38 @@
 }
 
 .pcl-stat-caption {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 10px;
   position: relative;
   z-index: 1;
 }
 
 @media (min-width: 640px) {
-  .pcl-stat-col { padding: 20px 22px; gap: 6px; }
-  .pcl-stat-icon { font-size: 26px; }
-  .pcl-stat-label { font-size: 11px; letter-spacing: 0.08em; }
-  .pcl-stat-value { font-size: 22px; }
-  .pcl-stat-caption { font-size: 12px; }
+  .pcl-stat-col {
+    padding: 20px 22px;
+    gap: 6px;
+  }
+  .pcl-stat-icon {
+    font-size: 26px;
+  }
+  .pcl-stat-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+  .pcl-stat-value {
+    font-size: 22px;
+  }
+  .pcl-stat-caption {
+    font-size: 12px;
+  }
 }
 
-.pcl-stat-caption-primary { color: rgba(89, 222, 155, 0.8); }
-.pcl-stat-caption-muted   { color: var(--on-surface-variant); }
+.pcl-stat-caption-primary {
+  color: rgba(89, 222, 155, 0.8);
+}
+.pcl-stat-caption-muted {
+  color: var(--on-surface-variant);
+}
 
 /* Table wrapper */
 
@@ -798,8 +1379,12 @@
   overflow-x: auto;
 }
 
-.pcl-table-scroll::-webkit-scrollbar { height: 4px; }
-.pcl-table-scroll::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); }
+.pcl-table-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.pcl-table-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
 .pcl-table-scroll::-webkit-scrollbar-thumb {
   background: var(--primary-container);
   border-radius: 10px;
@@ -820,7 +1405,7 @@
 
 .pcl-th {
   padding: 12px 24px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -829,7 +1414,9 @@
   white-space: nowrap;
 }
 
-.pcl-th-right { text-align: right; }
+.pcl-th-right {
+  text-align: right;
+}
 
 /* Table body */
 
@@ -839,9 +1426,13 @@
   cursor: pointer;
 }
 
-.pcl-tbody-row:last-child { border-bottom: none; }
+.pcl-tbody-row:last-child {
+  border-bottom: none;
+}
 
-.pcl-tbody-row:hover { background: rgba(47, 54, 49, 0.35); }
+.pcl-tbody-row:hover {
+  background: rgba(47, 54, 49, 0.35);
+}
 
 .pcl-td {
   padding: 20px 24px;
@@ -849,7 +1440,7 @@
 }
 
 .pcl-td-date {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: var(--on-surface-variant);
@@ -860,11 +1451,13 @@
   text-align: center;
   padding: 48px 24px;
   color: var(--on-surface-variant);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 14px;
 }
 
-.pcl-td-right { text-align: right; }
+.pcl-td-right {
+  text-align: right;
+}
 
 /* Transaction cell */
 
@@ -899,21 +1492,21 @@
 }
 
 .pcl-tx-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .pcl-tx-sub {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
 }
 
 .pcl-tx-amount {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--primary);
@@ -925,7 +1518,7 @@
 }
 
 .pcl-tx-amount-sub {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
@@ -938,7 +1531,7 @@
   align-items: center;
   padding: 4px 10px;
   border-radius: 9999px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -960,8 +1553,12 @@
 }
 
 @media (max-width: 640px) {
-  .pcl-table-scroll { display: none; }
-  .pcl-tx-list { display: flex; }
+  .pcl-table-scroll {
+    display: none;
+  }
+  .pcl-tx-list {
+    display: flex;
+  }
 }
 
 .pcl-tx-card {
@@ -972,7 +1569,9 @@
   border-bottom: 1px solid rgba(61, 74, 65, 0.15);
 }
 
-.pcl-tx-card:last-child { border-bottom: none; }
+.pcl-tx-card:last-child {
+  border-bottom: none;
+}
 
 .pcl-tx-card-top {
   display: flex;
@@ -998,7 +1597,7 @@
 }
 
 .pcl-tx-card-date {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: var(--on-surface-variant);
@@ -1016,7 +1615,7 @@
 }
 
 .pcl-pagination-count {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
 }
@@ -1036,11 +1635,13 @@
   border: 1px solid rgba(61, 74, 65, 0.35);
   background: none;
   color: var(--on-surface-variant);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .pcl-page-btn:hover {
@@ -1085,7 +1686,7 @@
 }
 
 .pc-footer-copy {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
 }
@@ -1096,7 +1697,7 @@
 }
 
 .pc-footer-link {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 12px;
   color: var(--secondary);
   text-decoration: none;

@@ -226,6 +226,28 @@
   margin-bottom: 6px;
 }
 
+.prod-detail-top-nav {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.prod-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  padding: 6px 0;
+  background: transparent;
+  color: var(--on-surface-variant);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.prod-back-link:hover {
+  color: var(--primary);
+}
+
 .prod-secondary-btn,
 .prod-primary-btn {
   border: 0;
@@ -257,10 +279,93 @@
 }
 
 .prod-detail-card {
-  padding: 24px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 0;
+}
+
+.prod-detail-hero {
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  background: var(--surface-container);
+}
+
+.prod-detail-image,
+.prod-detail-image-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.prod-detail-image {
+  object-fit: cover;
+  object-position: center;
+}
+
+.prod-detail-image-overlay {
+  background: linear-gradient(90deg, rgba(4, 8, 6, 0.82), rgba(4, 8, 6, 0.12));
+}
+
+.prod-detail-hero-content {
+  position: absolute;
+  left: 28px;
+  bottom: 28px;
+  max-width: 440px;
+}
+
+.prod-detail-tier-pill {
+  display: inline-flex;
+  padding: 6px 10px;
+  border: 1px solid rgba(89, 222, 155, 0.45);
+  border-radius: 999px;
+  color: var(--primary);
+  background: rgba(9, 18, 13, 0.55);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.prod-detail-hero h2 {
+  margin: 12px 0 4px;
+  color: #fff;
+  font-family: var(--font-jakarta);
+  font-size: 30px;
+}
+
+.prod-detail-hero p {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+}
+
+.prod-detail-summary,
+.prod-detail-body,
+.prod-detail-benefits,
+.prod-detail-actions {
+  margin-right: 28px;
+  margin-left: 28px;
+}
+
+.prod-detail-summary {
+  display: flex;
+  gap: 32px;
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(61, 74, 65, 0.24);
+}
+
+.prod-detail-price-block,
+.prod-detail-gems-block {
+  display: grid;
+  gap: 5px;
+}
+
+.prod-detail-gems-block strong {
+  color: var(--primary);
+  font-family: var(--font-jakarta);
+  font-size: 20px;
 }
 
 .prod-detail-header {
@@ -286,6 +391,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 20px 0 4px;
 }
 
 .prod-detail-row {
@@ -314,6 +420,36 @@
 .prod-detail-actions {
   display: flex;
   justify-content: flex-start;
+  padding: 22px 0 28px;
+}
+
+.prod-detail-benefits {
+  padding-top: 20px;
+}
+
+.prod-detail-benefits h3 {
+  margin: 0 0 12px;
+  color: var(--on-surface);
+  font-family: var(--font-jakarta);
+  font-size: 16px;
+}
+
+.prod-detail-benefits > div {
+  display: grid;
+  gap: 10px;
+}
+
+.prod-detail-benefits span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--on-surface-variant);
+  font-size: 13px;
+}
+
+.prod-detail-benefits .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 18px;
 }
 
 /* ─── Footer ──────────────────────────────────────────────────── */

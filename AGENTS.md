@@ -1,3 +1,3 @@
-# Expo HAS CHANGED
+# Web Application
 
-Read the exact versioned docs at https://docs.expo.dev/versions/v54.0.0/ before writing any code.
+This repository is a Vite-powered React web application. Keep browser code in `src/` and use the existing Vite and React dependencies.

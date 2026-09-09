@@ -21,6 +21,26 @@
   -webkit-backdrop-filter: blur(24px);
   border-top: 1px solid rgba(89, 222, 155, 0.15);
   box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.6);
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    /* Becomes visible again immediately so the slide/fade-in is seen
+       right away. */
+    visibility 0s linear 0s;
+}
+
+.bn-bar.is-hidden {
+  transform: translateY(110%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    /* Wait until the slide/fade-out finishes before actually switching
+       to hidden, instead of cutting the animation off instantly. This
+       is what caused the hide to look like a flicker. */
+    visibility 0s linear 0.2s;
 }
 
 .bn-item {
@@ -41,7 +61,7 @@
 }
 
 .bn-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 500;
 }

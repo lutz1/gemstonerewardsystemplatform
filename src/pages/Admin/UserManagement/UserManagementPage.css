@@ -1,0 +1,565 @@
+.admin-users-root {
+  min-height: 100vh;
+  padding-bottom: 80px;
+  background-color: var(--background);
+  background-image:
+    radial-gradient(at 0% 0%, rgba(0, 168, 107, 0.08) 0, transparent 45%),
+    radial-gradient(at 100% 100%, rgba(0, 168, 107, 0.1) 0, transparent 45%);
+  color: var(--on-surface);
+  font-family: var(--font-hanken);
+}
+
+.admin-users-root.search-is-focused .bn-bar {
+  display: none;
+}
+
+.admin-users-main {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 96px 0 32px;
+}
+
+.admin-users-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.admin-users-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-users-eyebrow {
+  margin: 0 0 8px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.admin-users-title {
+  margin: 0;
+  color: var(--color-on-surface);
+  font-family: var(--font-jakarta);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.admin-users-subtitle {
+  margin: 12px 0 0;
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+}
+
+.admin-users-panel {
+  border: 1px solid var(--color-border-faint);
+  border-radius: 12px;
+  background: rgba(26, 33, 28, 0.7);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+  overflow: visible;
+}
+
+.admin-users-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid var(--color-border-faint);
+}
+
+.admin-users-controls {
+  border-bottom: 0;
+}
+
+.admin-users-filter-group,
+.admin-users-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-users-filter {
+  position: relative;
+  min-width: 128px;
+}
+
+.admin-users-filter-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: rgba(14, 21, 16, 0.65);
+  color: var(--color-on-surface);
+  font-family: var(--font-hanken);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.admin-users-filter-button:hover,
+.admin-users-filter-button[aria-expanded="true"] {
+  border-color: var(--color-primary);
+  background: rgba(47, 54, 49, 0.72);
+}
+
+.admin-users-filter-button .material-symbols-outlined {
+  color: var(--color-on-surface-variant);
+  font-size: 18px;
+}
+
+.admin-users-filter-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: var(--surface-container-high);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+}
+
+.admin-users-filter-menu button {
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-users-filter-menu button:hover,
+.admin-users-filter-menu button.selected {
+  background: rgba(89, 222, 155, 0.14);
+  color: var(--color-primary);
+}
+
+/* Also styled (independently) in adduser/AddUserModal.css and
+   promotetoleader/PromoteToLeaderModal.css, since those modals each
+   have their own submit/confirm button using this same class. */
+.admin-users-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--on-primary-container);
+  box-shadow: 0 8px 20px rgba(0, 168, 107, 0.18);
+  font-family: var(--font-hanken);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-users-primary-button:hover,
+.admin-users-primary-button:focus-visible {
+  background: var(--primary-fixed);
+}
+
+.admin-users-search,
+.admin-users-filter select {
+  min-height: 42px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: rgba(14, 21, 16, 0.65);
+  color: var(--color-on-surface);
+}
+
+.admin-users-search {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+  padding: 0 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.admin-users-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-on-surface);
+  font-family: var(--font-hanken);
+  font-size: 14px;
+}
+
+.admin-users-search input::placeholder {
+  color: var(--color-on-surface-variant);
+}
+
+.admin-users-filter select {
+  padding: 0 12px;
+  appearance: none;
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      var(--color-on-surface-variant) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--color-on-surface-variant) 50%,
+      transparent 50%
+    );
+  background-position:
+    calc(100% - 15px) 18px,
+    calc(100% - 10px) 18px;
+  background-repeat: no-repeat;
+  background-size:
+    5px 5px,
+    5px 5px;
+  padding-right: 28px;
+  font-family: var(--font-hanken);
+  font-size: 14px;
+}
+
+.admin-users-table-section {
+  width: 100%;
+  border-top: 1px solid var(--color-border-faint);
+  overflow: visible;
+}
+
+/* Leave page scrolling native so the table does not trap the browser scroll.
+   Horizontal table overflow remains available without intercepting vertical page behavior. */
+.admin-users-table-scroll-panel {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: auto;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+  cursor: default;
+  user-select: auto;
+}
+
+.admin-users-table-scroll-panel::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.admin-users-table-scroll-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-users-table-scroll-panel::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.admin-users-table-wrap {
+  display: block;
+  width: 100%;
+}
+
+.admin-users-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.admin-users-table th,
+.admin-users-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--color-border-faint);
+  color: var(--color-on-surface-variant);
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* Only the short, single-value columns get hard-truncated with an
+   ellipsis. Avatar and Name (below) are left alone so a user's full
+   name is always readable instead of getting cut off. */
+.admin-users-table td:nth-child(3),
+.admin-users-table td:nth-child(4),
+.admin-users-table td:nth-child(5),
+.admin-users-table td:nth-child(6) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Column widths as percentages (sum to 100%) so the header cells and
+   body cells always land on the exact same grid, at any table width. */
+.admin-users-table th:nth-child(1),
+.admin-users-table td:nth-child(1) {
+  width: 8%;
+}
+
+.admin-users-table th:nth-child(2),
+.admin-users-table td:nth-child(2) {
+  width: 30%;
+}
+
+.admin-users-table th:nth-child(2) {
+  text-align: center;
+}
+
+.admin-users-table th:nth-child(3),
+.admin-users-table td:nth-child(3) {
+  width: 16%;
+}
+
+.admin-users-table th:nth-child(4),
+.admin-users-table td:nth-child(4) {
+  width: 18%;
+}
+
+.admin-users-table th:nth-child(5),
+.admin-users-table td:nth-child(5) {
+  width: 14%;
+}
+
+.admin-users-table th:nth-child(6),
+.admin-users-table td:nth-child(6) {
+  width: 14%;
+}
+
+.admin-users-table th {
+  background: rgba(20, 26, 22, 0.98);
+  color: var(--color-on-surface-variant);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-users-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Also styled (independently) in promotetoleader/PromoteToLeaderModal.css,
+   since the promotion list reuses the same avatar-and-name layout. */
+.admin-user-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-user-name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-user-name-block strong {
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-height: 1.3;
+}
+
+.admin-user-name-block small {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-user-avatar {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(89, 222, 155, 0.12);
+  border: 1px solid rgba(89, 222, 155, 0.25);
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.admin-user-identity > span:last-child {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-user-identity small {
+  color: var(--color-on-surface-variant);
+  font-size: 0.8rem;
+}
+
+.admin-user-status {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.admin-user-status.active {
+  background: rgba(89, 222, 155, 0.12);
+  color: var(--color-primary);
+}
+
+.admin-user-status.suspended {
+  background: rgba(255, 179, 177, 0.12);
+  color: var(--tertiary);
+}
+
+/* Also styled (independently) in promotetoleader/PromoteToLeaderModal.css,
+   since each promotion result shows the member's current role too. */
+.admin-user-role {
+  color: var(--color-on-surface-variant);
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.admin-users-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid var(--color-border-faint);
+  color: var(--color-on-surface-variant);
+  font-size: 0.9rem;
+}
+
+.admin-users-pagination > div {
+  display: flex;
+  gap: 6px;
+}
+
+.admin-users-pagination button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: rgba(47, 54, 49, 0.5);
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+.admin-users-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.admin-users-empty {
+  padding: 32px 20px;
+  color: var(--color-on-surface-variant);
+  text-align: center;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .admin-users-main {
+    width: min(100% - 28px, 520px);
+    padding: 96px 0 32px;
+  }
+
+  .admin-users-header,
+  .admin-users-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-users-controls {
+    padding-bottom: 12px;
+  }
+
+  .admin-users-header-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-users-toolbar > * {
+    width: 100%;
+  }
+
+  .admin-users-filter-group,
+  .admin-users-toolbar-actions {
+    width: 100%;
+  }
+
+  .admin-users-toolbar-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+    gap: 8px;
+  }
+
+  .admin-users-filter-group > *,
+  .admin-users-toolbar-actions > * {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admin-users-filter-group {
+    gap: 6px;
+  }
+
+  .admin-users-filter-group .admin-users-filter {
+    flex: 1;
+  }
+
+  .admin-users-filter,
+  .admin-users-toolbar-actions button {
+    width: 100%;
+  }
+
+  .admin-users-table {
+    min-width: 640px;
+    table-layout: fixed;
+  }
+
+  .admin-users-table th,
+  .admin-users-table td {
+    padding: 12px 10px;
+  }
+
+  .admin-users-table th {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  .admin-user-identity,
+  .admin-user-identity > span:last-child {
+    min-width: 0;
+  }
+
+  .admin-user-identity small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

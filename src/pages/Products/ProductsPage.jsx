@@ -1,21 +1,58 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./ProductsPage.css";
+import diamondCard from "../../assets/diamond_card_products.png";
+import emeraldCard from "../../assets/emerald_card_products.png";
+import sapphireCard from "../../assets/sapphire_card_products.png";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
-import { packages, calcTotal, formatCurrency } from "../../utils/PackagesData";
+import { app } from "../../firebase";
+import { formatCurrency, packages } from "../../utils/PackagesData";
+import "./ProductsPage.css";
+
+const tierImages = {
+  emerald: emeraldCard,
+  sapphire: sapphireCard,
+  diamond: diamondCard,
+  muted: emeraldCard,
+  primary: sapphireCard,
+  platinum: diamondCard,
+};
+
+const fallbackTierImages = [emeraldCard, sapphireCard, diamondCard];
+
+function FeatureRow({ children }) {
+  return (
+    <span className="prod-feature-row">
+      <span className="material-symbols-outlined">check_circle</span>
+      {children}
+    </span>
+  );
+}
 
 export default function ProductsPage() {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const getUserProfile = httpsCallable(
+      getFunctions(app, "asia-southeast1"),
+      "getUserProfile",
+    );
+    getUserProfile().then(({ data }) => setProfile(data || {})).catch(() => {});
+  }, []);
 
   return (
     <div className="prod-root">
       {/* ── Top App Bar ──────────────────────────────────────── */}
-      <TopBar />
+      <TopBar
+        userName={profile?.name || "Member"}
+        userRole={profile?.tier || profile?.membershipTier || profile?.role || "Member"}
+      />
 
       <div className="prod-shell">
         <main className="prod-main">
           <div className="prod-content">
-
             {/* Page header */}
             <div className="prod-page-header">
               <div>
@@ -28,7 +65,7 @@ export default function ProductsPage() {
 
             {/* Packages grid */}
             <section className="prod-packages-grid">
-              {packages.map((pkg) => (
+              {packages.map((pkg, index) => (
                 <button
                   key={pkg.id}
                   className="prod-glass-panel prod-package-card"
@@ -38,28 +75,39 @@ export default function ProductsPage() {
                     })
                   }
                 >
-                  <div className="prod-package-header">
-                    <span className={`prod-tier-dot ${pkg.tierColor}`} />
-                    <span className="prod-package-tier">{pkg.tier}</span>
-                  </div>
-                  <p className="prod-package-name">{pkg.name}</p>
-                  <div className="prod-package-rows">
-                    <div className="prod-package-row">
-                      <span>Quantity</span>
-                      <span>{pkg.quantity} codes</span>
-                    </div>
-                    <div className="prod-package-row">
-                      <span>Price</span>
-                      <span>{formatCurrency(pkg.price)} / code</span>
-                    </div>
-                    <div className="prod-package-row prod-package-total">
-                      <span>Total</span>
-                      <span>{formatCurrency(calcTotal(pkg))}</span>
-                    </div>
-                  </div>
-                  <span className="prod-package-cta">
-                    View Package
-                    <span className="material-symbols-outlined">arrow_forward</span>
+                  <img
+                    className="prod-package-image"
+                    src={
+                      tierImages[pkg.tierColor] ||
+                      fallbackTierImages[index % fallbackTierImages.length]
+                    }
+                    alt=""
+                  />
+                  <span className="prod-package-vignette" />
+                  <span className="prod-package-content">
+                    <span className="prod-package-top-row">
+                      <span className="prod-tier-tag">{pkg.tier}</span>
+                      <span
+                        className="prod-price-tag"
+                        aria-label={`${formatCurrency(pkg.price)} product price`}
+                      >
+                        {formatCurrency(pkg.price)}
+                      </span>
+                    </span>
+                    <span className="prod-package-bottom">
+                      <span className="prod-package-membership">
+                        MEMBERSHIP
+                      </span>
+                      <span className="prod-feature-list">
+                        <FeatureRow>{pkg.totalGems} Total Gems</FeatureRow>
+                        <FeatureRow>
+                          {pkg.dailyGems} Gems Daily Rewards
+                        </FeatureRow>
+                        {pkg.features.map((feature) => (
+                          <FeatureRow key={feature}>{feature}</FeatureRow>
+                        ))}
+                      </span>
+                    </span>
                   </span>
                 </button>
               ))}
@@ -69,11 +117,19 @@ export default function ProductsPage() {
           {/* Footer */}
           <footer className="prod-footer">
             <div className="prod-footer-inner">
-              <p className="prod-footer-copy">© 2024 Gemstone Code. All rights reserved.</p>
+              <p className="prod-footer-copy">
+                © 2024 Gemstone Code. All rights reserved.
+              </p>
               <div className="prod-footer-links">
-                <a className="prod-footer-link" href="#">Privacy Policy</a>
-                <a className="prod-footer-link" href="#">Terms of Service</a>
-                <a className="prod-footer-link" href="#">Help Center</a>
+                <a className="prod-footer-link" href="#">
+                  Privacy Policy
+                </a>
+                <a className="prod-footer-link" href="#">
+                  Terms of Service
+                </a>
+                <a className="prod-footer-link" href="#">
+                  Help Center
+                </a>
               </div>
             </div>
           </footer>
