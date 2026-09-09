@@ -1,16 +1,17 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import {
-  MdAccountBalanceWallet,
-  MdArrowForward,
-  MdCheckCircle,
-  MdClose,
-  MdGroup,
-  MdLocalFireDepartment,
-  MdPayments,
-  MdPendingActions,
-  MdTrendingUp,
-  MdWorkspacePremium,
+    MdAccountBalanceWallet,
+    MdArrowForward,
+    MdCheckCircle,
+    MdClose,
+    MdDiamond,
+    MdGroup,
+    MdLocalFireDepartment,
+    MdPayments,
+    MdPendingActions,
+    MdTrendingUp,
+    MdWorkspacePremium,
 } from "react-icons/md";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import GemValueChart from "../../components/GemValueChart/GemValueChart";
@@ -31,6 +32,7 @@ const emptyDashboard = {
   pendingApprovals: 0,
   purchaseTotalsByTier: [],
   activities: [],
+  gemPond: 0,
   // Each point: { label: "Mon", amount: 1234 } — GEM value redeemed/spent
   // on that day. Powers the burn-rate panel below.
   gemBurnRate: [],
@@ -73,6 +75,7 @@ export default function AdminPage() {
     pendingApprovals: pendingWithdrawals,
     purchaseTotalsByTier,
     activities,
+    gemPond,
     gemBurnRate,
   } = dashboard;
 
@@ -227,28 +230,50 @@ export default function AdminPage() {
                 </div>
                 <MdLocalFireDepartment className="admin-heading-icon" />
               </div>
-              <div className="admin-burn-summary">
-                <strong>{formatPeso(currentBurnRate)}</strong>
-                <span>GEM value redeemed per day, 7-day average</span>
-              </div>
-              <div
-                className="admin-burn-chart"
-                role="img"
-                aria-label="GEM burn rate over recent days"
-              >
-                {gemBurnRate.map((point) => (
-                  <div className="admin-burn-bar" key={point.label}>
-                    <span
-                      style={{
-                        height: `${maxBurn ? (point.amount / maxBurn) * 100 : 0}%`,
-                      }}
-                    />
-                    <small>{point.label}</small>
+              <div className="admin-burn-panel-layout">
+                <aside className="admin-burn-pond-wrapper">
+                  <section className="admin-burn-pond-card">
+                    <div className="admin-burn-pond-card-head">
+                      <span className="admin-burn-pond-title">
+                        <MdDiamond className="admin-burn-pond-icon" />
+                        Gem Pond
+                      </span>
+                    </div>
+                    <div className="admin-burn-pond-content">
+                      <strong className="admin-burn-pond-total">
+                        {Number(gemPond ?? 0).toLocaleString("en-PH")}
+                      </strong>
+                      <span className="admin-burn-pond-copy">
+                        Total GEM points available
+                      </span>
+                    </div>
+                  </section>
+                </aside>
+                <section className="admin-burn-detail">
+                  <div className="admin-burn-summary">
+                    <strong>{formatPeso(currentBurnRate)}</strong>
+                    <span>GEM value redeemed per day, 7-day average</span>
                   </div>
-                ))}
-                {gemBurnRate.length === 0 && (
-                  <p className="admin-users-empty">No burn rate data yet.</p>
-                )}
+                  <div
+                    className="admin-burn-chart"
+                    role="img"
+                    aria-label="GEM burn rate over recent days"
+                  >
+                    {gemBurnRate.map((point) => (
+                      <div className="admin-burn-bar" key={point.label}>
+                        <span
+                          style={{
+                            height: `${maxBurn ? (point.amount / maxBurn) * 100 : 0}%`,
+                          }}
+                        />
+                        <small>{point.label}</small>
+                      </div>
+                    ))}
+                    {gemBurnRate.length === 0 && (
+                      <p className="admin-users-empty">No burn rate data yet.</p>
+                    )}
+                  </div>
+                </section>
               </div>
             </section>
           </div>

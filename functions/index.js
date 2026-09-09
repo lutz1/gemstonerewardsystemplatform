@@ -4,6 +4,7 @@ const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { getFirestore } = require('firebase-admin/firestore');
 const { getAuth } = require('firebase-admin/auth');
 const { initializeApp } = require('firebase-admin/app');
+const { getMessaging } = require('firebase-admin/messaging');
 const crypto = require('crypto');
 
 initializeApp();
@@ -57,6 +58,43 @@ function requireNonEmptyString(value, fieldName) {
     throw new HttpsError('invalid-argument', `${fieldName} is required.`);
   }
   return value.trim();
+}
+
+async function sendWebPushToUser(userRef, userData, amount, kind = 'daily_membership_reward') {
+  const tokenSnapshot = await userRef.collection('webPushTokens').get();
+  if (tokenSnapshot.empty) return;
+
+  const title = 'Daily GEM Reward';
+  const body = `You earned ${amount} GEM${amount === 1 ? '' : 's'} today.`;
+  const webPayload = {
+    notification: {
+      title,
+      body,
+    },
+    data: {
+      type: kind,
+      amount: String(amount),
+      route: '/notifications',
+      userId: userData?.uid || userRef.id,
+    },
+  };
+
+  const sendPromises = tokenSnapshot.docs.map(async (tokenDoc) => {
+    const token = tokenDoc.data()?.token;
+    if (!token) return;
+
+    try {
+      await getMessaging().send({
+        token,
+        notification: webPayload.notification,
+        data: webPayload.data,
+      });
+    } catch (error) {
+      console.warn(`Unable to send web push to ${userRef.id}:`, error);
+    }
+  });
+
+  await Promise.all(sendPromises);
 }
 
 function nextManilaMidnight(date = new Date()) {
@@ -253,7 +291,16 @@ exports.creditDailyGemRewards = onSchedule({
 }, async () => {
   const now = new Date();
   const nowIso = now.toISOString();
+  const nowKey = now.toISOString().slice(0, 10);
   const usersSnapshot = await db().collection('users').get();
+  const usersByReferralCode = new Map();
+  usersSnapshot.docs.forEach((document) => {
+    const data = document.data() || {};
+    if (data.referralCode) {
+      usersByReferralCode.set(data.referralCode, document);
+    }
+  });
+
   let credited = 0;
   let expired = 0;
 
@@ -263,10 +310,6 @@ exports.creditDailyGemRewards = onSchedule({
     const dailyGemReward = Number(userData.dailyGemReward || 0);
     const nextRewardAt = new Date(userData.nextGemRewardAt || 0);
     const membershipExpiresAt = userData.membershipExpiresAt ? new Date(userData.membershipExpiresAt) : null;
-    const isActiveMembership = userData.membershipStatus === 'active'
-      && membershipExpiresAt
-      && Number.isFinite(membershipExpiresAt.getTime())
-      && membershipExpiresAt.getTime() > now.getTime();
 
     if (dailyGemReward <= 0 || nextRewardAt > now) {
       continue;
@@ -280,6 +323,9 @@ exports.creditDailyGemRewards = onSchedule({
 
     const rewardKey = now.toISOString().slice(0, 10);
     const rewardRef = userRef.collection('gemTransactions').doc(`daily-${rewardKey}`);
+    const notificationRef = userRef.collection('notifications').doc(`daily-${rewardKey}-${userDocument.id}`);
+    let earned = false;
+
     await db().runTransaction(async (transaction) => {
       const [currentUserSnapshot, rewardSnapshot] = await Promise.all([
         transaction.get(userRef),
@@ -308,6 +354,7 @@ exports.creditDailyGemRewards = onSchedule({
       transaction.update(userRef, {
         gemPoints: (Number.isFinite(currentGemPoints) ? currentGemPoints : 0) + dailyGemReward,
         nextGemRewardAt: nextManilaMidnight(now),
+        hasNotifications: true,
         updatedAt: nowIso,
       });
       transaction.set(rewardRef, {
@@ -316,11 +363,155 @@ exports.creditDailyGemRewards = onSchedule({
         tier: currentUser.membershipTier || currentUser.role || '',
         createdAt: nowIso,
       });
-      credited += 1;
+      transaction.set(notificationRef, {
+        type: isCurrentUserMembershipActive ? 'daily_membership_reward' : 'daily_hierarchy_distribution_reward',
+        title: 'Daily GEM Reward',
+        message: `You earned ${dailyGemReward} GEM${dailyGemReward === 1 ? '' : 's'} today.`,
+        amount: dailyGemReward,
+        read: false,
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      });
+      earned = true;
     });
+
+    if (!earned) {
+      continue;
+    }
+
+    credited += 1;
+    await sendWebPushToUser(userRef, userData, dailyGemReward, 'daily_gem_reward');
+
+    const hierarchyRecipients = [];
+    const selectedRecipientIds = new Set();
+    let nextUplineCode = userData.uplineReferralCode || '';
+    let firstLeaderFound = false;
+    let firstCeoFound = false;
+    const visitedReferralCodes = new Set();
+
+    while (nextUplineCode && !visitedReferralCodes.has(nextUplineCode)) {
+      visitedReferralCodes.add(nextUplineCode);
+      const ancestorDocument = usersByReferralCode.get(nextUplineCode);
+      if (!ancestorDocument) break;
+
+      const ancestorData = ancestorDocument.data() || {};
+      const ancestorRole = String(ancestorData.role || '').toLowerCase();
+      if (hierarchyRecipients.length === 0) {
+        hierarchyRecipients.push({
+          userRef: ancestorDocument.ref,
+          userId: ancestorDocument.id,
+          role: 'upline',
+          document: ancestorDocument,
+          data: ancestorData,
+        });
+        selectedRecipientIds.add(ancestorDocument.id);
+      } else if (ancestorRole === 'leader' && !firstLeaderFound && !selectedRecipientIds.has(ancestorDocument.id)) {
+        hierarchyRecipients.push({
+          userRef: ancestorDocument.ref,
+          userId: ancestorDocument.id,
+          role: 'leader',
+          document: ancestorDocument,
+          data: ancestorData,
+        });
+        selectedRecipientIds.add(ancestorDocument.id);
+        firstLeaderFound = true;
+      } else if (ancestorRole === 'ceo' && !firstCeoFound && !selectedRecipientIds.has(ancestorDocument.id)) {
+        hierarchyRecipients.push({
+          userRef: ancestorDocument.ref,
+          userId: ancestorDocument.id,
+          role: 'ceo',
+          document: ancestorDocument,
+          data: ancestorData,
+        });
+        selectedRecipientIds.add(ancestorDocument.id);
+        firstCeoFound = true;
+      }
+
+      nextUplineCode = ancestorData.uplineReferralCode || '';
+    }
+
+    for (const recipient of hierarchyRecipients) {
+      try {
+        const recipientRef = recipient.userRef;
+        const recipientData = recipient.data || {};
+        const recipientStatus = String(recipientData.status || 'active').toLowerCase();
+        if (recipientStatus !== 'active') {
+          continue;
+        }
+
+        const recipientGemPoints = Number(recipientData.gemPoints || 0);
+        const recipientRewardRef = recipientRef.collection('gemTransactions')
+          .doc(`daily-hierarchy-${nowKey}-${userDocument.id}-${recipient.role}`);
+        const recipientNotificationRef = recipientRef.collection('notifications')
+          .doc(`daily-hierarchy-${nowKey}-${userDocument.id}-${recipient.role}`);
+
+        await db().runTransaction(async (transaction) => {
+          const recipientSnapshot = await transaction.get(recipientRef);
+          if (!recipientSnapshot.exists) return;
+
+          const latestRecipient = recipientSnapshot.data() || {};
+          const latestGemPoints = Number(latestRecipient.gemPoints || 0);
+          const payloadType = 'daily_hierarchy_distribution_reward';
+
+          transaction.update(recipientRef, {
+            gemPoints: (Number.isFinite(latestGemPoints) ? latestGemPoints : 0) + dailyGemReward,
+            hasNotifications: true,
+            updatedAt: nowIso,
+          });
+          transaction.set(recipientRewardRef, {
+            type: payloadType,
+            amount: dailyGemReward,
+            role: recipient.role,
+            sourceUserId: userDocument.id,
+            tier: latestRecipient.membershipTier || latestRecipient.role || '',
+            createdAt: nowIso,
+          });
+          transaction.set(recipientNotificationRef, {
+            type: payloadType,
+            title: 'Daily GEM Reward',
+            message: `You earned ${dailyGemReward} GEM${dailyGemReward === 1 ? '' : 's'} from ${userData.name || userData.username || userDocument.id}'s daily reward.`,
+            amount: dailyGemReward,
+            read: false,
+            role: recipient.role,
+            sourceUserId: userDocument.id,
+            createdAt: nowIso,
+            updatedAt: nowIso,
+          });
+        });
+
+        await sendWebPushToUser(recipientRef, recipientData, dailyGemReward, 'daily_gem_reward');
+      } catch (error) {
+        console.error('Failed to distribute daily hierarchy reward:', error);
+      }
+    }
   }
 
   console.log(`Daily GEM rewards credited: ${credited}; memberships expired: ${expired}`);
+});
+
+exports.saveWebPushToken = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+
+  const token = typeof request.data?.token === 'string'
+    ? request.data.token.trim()
+    : '';
+
+  if (!token) {
+    throw new HttpsError('invalid-argument', 'A push token is required.');
+  }
+
+  const userRef = db().collection('users').doc(request.auth.uid);
+  const tokenRef = userRef.collection('webPushTokens').doc(token);
+  await tokenRef.set({
+    token,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }, { merge: true });
+
+  await userRef.update({ hasNotifications: true, updatedAt: new Date().toISOString() });
+  return { success: true };
 });
 
 exports.resolveUsername = onCall({ region: 'asia-southeast1' }, async (request) => {
@@ -421,9 +612,6 @@ exports.registerMembership = onCall({ region: 'asia-southeast1' }, async (reques
 
   const referralCode = await generateReferralCode();
   const joinDate = new Date().toISOString();
-  const settingsSnapshot = await db().collection('settings').doc('admin').get();
-  const defaultGemValue = Number(settingsSnapshot.data()?.defaultGemValue);
-  const initialGemPoints = Number.isFinite(defaultGemValue) ? defaultGemValue : 0;
   const userDoc = {
     username,
     referralCode,
@@ -440,7 +628,7 @@ exports.registerMembership = onCall({ region: 'asia-southeast1' }, async (reques
     role: 'member',
     status: 'active',
     walletAddress: generateWalletAddress(),
-    gemPoints: initialGemPoints,
+    gemPoints: 0,
     walletBalance: 0,
     totalSpent: 0,
     mpinSetup: false,
@@ -537,6 +725,13 @@ exports.getAdminDashboard = onCall({ region: 'asia-southeast1' }, async (request
     }),
   ];
 
+  const gemPointsTotal = users.reduce((sum, user) => {
+    const gemPoints = Number(user.gemPoints ?? user.gemsBalance ?? user.gemBalance ?? user.gems ?? 0);
+    return sum + (Number.isFinite(gemPoints) ? gemPoints : 0);
+  }, 0);
+
+  const gemPond = Number((gemPointsTotal * 0.40).toFixed(2));
+
   return {
     totalSales: purchases.reduce((total, purchase) => total + getAmount(purchase), 0),
     totalCodes: codesSnapshot.size || purchases.reduce(
@@ -548,6 +743,8 @@ exports.getAdminDashboard = onCall({ region: 'asia-southeast1' }, async (request
     pendingApprovals: pendingApprovals.length,
     purchaseTotalsByTier: Array.from(tierTotals.values()),
     activities: activities.sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0)),
+    totalGemValueAccumulated: gemPointsTotal,
+    gemPond,
   };
 });
 
@@ -723,14 +920,24 @@ exports.getUserDashboard = onCall({ region: 'asia-southeast1' }, async (request)
       const data = document.data() || {};
       const labelByType = {
         daily_membership_reward: 'Daily GEM Reward',
+        daily_hierarchy_distribution_reward: 'Daily GEM Reward',
         membership_activation_reward: 'Membership GEM Reward',
         purchase_distribution: 'Referral GEM Reward',
       };
+      const normalizedAmount = Number(
+        Number.isFinite(Number(data.amount))
+          ? data.amount
+          : Number.isFinite(Number(data.dailyGemReward))
+            ? data.dailyGemReward
+            : Number.isFinite(Number(data.distributionReward))
+              ? data.distributionReward
+              : Number(data.gemPoints ?? 0)
+      );
       return {
         id: document.id,
         label: labelByType[data.type] || 'GEM Transaction',
         detail: data.tier ? `${data.tier} · ${data.type || 'reward'}` : data.type || 'reward',
-        amount: Number(data.amount ?? 0),
+        amount: Number.isFinite(normalizedAmount) ? normalizedAmount : 0,
         createdAt: data.createdAt || data.date || null,
         status: 'completed',
       };
@@ -1068,9 +1275,6 @@ exports.createUser = onCall({ region: 'asia-southeast1' }, async (request) => {
   const walletAddress = generateWalletAddress();
   const referralCode = await generateReferralCode();
   const joinDate = new Date().toISOString();
-  const settingsSnapshot = await db().collection('settings').doc('admin').get();
-  const defaultGemValue = Number(settingsSnapshot.data()?.defaultGemValue);
-  const initialGemPoints = Number.isFinite(defaultGemValue) ? defaultGemValue : 0;
 
   const userDoc = {
     username,
@@ -1087,7 +1291,7 @@ exports.createUser = onCall({ region: 'asia-southeast1' }, async (request) => {
     role,
     status,
     walletAddress,
-    gemPoints: initialGemPoints,
+    gemPoints: 0,
     walletBalance: 0,
     totalSpent: 0,
     mpinSetup: false,

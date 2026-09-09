@@ -1,7 +1,52 @@
 import { onIdTokenChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { getToken } from "firebase/messaging";
 import { createContext, useContext, useEffect, useState } from "react";
-import { app, auth } from "../src/firebase";
+import { app, auth, messaging } from "../src/firebase";
+
+const webPushSave = async (token) => {
+  if (!token || !auth.currentUser) return;
+
+  const saveWebPushToken = httpsCallable(
+    getFunctions(app, "asia-southeast1"),
+    "saveWebPushToken",
+  );
+
+  try {
+    await saveWebPushToken({ token });
+  } catch (error) {
+    console.error("Failed to save web push token:", error);
+  }
+};
+
+const requestBrowserPush = async () => {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    return null;
+  }
+
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    return null;
+  }
+
+  try {
+    await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    await navigator.serviceWorker.ready;
+
+    const token = await getToken(messaging, {
+      vapidKey: 'BHIQi5JLMrYQwl0I4aDSjS3G0WNO1J3Aq4P7wE5C2gKpVjYb9Lk1cR2nT6mQ4uU0',
+    });
+
+    if (token) {
+      await webPushSave(token);
+    }
+
+    return token;
+  } catch (error) {
+    console.error('Push registration error:', error);
+    return null;
+  }
+};
 
 const PIN_VERIFIED_KEY = "gemstone_pin_verified";
 
@@ -75,6 +120,14 @@ export function AuthProvider({ children }) {
         setReferralCode(status.referralCode || "");
         setMpinSetup(status.mpinSetup);
         setPinVerified(hasValidatedPin);
+
+        if (typeof window !== 'undefined') {
+          try {
+            await requestBrowserPush();
+          } catch (error) {
+            console.error('Browser push setup failed:', error);
+          }
+        }
       } catch {
         setRole(user ? "member" : null);
         setUsername("");
