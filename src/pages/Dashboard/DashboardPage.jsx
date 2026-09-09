@@ -14,6 +14,7 @@ import {
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import guideImage from "../../assets/bg_belowdashboard.png";
+import gemVideo from "../../assets/gemvideo.mp4";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav.jsx";
 import GemValueChart from "../../components/GemValueChart/GemValueChart.jsx";
 import TopBar from "../../components/TopBar/TopBar.jsx";
@@ -288,15 +289,33 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Guide image card */}
-        <button className="dash-img-card">
-          <img src={GUIDE_IMG} alt="" className="dash-img-card-image" />
-          <div className="dash-img-card-gradient" />
-          <div className="dash-img-text-wrap">
-            <p className="dash-img-eyebrow">Gem Resource</p>
-            <p className="dash-img-heading">Go Mine, Go Exchange, Go Earn</p>
+        {/* YouTube-style gem video card */}
+        <section className="dash-video-panel">
+          <div className="dash-video-panel-head">
+            <div className="dash-video-title-wrap">
+              <span className="dash-video-channel-label">Gem Rewards</span>
+              <span className="dash-video-title">Gem Guide</span>
+            </div>
           </div>
-        </button>
+          <div className="dash-video-frame">
+            <video
+              className="dash-video-player"
+              src={gemVideo}
+              controls
+              preload="metadata"
+              playsInline
+              poster=""
+              loop={false}
+            >
+              Your browser does not support HTML video.
+            </video>
+          </div>
+          <div className="dash-video-panel-footer">
+            <span className="dash-video-meta-label">Featured</span>
+            <span className="dash-video-meta-divider" />
+            <span className="dash-video-meta-copy">Gem Rewards Overview</span>
+          </div>
+        </section>
           </>
         )}
       </div>
