@@ -190,8 +190,11 @@ exports.completePurchase = onCall({ region: 'asia-southeast1' }, async (request)
       if (!snapshot.exists || rewardExists) return;
       const recipientData = snapshot.data() || {};
       const recipientGemPoints = Number(recipientData.gemPoints || 0);
+      const recipientDailyGemReward = Number(recipientData.dailyGemReward || 0);
       transaction.update(snapshot.ref, {
         gemPoints: (Number.isFinite(recipientGemPoints) ? recipientGemPoints : 0) + amount,
+        dailyGemReward: Math.max(recipientDailyGemReward, amount),
+        nextGemRewardAt: nextRewardAt,
         updatedAt: now,
       });
       transaction.set(rewardRef, {
@@ -257,21 +260,21 @@ exports.creditDailyGemRewards = onSchedule({
   for (const userDocument of usersSnapshot.docs) {
     const userRef = userDocument.ref;
     const userData = userDocument.data() || {};
-    const expiresAt = new Date(userData.membershipExpiresAt || 0);
-    const nextRewardAt = new Date(userData.nextGemRewardAt || 0);
     const dailyGemReward = Number(userData.dailyGemReward || 0);
+    const nextRewardAt = new Date(userData.nextGemRewardAt || 0);
+    const membershipExpiresAt = userData.membershipExpiresAt ? new Date(userData.membershipExpiresAt) : null;
+    const isActiveMembership = userData.membershipStatus === 'active'
+      && membershipExpiresAt
+      && Number.isFinite(membershipExpiresAt.getTime())
+      && membershipExpiresAt.getTime() > now.getTime();
 
-    if (!Number.isFinite(expiresAt.getTime())) continue;
-
-    if (expiresAt.getTime() <= now.getTime()) {
-      if (userData.membershipStatus === 'active') {
-        await userRef.update({ membershipStatus: 'expired', updatedAt: nowIso });
-        expired += 1;
-      }
+    if (dailyGemReward <= 0 || nextRewardAt > now) {
       continue;
     }
 
-    if (userData.membershipStatus !== 'active' || dailyGemReward <= 0 || nextRewardAt > now) {
+    if (userData.membershipStatus === 'active' && membershipExpiresAt && membershipExpiresAt.getTime() <= now.getTime()) {
+      await userRef.update({ membershipStatus: 'expired', updatedAt: nowIso });
+      expired += 1;
       continue;
     }
 
@@ -286,8 +289,21 @@ exports.creditDailyGemRewards = onSchedule({
 
       const currentUser = currentUserSnapshot.data() || {};
       const currentGemPoints = Number(currentUser.gemPoints || 0);
-      const currentExpiry = new Date(currentUser.membershipExpiresAt || 0);
-      if (currentUser.membershipStatus !== 'active' || currentExpiry <= now) return;
+      const currentMembershipStatus = currentUser.membershipStatus;
+      const currentMembershipExpiresAt = currentUser.membershipExpiresAt ? new Date(currentUser.membershipExpiresAt) : null;
+      const isCurrentUserMembershipActive = currentMembershipStatus === 'active'
+        && currentMembershipExpiresAt
+        && Number.isFinite(currentMembershipExpiresAt.getTime())
+        && currentMembershipExpiresAt.getTime() > now.getTime();
+
+      if (!isCurrentUserMembershipActive && currentMembershipStatus === 'active') {
+        transaction.update(userRef, {
+          membershipStatus: 'expired',
+          updatedAt: nowIso,
+        });
+        expired += 1;
+        return;
+      }
 
       transaction.update(userRef, {
         gemPoints: (Number.isFinite(currentGemPoints) ? currentGemPoints : 0) + dailyGemReward,
@@ -295,9 +311,9 @@ exports.creditDailyGemRewards = onSchedule({
         updatedAt: nowIso,
       });
       transaction.set(rewardRef, {
-        type: 'daily_membership_reward',
+        type: isCurrentUserMembershipActive ? 'daily_membership_reward' : 'daily_hierarchy_distribution_reward',
         amount: dailyGemReward,
-        tier: currentUser.membershipTier || '',
+        tier: currentUser.membershipTier || currentUser.role || '',
         createdAt: nowIso,
       });
       credited += 1;
