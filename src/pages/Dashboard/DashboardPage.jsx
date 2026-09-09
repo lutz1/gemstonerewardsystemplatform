@@ -13,7 +13,7 @@ import {
   MdSwapHoriz,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import guideImage from "../../assets/bg_belowdashboard.png";
+import bgImage from "../../assets/bg_dashboard.jpg";
 import gemVideo from "../../assets/gemvideo.mp4";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav.jsx";
 import GemValueChart from "../../components/GemValueChart/GemValueChart.jsx";
@@ -21,7 +21,7 @@ import TopBar from "../../components/TopBar/TopBar.jsx";
 import { app } from "../../firebase";
 import "./DashboardPage.css";
 
-const GUIDE_IMG = guideImage;
+const BG_IMAGE = bgImage;
 
 function displayNumber(value) {
   return value == null ? "—" : Number(value).toLocaleString();
@@ -90,6 +90,12 @@ export default function Dashboard() {
 
   return (
     <div className="dash-root">
+      <div className="dash-bg" aria-hidden="true">
+        <img src={BG_IMAGE} alt="" className="dash-bg-img" />
+        <div className="dash-bg-gradient" />
+        <div className="dash-bg-grid" />
+      </div>
+
       <TopBar
         userName={dashboard?.name || "Member"}
         userRole="Member"
@@ -103,219 +109,265 @@ export default function Dashboard() {
           </p>
         ) : (
           <>
-        {/* Welcome */}
-        <div className="dash-welcome">
-          <p className="dash-eyebrow">Dashboard Overview</p>
-          <h1 className="dash-hello">Hello, {dashboard.name || "Member"}</h1>
-          <p className="dash-welcome-sub">
-            Welcome back to your member portal. Your network expanded by{" "}
-            <span className="dash-highlight">
-              {displayPercent(dashboard.networkGrowthPercent)}
-            </span>{" "}
-            this week.
-          </p>
-        </div>
-
-        {/* Wallet & Gem Points */}
-        <div className="dash-wallet-card">
-          {/* Decorative watermark, purely visual depth */}
-          <MdDiamond className="dash-wallet-watermark" size={140} />
-
-          <div className="dash-wallet-top">
-            <div className="dash-wallet-heading">
-              <div className="dash-wallet-icon-row">
-                <div className="dash-wallet-icon-wrap">
-                  <MdAccountBalanceWallet
-                    size={18}
-                    color="var(--color-primary)"
-                  />
-                </div>
-                <div>
-                  <span className="dash-wallet-label">Wallet & Gem Points</span>
-                  <p className="dash-wallet-caption">Your available rewards</p>
-                </div>
-              </div>
-              <span className="dash-wallet-status">Available</span>
+            {/* Welcome */}
+            <div className="dash-welcome">
+              <p className="dash-eyebrow">Dashboard Overview</p>
+              <h1 className="dash-hello">
+                Hello, {dashboard.name || "Member"}
+              </h1>
+              <p className="dash-welcome-sub">
+                Welcome back to your member portal. Your network expanded by{" "}
+                <span className="dash-highlight">
+                  {displayPercent(dashboard.networkGrowthPercent)}
+                </span>{" "}
+                this week.
+              </p>
             </div>
-            <div className="dash-wallet-values">
-              <div className="dash-wallet-value-cell">
-                <p className="dash-wallet-sublabel">Wallet Balance</p>
-                <p className="dash-wallet-amount">
-                  {displayNumber(dashboard.walletBalance)}
-                </p>
-                <span className="dash-wallet-unit">Wallet credits</span>
+
+            {/* Wallet & Gem Points */}
+            <div className="dash-wallet-card">
+              {/* Decorative watermark, purely visual depth */}
+              <MdDiamond className="dash-wallet-watermark" size={140} />
+
+              <div className="dash-wallet-top">
+                <div className="dash-wallet-heading">
+                  <div className="dash-wallet-icon-row">
+                    <div className="dash-wallet-icon-wrap">
+                      <MdAccountBalanceWallet
+                        size={18}
+                        color="var(--color-primary)"
+                      />
+                    </div>
+                    <div>
+                      <span className="dash-wallet-label">
+                        Wallet & Gem Points
+                      </span>
+                      <p className="dash-wallet-caption">
+                        Your available rewards
+                      </p>
+                    </div>
+                  </div>
+                  <span className="dash-wallet-status">Available</span>
+                </div>
+                <div className="dash-wallet-values">
+                  <div className="dash-wallet-value-cell">
+                    <p className="dash-wallet-sublabel">Wallet Balance</p>
+                    <p className="dash-wallet-amount">
+                      {displayNumber(dashboard.walletBalance)}
+                    </p>
+                    <span className="dash-wallet-unit">Wallet credits</span>
+                  </div>
+                  <div className="dash-wallet-value-cell dash-wallet-value-cell-accent">
+                    <p className="dash-wallet-sublabel">Gem Points</p>
+                    <p className="dash-wallet-amount">
+                      {displayNumber(dashboard.gemPoints)}
+                    </p>
+                    <span className="dash-wallet-unit">Reward points</span>
+                  </div>
+                </div>
+                <div className="dash-wallet-address-row">
+                  <div className="dash-wallet-address-copy">
+                    <span className="dash-wallet-address-label">
+                      Wallet address
+                    </span>
+                    <span
+                      className="dash-wallet-address-value"
+                      title={
+                        dashboard.walletAddress || "Wallet address unavailable"
+                      }
+                    >
+                      {dashboard.walletAddress || "Wallet address unavailable"}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="dash-wallet-copy-btn"
+                    onClick={handleCopyWalletAddress}
+                    disabled={!dashboard.walletAddress}
+                    aria-label={
+                      walletCopied
+                        ? "Wallet address copied"
+                        : "Copy wallet address"
+                    }
+                    title={walletCopied ? "Copied" : "Copy wallet address"}
+                  >
+                    {walletCopied ? (
+                      <span aria-hidden="true">✓</span>
+                    ) : (
+                      <MdContentCopy size={16} />
+                    )}
+                  </button>
+                </div>
               </div>
-              <div className="dash-wallet-value-cell dash-wallet-value-cell-accent">
-                <p className="dash-wallet-sublabel">Gem Points</p>
-                <p className="dash-wallet-amount">
-                  {displayNumber(dashboard.gemPoints)}
-                </p>
-                <span className="dash-wallet-unit">Reward points</span>
-              </div>
-            </div>
-            <div className="dash-wallet-address-row">
-              <div className="dash-wallet-address-copy">
-                <span className="dash-wallet-address-label">Wallet address</span>
-                <span
-                  className="dash-wallet-address-value"
-                  title={dashboard.walletAddress || "Wallet address unavailable"}
-                >
-                  {dashboard.walletAddress || "Wallet address unavailable"}
-                </span>
-              </div>
+
+              {/* Exchange: converts Gem Points into wallet balance -- also
+              where top-up and withdraw live once those are built out. */}
               <button
-                type="button"
-                className="dash-wallet-copy-btn"
-                onClick={handleCopyWalletAddress}
-                disabled={!dashboard.walletAddress}
-                aria-label={walletCopied ? "Wallet address copied" : "Copy wallet address"}
-                title={walletCopied ? "Copied" : "Copy wallet address"}
+                className="dash-exchange-btn"
+                onClick={() => navigate("/exchange")}
               >
-                {walletCopied ? <span aria-hidden="true">✓</span> : <MdContentCopy size={16} />}
+                <MdSwapHoriz
+                  size={18}
+                  color="var(--color-on-primary-container)"
+                />
+                <span>Exchange</span>
+                <MdArrowForward
+                  size={17}
+                  color="var(--color-on-primary-container)"
+                />
               </button>
             </div>
-          </div>
 
-          {/* Exchange: converts Gem Points into wallet balance -- also
-              where top-up and withdraw live once those are built out. */}
-          <button
-            className="dash-exchange-btn"
-            onClick={() => navigate("/exchange")}
-          >
-            <MdSwapHoriz size={18} color="var(--color-on-primary-container)" />
-            <span>Exchange</span>
-            <MdArrowForward size={17} color="var(--color-on-primary-container)" />
-          </button>
-        </div>
-
-        {/* Quick stats */}
-        <div className="dash-stats-row">
-          <button
-            type="button"
-            className="dash-glass-card dash-stat-mini dash-direct-reward-card"
-            onClick={() => navigate("/direct-referrals")}
-            aria-describedby={showInviteTooltip ? "invite-tooltip" : undefined}
-          >
-            <div className="dash-stat-mini-icon-wrap">
-              <MdPersonAdd size={20} color="var(--color-primary)" />
-            </div>
-            <div>
-              <p className="dash-stat-mini-label">DIRECT GEM REWARD</p>
-              <p className="dash-stat-mini-value">
-                {displayNumber(dashboard.directReferrals)}
-              </p>
-            </div>
-            {showInviteTooltip && (
-              <span className="dash-invite-tooltip" id="invite-tooltip" role="status">
-                Click Me! to see your Invites.
-              </span>
-            )}
-          </button>
-          <button
-            type="button"
-            className="dash-glass-card dash-stat-mini dash-network-reward-card"
-            onClick={() => navigate("/network-referrals")}
-          >
-            <div className="dash-stat-mini-icon-wrap dash-stat-mini-icon-muted">
-              <MdHub size={20} color="var(--color-secondary)" />
-            </div>
-            <div>
-              <p className="dash-stat-mini-label">NETWORK</p>
-              <p className="dash-stat-mini-value">
-                {displayNumber(dashboard.networkReferrals)}
-              </p>
-            </div>
-          </button>
-        </div>
-
-        {/* Whole row navigates, not just the chevron -- Purchase Codes
-            is where the referral link itself lives. */}
-        <button
-          className="dash-glass-card dash-referral-card"
-          onClick={() => navigate("/purchase-codes")}
-        >
-          <div className="dash-referral-inner">
-            <div className="dash-referral-icon-wrap">
-              <MdCampaign size={20} color="var(--color-primary)" />
-            </div>
-            <div className="dash-referral-text">
-              <p className="dash-referral-title">Invite Friends</p>
-              <p className="dash-referral-sub">Earn Gems if your friends sign up and purchase</p>
-            </div>
-          </div>
-          <div className="dash-chevron-btn">
-            <MdChevronRight size={22} color="var(--color-primary)" />
-          </div>
-        </button>
-
-        {/* Gem value chart */}
-        <GemValueChart onScrubbingChange={handleScrubbingChange} />
-
-        <button
-          className="dash-txlogs-btn"
-          onClick={() => navigate("/purchase-codes")}
-        >
-          <MdReceiptLong size={18} color="var(--color-primary)" />
-          <span>View Transaction Logs</span>
-          <MdArrowForward size={18} color="var(--color-primary)" />
-        </button>
-
-        {/* Transaction summary */}
-        <h2 className="dash-insights-title">Transaction Logs Summary</h2>
-        <div className="dash-glass-card dash-insights-card">
-          {[...(dashboard.recentTransactions || []), ...(dashboard.gemTransactions || [])].length ? (
-            [...(dashboard.recentTransactions || []), ...(dashboard.gemTransactions || [])]
-              .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
-              .map((transaction) => (
-              <div className="dash-insight-row" key={transaction.id}>
-                <MdReceiptLong
-                  size={22}
-                  color="var(--color-primary)"
-                  className="dash-insight-icon"
-                />
-                <div className="dash-insight-body">
-                  <p className="dash-insight-heading">{transaction.label}</p>
-                  <p className="dash-insight-text">
-                    {transaction.detail} · {formatDate(transaction.createdAt)}
+            {/* Quick stats */}
+            <div className="dash-stats-row">
+              <button
+                type="button"
+                className="dash-glass-card dash-stat-mini dash-direct-reward-card"
+                onClick={() => navigate("/direct-referrals")}
+                aria-describedby={
+                  showInviteTooltip ? "invite-tooltip" : undefined
+                }
+              >
+                <div className="dash-stat-mini-icon-wrap">
+                  <MdPersonAdd size={20} color="var(--color-primary)" />
+                </div>
+                <div>
+                  <p className="dash-stat-mini-label">DIRECT GEM REWARD</p>
+                  <p className="dash-stat-mini-value">
+                    {displayNumber(dashboard.directReferrals)}
                   </p>
                 </div>
-                <strong className="dash-transaction-amount">
-                  {displayNumber(transaction.amount)}
-                </strong>
-              </div>
-              ))
-          ) : (
-            <p className="dash-insight-empty">No transactions yet.</p>
-          )}
-        </div>
-
-        {/* YouTube-style gem video card */}
-        <section className="dash-video-panel">
-          <div className="dash-video-panel-head">
-            <div className="dash-video-title-wrap">
-              <span className="dash-video-channel-label">Gem Rewards</span>
-              <span className="dash-video-title">Gem Guide</span>
+                {showInviteTooltip && (
+                  <span
+                    className="dash-invite-tooltip"
+                    id="invite-tooltip"
+                    role="status"
+                  >
+                    Click Me! to see your Invites.
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                className="dash-glass-card dash-stat-mini dash-network-reward-card"
+                onClick={() => navigate("/network-referrals")}
+              >
+                <div className="dash-stat-mini-icon-wrap dash-stat-mini-icon-muted">
+                  <MdHub size={20} color="var(--color-secondary)" />
+                </div>
+                <div>
+                  <p className="dash-stat-mini-label">NETWORK</p>
+                  <p className="dash-stat-mini-value">
+                    {displayNumber(dashboard.networkReferrals)}
+                  </p>
+                </div>
+              </button>
             </div>
-          </div>
-          <div className="dash-video-frame">
-            <video
-              className="dash-video-player"
-              src={gemVideo}
-              controls
-              preload="metadata"
-              playsInline
-              poster=""
-              loop={false}
+
+            {/* Whole row navigates, not just the chevron -- Purchase Codes
+            is where the referral link itself lives. */}
+            <button
+              className="dash-glass-card dash-referral-card"
+              onClick={() => navigate("/purchase-codes")}
             >
-              Your browser does not support HTML video.
-            </video>
-          </div>
-          <div className="dash-video-panel-footer">
-            <span className="dash-video-meta-label">Featured</span>
-            <span className="dash-video-meta-divider" />
-            <span className="dash-video-meta-copy">Gem Rewards Overview</span>
-          </div>
-        </section>
+              <div className="dash-referral-inner">
+                <div className="dash-referral-icon-wrap">
+                  <MdCampaign size={20} color="var(--color-primary)" />
+                </div>
+                <div className="dash-referral-text">
+                  <p className="dash-referral-title">Invite Friends</p>
+                  <p className="dash-referral-sub">
+                    Earn Gems if your friends sign up and purchase
+                  </p>
+                </div>
+              </div>
+              <div className="dash-chevron-btn">
+                <MdChevronRight size={22} color="var(--color-primary)" />
+              </div>
+            </button>
+
+            {/* Gem value chart */}
+            <GemValueChart onScrubbingChange={handleScrubbingChange} />
+
+            <button
+              className="dash-txlogs-btn"
+              onClick={() => navigate("/purchase-codes")}
+            >
+              <MdReceiptLong size={18} color="var(--color-primary)" />
+              <span>View Transaction Logs</span>
+              <MdArrowForward size={18} color="var(--color-primary)" />
+            </button>
+
+            {/* Transaction summary */}
+            <h2 className="dash-insights-title">Transaction Logs Summary</h2>
+            <div className="dash-glass-card dash-insights-card">
+              {[
+                ...(dashboard.recentTransactions || []),
+                ...(dashboard.gemTransactions || []),
+              ].length ? (
+                [
+                  ...(dashboard.recentTransactions || []),
+                  ...(dashboard.gemTransactions || []),
+                ]
+                  .sort(
+                    (a, b) =>
+                      new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
+                  )
+                  .map((transaction) => (
+                    <div className="dash-insight-row" key={transaction.id}>
+                      <MdReceiptLong
+                        size={22}
+                        color="var(--color-primary)"
+                        className="dash-insight-icon"
+                      />
+                      <div className="dash-insight-body">
+                        <p className="dash-insight-heading">
+                          {transaction.label}
+                        </p>
+                        <p className="dash-insight-text">
+                          {transaction.detail} ·{" "}
+                          {formatDate(transaction.createdAt)}
+                        </p>
+                      </div>
+                      <strong className="dash-transaction-amount">
+                        {displayNumber(transaction.amount)}
+                      </strong>
+                    </div>
+                  ))
+              ) : (
+                <p className="dash-insight-empty">No transactions yet.</p>
+              )}
+            </div>
+
+            {/* YouTube-style gem video card */}
+            <section className="dash-video-panel">
+              <div className="dash-video-panel-head">
+                <div className="dash-video-title-wrap">
+                  <span className="dash-video-channel-label">Gem Rewards</span>
+                  <span className="dash-video-title">Gem Guide</span>
+                </div>
+              </div>
+              <div className="dash-video-frame">
+                <video
+                  className="dash-video-player"
+                  src={gemVideo}
+                  controls
+                  preload="metadata"
+                  playsInline
+                  poster=""
+                  loop={false}
+                >
+                  Your browser does not support HTML video.
+                </video>
+              </div>
+              <div className="dash-video-panel-footer">
+                <span className="dash-video-meta-label">Featured</span>
+                <span className="dash-video-meta-divider" />
+                <span className="dash-video-meta-copy">
+                  Gem Rewards Overview
+                </span>
+              </div>
+            </section>
           </>
         )}
       </div>
