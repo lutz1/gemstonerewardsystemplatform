@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import NotificationDrawer from "./notification/NotificationDrawer";
 import "./TopBar.css";
 
 const DEFAULT_AVATAR_URL =
@@ -13,7 +15,10 @@ const DEFAULT_AVATAR_URL =
  * - userRole:   member tier/role label                (default "Executive Member")
  * - avatarUrl:  avatar image src                      (default sample avatar)
  * - profilePath: route opened by the avatar             (default "/profile")
- * - onNotifClick: handler for the notification bell   (optional)
+ * - notifications: array of { id, title, message, time, unread } shown in the
+ *                   notification drawer (default [])
+ * - onNotifClick: handler for the notification bell. If not provided,
+ *                  clicking the bell opens the notification drawer by default.
  * - onAvatarClick: handler for the avatar. If not provided, clicking the
  *                   avatar navigates to /profile by default.
  */
@@ -24,10 +29,12 @@ export default function TopBar({
   avatarUrl = DEFAULT_AVATAR_URL,
   profilePath = "/profile",
   showNotifDot = false,
+  notifications = [],
   onNotifClick,
   onAvatarClick,
 }) {
   const navigate = useNavigate();
+  const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
 
   const handleAvatarClick = () => {
     if (onAvatarClick) {
@@ -43,6 +50,11 @@ export default function TopBar({
       return;
     }
 
+    setIsNotifDrawerOpen(true);
+  };
+
+  const handleViewAllNotifications = () => {
+    setIsNotifDrawerOpen(false);
     const notificationsPath = profilePath.includes("/admin")
       ? "/admin/notifications"
       : "/notifications";
@@ -50,36 +62,46 @@ export default function TopBar({
   };
 
   return (
-    <header className="tb-topbar">
-      <div className="tb-topbar-inner">
-        <div className="tb-topbar-left">
-          <span className="tb-logo">{logoText}</span>
-        </div>
+    <>
+      <header className="tb-topbar">
+        <div className="tb-topbar-inner">
+          <div className="tb-topbar-left">
+            <span className="tb-logo">{logoText}</span>
+          </div>
 
-        <div className="tb-topbar-right">
-          <div className="tb-user-info">
-            <p className="tb-user-role">{userRole}</p>
-            <p className="tb-user-name">{userName}</p>
-          </div>
-          <button
-            className="tb-notif-btn"
-            aria-label="Notifications"
-            onClick={handleNotifClick}
-          >
-            <span className="material-symbols-outlined">notifications</span>
-            {showNotifDot && <span className="tb-notif-dot" />}
-          </button>
-          <div
-            className="tb-topbar-avatar"
-            onClick={handleAvatarClick}
-            role="button"
-            tabIndex={0}
-            aria-label="View profile"
-          >
-            <img src={avatarUrl} alt={userName} />
+          <div className="tb-topbar-right">
+            <div className="tb-user-info">
+              <p className="tb-user-role">{userRole}</p>
+              <p className="tb-user-name">{userName}</p>
+            </div>
+            <button
+              className="tb-notif-btn"
+              aria-label="Notifications"
+              aria-expanded={isNotifDrawerOpen}
+              onClick={handleNotifClick}
+            >
+              <span className="material-symbols-outlined">notifications</span>
+              {showNotifDot && <span className="tb-notif-dot" />}
+            </button>
+            <div
+              className="tb-topbar-avatar"
+              onClick={handleAvatarClick}
+              role="button"
+              tabIndex={0}
+              aria-label="View profile"
+            >
+              <img src={avatarUrl} alt={userName} />
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <NotificationDrawer
+        isOpen={isNotifDrawerOpen}
+        onClose={() => setIsNotifDrawerOpen(false)}
+        notifications={notifications}
+        onViewAll={handleViewAllNotifications}
+      />
+    </>
   );
 }
