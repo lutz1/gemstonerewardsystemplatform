@@ -1,6 +1,7 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import bgImage from "../../assets/bg_dashboard.jpg";
 import diamondCard from "../../assets/diamond_card_products.png";
 import emeraldCard from "../../assets/emerald_card_products.png";
 import sapphireCard from "../../assets/sapphire_card_products.png";
@@ -9,6 +10,8 @@ import TopBar from "../../components/TopBar/TopBar";
 import { app } from "../../firebase";
 import { formatCurrency, packages } from "../../utils/PackagesData";
 import "./ProductsPage.css";
+
+const BG_IMAGE = bgImage;
 
 const tierImages = {
   emerald: emeraldCard,
@@ -39,15 +42,25 @@ export default function ProductsPage() {
       getFunctions(app, "asia-southeast1"),
       "getUserProfile",
     );
-    getUserProfile().then(({ data }) => setProfile(data || {})).catch(() => {});
+    getUserProfile()
+      .then(({ data }) => setProfile(data || {}))
+      .catch(() => {});
   }, []);
 
   return (
     <div className="prod-root">
+      <div className="prod-bg" aria-hidden="true">
+        <img src={BG_IMAGE} alt="" className="prod-bg-img" />
+        <div className="prod-bg-gradient" />
+        <div className="prod-bg-grid" />
+      </div>
+
       {/* ── Top App Bar ──────────────────────────────────────── */}
       <TopBar
         userName={profile?.name || "Member"}
-        userRole={profile?.tier || profile?.membershipTier || profile?.role || "Member"}
+        userRole={
+          profile?.tier || profile?.membershipTier || profile?.role || "Member"
+        }
       />
 
       <div className="prod-shell">

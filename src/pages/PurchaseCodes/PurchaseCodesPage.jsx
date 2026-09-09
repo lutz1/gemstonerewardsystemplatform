@@ -1,12 +1,15 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import bgImage from "../../assets/bg_dashboard.jpg";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
 import { app } from "../../firebase";
 import { getTransactions } from "../../utils/TransactionsData";
 import "./PurchaseCodesPage.css";
 import ReferralActionsModal from "./ReferralActions/ReferralActionsModal";
+
+const BG_IMAGE = bgImage;
 
 const codes = [
   {
@@ -124,7 +127,9 @@ export default function PurchaseCodesPage() {
       getFunctions(app, "asia-southeast1"),
       "getUserProfile",
     );
-    getUserProfile().then(({ data }) => setProfile(data || {})).catch(() => {});
+    getUserProfile()
+      .then(({ data }) => setProfile(data || {}))
+      .catch(() => {});
   }, []);
 
   const filtered = codes.filter(
@@ -171,6 +176,12 @@ export default function PurchaseCodesPage() {
 
   return (
     <div className="pc-root">
+      <div className="pc-bg" aria-hidden="true">
+        <img src={BG_IMAGE} alt="" className="pc-bg-img" />
+        <div className="pc-bg-gradient" />
+        <div className="pc-bg-grid" />
+      </div>
+
       {/* ── Atmosphere glows ─────────────────────────────────── */}
       <div className="pc-glow pc-glow-tr" />
       <div className="pc-glow pc-glow-bl" />
@@ -178,7 +189,9 @@ export default function PurchaseCodesPage() {
       {/* ── Top App Bar ──────────────────────────────────────── */}
       <TopBar
         userName={profile?.name || username || "Member"}
-        userRole={profile?.tier || profile?.membershipTier || profile?.role || "Member"}
+        userRole={
+          profile?.tier || profile?.membershipTier || profile?.role || "Member"
+        }
       />
 
       {/* ── Main ─────────────────────────────────────────────── */}

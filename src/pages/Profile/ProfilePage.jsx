@@ -3,10 +3,13 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
+import bgImage from "../../assets/bg_dashboard.jpg";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
 import { app, auth } from "../../firebase";
 import "./ProfilePage.css";
+
+const BG_IMAGE = bgImage;
 
 const preferenceToggles = [
   {
@@ -52,7 +55,8 @@ function ToggleRow({ label, caption, defaultOn }) {
 
 function formatDate(value) {
   if (!value) return "—";
-  const date = typeof value.toDate === "function" ? value.toDate() : new Date(value);
+  const date =
+    typeof value.toDate === "function" ? value.toDate() : new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
@@ -77,7 +81,9 @@ function getInitials(name) {
 function buildProfile(data, currentUser) {
   const name =
     data.name ||
-    [data.firstName, data.middleName, data.lastName].filter(Boolean).join(" ") ||
+    [data.firstName, data.middleName, data.lastName]
+      .filter(Boolean)
+      .join(" ") ||
     currentUser.displayName ||
     currentUser.email ||
     "Member";
@@ -96,10 +102,35 @@ function buildProfile(data, currentUser) {
     gemsToNext: data.gemsToNext,
     progressPercent: Number(data.tierProgress ?? data.progressPercent ?? 0),
     stats: [
-      { key: "codes", icon: "token", label: "Codes Purchased", value: data.codesPurchased ?? data.totalCodes ?? "—" },
-      { key: "referrals", icon: "diversity_3", label: "Active Referrals", value: data.activeReferrals ?? data.referrals ?? "—" },
-      { key: "gems", icon: "diamond", label: "GEMS Balance", value: data.gemPoints ?? data.gemsBalance ?? data.gemBalance ?? data.gems ?? "—" },
-      { key: "age", icon: "calendar_month", label: "Member Since", value: formatDate(data.joinDate || data.createdAt) },
+      {
+        key: "codes",
+        icon: "token",
+        label: "Codes Purchased",
+        value: data.codesPurchased ?? data.totalCodes ?? "—",
+      },
+      {
+        key: "referrals",
+        icon: "diversity_3",
+        label: "Active Referrals",
+        value: data.activeReferrals ?? data.referrals ?? "—",
+      },
+      {
+        key: "gems",
+        icon: "diamond",
+        label: "GEMS Balance",
+        value:
+          data.gemPoints ??
+          data.gemsBalance ??
+          data.gemBalance ??
+          data.gems ??
+          "—",
+      },
+      {
+        key: "age",
+        icon: "calendar_month",
+        label: "Member Since",
+        value: formatDate(data.joinDate || data.createdAt),
+      },
     ],
   };
 }
@@ -169,6 +200,12 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="prof-root">
+        <div className="prof-bg" aria-hidden="true">
+          <img src={BG_IMAGE} alt="" className="prof-bg-img" />
+          <div className="prof-bg-gradient" />
+          <div className="prof-bg-grid" />
+        </div>
+
         <TopBar userName="Member" userRole="Member" />
         <main className="prof-main">
           <div className="prof-content">
@@ -183,6 +220,12 @@ export default function ProfilePage() {
 
   return (
     <div className="prof-root">
+      <div className="prof-bg" aria-hidden="true">
+        <img src={BG_IMAGE} alt="" className="prof-bg-img" />
+        <div className="prof-bg-gradient" />
+        <div className="prof-bg-grid" />
+      </div>
+
       {/* ── Atmosphere glows ─────────────────────────────────── */}
       <div className="prof-glow prof-glow-tr" />
       <div className="prof-glow prof-glow-bl" />
@@ -251,14 +294,14 @@ export default function ProfilePage() {
               />
             </div>
             <p className="prof-progress-caption">
-              Reach {profile.nextTier} to unlock priority code drops and
-              higher batch limits.
+              Reach {profile.nextTier} to unlock priority code drops and higher
+              batch limits.
             </p>
           </section>
 
           {/* ── Quick stats ────────────────────────────────── */}
           <section className="prof-stats-grid">
-              {profile.stats.map((s) => (
+            {profile.stats.map((s) => (
               <div className="prof-glass-panel prof-stat-card" key={s.key}>
                 <div className="prof-stat-icon">
                   <span className="material-symbols-outlined">{s.icon}</span>
