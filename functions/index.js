@@ -573,6 +573,34 @@ exports.saveWebPushToken = onCall({ region: 'asia-southeast1' }, async (request)
   return { success: true };
 });
 
+exports.getUserNotifications = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+
+  const notificationsSnapshot = await db()
+    .collection('users')
+    .doc(request.auth.uid)
+    .collection('notifications')
+    .orderBy('createdAt', 'desc')
+    .limit(50)
+    .get();
+
+  const notifications = notificationsSnapshot.docs.map((document) => {
+    const data = document.data() || {};
+    return {
+      id: document.id,
+      title: data.title || 'Gemstone Notification',
+      message: data.message || '',
+      time: data.createdAt || data.updatedAt || '',
+      unread: data.read === false,
+      type: data.type || 'info',
+    };
+  });
+
+  return { notifications };
+});
+
 exports.resolveUsername = onCall({ region: 'asia-southeast1' }, async (request) => {
   const username = requireNonEmptyString(request.data?.username, 'Username');
   const normalizedUsername = username.toUpperCase();
@@ -904,7 +932,7 @@ exports.getUserDashboard = onCall({ region: 'asia-southeast1' }, async (request)
 
   const userData = userSnapshot.data() || {};
   const referralCode = userData.referralCode || '';
-  const [referralsSnapshot, purchasesSnapshot, codesSnapshot, settingsSnapshot, usersSnapshot, gemTransactionsSnapshot] = await Promise.all([
+  const [referralsSnapshot, purchasesSnapshot, codesSnapshot, settingsSnapshot, usersSnapshot, gemTransactionsSnapshot, notificationsSnapshot] = await Promise.all([
     referralCode
       ? db().collection('users').where('uplineReferralCode', '==', referralCode).get()
       : Promise.resolve({ size: 0, docs: [] }),
@@ -913,6 +941,7 @@ exports.getUserDashboard = onCall({ region: 'asia-southeast1' }, async (request)
     db().collection('settings').doc('admin').get(),
     db().collection('users').get(),
     db().collection('users').doc(request.auth.uid).collection('gemTransactions').get(),
+    db().collection('users').doc(request.auth.uid).collection('notifications').orderBy('createdAt', 'desc').limit(20).get(),
   ]);
 
   const usersByUplineCode = new Map();
@@ -1004,6 +1033,17 @@ exports.getUserDashboard = onCall({ region: 'asia-southeast1' }, async (request)
     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
     .slice(0, 3);
 
+  const notifications = notificationsSnapshot.docs.map((document) => {
+    const data = document.data() || {};
+    return {
+      id: document.id,
+      title: data.title || 'Gemstone Notification',
+      message: data.message || '',
+      time: data.createdAt || data.updatedAt || '',
+      unread: data.read === false,
+    };
+  });
+
   return {
     name: userData.name || [userData.firstName, userData.lastName].filter(Boolean).join(' '),
     walletAddress: userData.walletAddress || '',
@@ -1018,7 +1058,8 @@ exports.getUserDashboard = onCall({ region: 'asia-southeast1' }, async (request)
     gemValueChangePercent: userData.gemValueChangePercent ?? userData.gemValueChange ?? null,
     recentTransactions,
     gemTransactions,
-    hasNotifications: userData.hasNotifications === true,
+    notifications,
+    hasNotifications: userData.hasNotifications === true || notifications.length > 0,
   };
 });
 

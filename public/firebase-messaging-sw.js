@@ -1,12 +1,21 @@
 self.addEventListener('push', (event) => {
-  const payload = event.data && event.data.json ? event.data.json() : {};
-  const title = payload.notification?.title || 'GEMSTONE Reward';
-  const body = payload.notification?.body || payload.data?.body || 'You have a new GEM reward update.';
+  let payload = {};
+
+  try {
+    payload = event.data?.json ? event.data.json() : {};
+  } catch (error) {
+    payload = {};
+  }
+
+  const notification = payload.notification || {};
+  const data = payload.data || {};
+  const title = notification.title || data.title || 'GEMSTONE Reward';
+  const body = notification.body || data.body || 'You have a new GEM reward update.';
   const options = {
     body,
     icon: '/icons.svg',
     badge: '/icons.svg',
-    data: payload.data || {},
+    data,
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
@@ -15,7 +24,11 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  const targetUrl = event.notification.data?.route || '/notifications';
+  const data = event.notification?.data || {};
+  const targetUrl = typeof data.route === 'string' && data.route.trim()
+    ? data.route.trim()
+    : '/notifications';
+
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {

@@ -1,16 +1,16 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import {
-  MdAccountBalanceWallet,
-  MdArrowForward,
-  MdCampaign,
-  MdChevronRight,
-  MdContentCopy,
-  MdDiamond,
-  MdHub,
-  MdPersonAdd,
-  MdReceiptLong,
-  MdSwapHoriz,
+    MdAccountBalanceWallet,
+    MdArrowForward,
+    MdCampaign,
+    MdChevronRight,
+    MdContentCopy,
+    MdDiamond,
+    MdHub,
+    MdPersonAdd,
+    MdReceiptLong,
+    MdSwapHoriz,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import bgImage from "../../assets/bg_dashboard.jpg";
@@ -106,6 +106,7 @@ export default function Dashboard() {
         userName={dashboard?.name || "Member"}
         userRole="Member"
         showNotifDot={dashboard?.hasNotifications === true}
+        notifications={dashboard?.notifications ?? []}
       />
 
       <div className="dash-content">

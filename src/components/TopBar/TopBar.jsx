@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { app, auth } from "../../firebase";
 import NotificationDrawer from "./notification/NotificationDrawer";
 import "./TopBar.css";
 
@@ -35,6 +37,44 @@ export default function TopBar({
 }) {
   const navigate = useNavigate();
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
+  const [drawerNotifications, setDrawerNotifications] = useState(notifications);
+
+  useEffect(() => {
+    setDrawerNotifications(notifications);
+  }, [notifications]);
+
+  useEffect(() => {
+    if (!auth.currentUser || notifications.length > 0) return undefined;
+
+    let cancelled = false;
+    const loadNotifications = async () => {
+      try {
+        const getUserNotifications = httpsCallable(
+          getFunctions(app, "asia-southeast1"),
+          "getUserNotifications",
+        );
+        const { data } = await getUserNotifications();
+        const next = (data?.notifications || []).map((item) => ({
+          id: item.id,
+          title: item.title,
+          message: item.message,
+          time: item.time,
+          unread: item.unread,
+        }));
+
+        if (!cancelled) {
+          setDrawerNotifications(next);
+        }
+      } catch (error) {
+        console.warn("Unable to load notification drawer data:", error);
+      }
+    };
+
+    void loadNotifications();
+    return () => {
+      cancelled = true;
+    };
+  }, [auth.currentUser, notifications]);
 
   const handleAvatarClick = () => {
     if (onAvatarClick) {
@@ -99,7 +139,7 @@ export default function TopBar({
       <NotificationDrawer
         isOpen={isNotifDrawerOpen}
         onClose={() => setIsNotifDrawerOpen(false)}
-        notifications={notifications}
+        notifications={drawerNotifications}
         onViewAll={handleViewAllNotifications}
       />
     </>

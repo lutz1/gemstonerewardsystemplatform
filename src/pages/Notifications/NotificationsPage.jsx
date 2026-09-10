@@ -1,36 +1,54 @@
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import TopBar from "../../components/TopBar/TopBar";
+import { app } from "../../firebase";
 import "./NotificationsPage.css";
 
-const sampleNotifications = [
-  {
-    id: 1,
-    title: "Gem value updated",
-    detail: "The platform default GEM value has been adjusted to PHP 12.50.",
-    time: "2 hours ago",
-    type: "info",
-  },
-  {
-    id: 2,
-    title: "Purchase approved",
-    detail: "Your latest code purchase has been successfully approved.",
-    time: "Today",
-    type: "success",
-  },
-  {
-    id: 3,
-    title: "Membership reminder",
-    detail:
-      "Your membership renewal is due in 12 days. Review your benefits now.",
-    time: "Yesterday",
-    type: "warning",
-  },
-];
+function formatNotificationTime(value) {
+  if (!value) return "Just now";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+
+  return date.toLocaleString("en-PH", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
 
 export default function NotificationsPage({ isAdmin = false }) {
   const navigate = useNavigate();
-  const notifications = sampleNotifications;
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const getUserNotifications = httpsCallable(
+          getFunctions(app, "asia-southeast1"),
+          "getUserNotifications",
+        );
+        const { data } = await getUserNotifications();
+        setNotifications((data?.notifications || []).map((item) => ({
+          id: item.id,
+          title: item.title,
+          message: item.message,
+          time: formatNotificationTime(item.time),
+          unread: item.unread,
+          type: item.type || "info",
+        })));
+      } catch (error) {
+        console.error("Failed to load notifications:", error);
+        setNotifications([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchNotifications();
+  }, []);
 
   const handleBack = () => {
     const previousPage =
@@ -54,10 +72,11 @@ export default function NotificationsPage({ isAdmin = false }) {
         userName={isAdmin ? "Admin" : "Marcus"}
         userRole={isAdmin ? "Administrator" : "Executive Member"}
         profilePath={isAdmin ? "/admin/profile" : "/profile"}
-        showNotifDot={notifications.length > 0}
+        showNotifDot={notifications.some((item) => item.unread)}
         onNotifClick={() =>
           navigate(isAdmin ? "/admin/notifications" : "/notifications")
         }
+        notifications={notifications}
       />
 
       <main className="notifications-main">
@@ -80,7 +99,14 @@ export default function NotificationsPage({ isAdmin = false }) {
           </div>
         </header>
 
-        {notifications.length === 0 ? (
+        {loading ? (
+          <div className="notifications-empty-state">
+            <span className="material-symbols-outlined" aria-hidden="true">
+              sync
+            </span>
+            <h2>Loading notifications...</h2>
+          </div>
+        ) : notifications.length === 0 ? (
           <div className="notifications-empty-state">
             <span className="material-symbols-outlined" aria-hidden="true">
               notifications_none
@@ -96,7 +122,9 @@ export default function NotificationsPage({ isAdmin = false }) {
             {notifications.map((item) => (
               <article
                 key={item.id}
-                className={`notification-card notification-card--${item.type}`}
+                className={`notification-card notification-card--${
+                  item.type || "info"
+                }`}
               >
                 <div className="notification-icon-wrap">
                   <span
@@ -107,7 +135,9 @@ export default function NotificationsPage({ isAdmin = false }) {
                       ? "check_circle"
                       : item.type === "warning"
                         ? "warning"
-                        : "info"}
+                        : item.type === "error"
+                          ? "error"
+                          : "info"}
                   </span>
                 </div>
                 <div className="notification-content">
@@ -115,7 +145,7 @@ export default function NotificationsPage({ isAdmin = false }) {
                     <h2>{item.title}</h2>
                     <time>{item.time}</time>
                   </div>
-                  <p>{item.detail}</p>
+                  <p>{item.message}</p>
                 </div>
               </article>
             ))}
