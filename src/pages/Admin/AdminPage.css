@@ -385,6 +385,42 @@
   color: var(--on-surface);
 }
 
+.admin-pond-panel {
+  background: linear-gradient(
+    145deg,
+    rgba(0, 168, 107, 0.16),
+    rgba(26, 33, 28, 0.75)
+  );
+}
+
+.admin-pond-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 120px;
+  padding: 16px;
+  border: 1px solid rgba(122, 230, 160, 0.22);
+  border-radius: 10px;
+  background: rgba(10, 36, 23, 0.58);
+}
+
+.admin-pond-total {
+  color: var(--on-surface);
+  font-family: var(--font-jakarta);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.admin-pond-copy {
+  color: var(--on-surface-variant);
+  font-family: var(--font-hanken);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
 .admin-burn-panel {
   background: linear-gradient(
     145deg,

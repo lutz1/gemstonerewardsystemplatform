@@ -60,12 +60,17 @@ function requireNonEmptyString(value, fieldName) {
   return value.trim();
 }
 
-async function sendWebPushToUser(userRef, userData, amount, kind = 'daily_membership_reward') {
+async function sendWebPushToUser(
+  userRef,
+  userData,
+  amount,
+  kind = 'daily_membership_reward',
+  title = 'Daily GEM Reward',
+  body = `You earned ${amount} GEM${amount === 1 ? '' : 's'} today.`,
+) {
   const tokenSnapshot = await userRef.collection('webPushTokens').get();
   if (tokenSnapshot.empty) return;
 
-  const title = 'Daily GEM Reward';
-  const body = `You earned ${amount} GEM${amount === 1 ? '' : 's'} today.`;
   const webPayload = {
     notification: {
       title,
@@ -174,6 +179,13 @@ exports.completePurchase = onCall({ region: 'asia-southeast1' }, async (request)
     nextUplineCode = ancestorData.uplineReferralCode || '';
   }
 
+  const recipientNotificationRefs = distributionRecipients.map(({ document, role }) => ({
+    userRef: document.ref,
+    userId: document.id,
+    role,
+    notificationRef: document.ref.collection('notifications').doc(`purchase-${purchaseRef.id}-${role}`),
+  }));
+
   await db().runTransaction(async (transaction) => {
     const userSnapshot = await transaction.get(userRef);
     if (!userSnapshot.exists) {
@@ -206,6 +218,7 @@ exports.completePurchase = onCall({ region: 'asia-southeast1' }, async (request)
     }));
     const currentGemPoints = Number(userData.gemPoints || 0);
     const purchaserRewardRef = userRef.collection('gemTransactions').doc(`${purchaseRef.id}-membership`);
+    const purchaserNotificationRef = userRef.collection('notifications').doc(`purchase-${purchaseRef.id}`);
 
     transaction.update(userRef, {
       walletBalance: walletBalance - total,
@@ -215,6 +228,7 @@ exports.completePurchase = onCall({ region: 'asia-southeast1' }, async (request)
       dailyGemReward: selectedPackage.dailyGemReward,
       nextGemRewardAt: nextRewardAt,
       membershipStatus: 'active',
+      hasNotifications: true,
       updatedAt: now,
     });
     transaction.set(purchaserRewardRef, {
@@ -224,7 +238,18 @@ exports.completePurchase = onCall({ region: 'asia-southeast1' }, async (request)
       purchaseId: purchaseRef.id,
       createdAt: now,
     });
-    distribution.forEach(({ snapshot, rewardRef, rewardExists, amount, role }) => {
+    transaction.set(purchaserNotificationRef, {
+      type: 'membership_purchase',
+      title: 'Payment Confirmed',
+      message: `Your ${selectedPackage.name} purchase has been confirmed successfully. ${selectedPackage.dailyGemReward} GEM reward has been added to your account.`,
+      amount: selectedPackage.dailyGemReward,
+      read: false,
+      purchaseId: purchaseRef.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    distribution.forEach(({ snapshot, rewardRef, rewardExists, amount, role }, index) => {
       if (!snapshot.exists || rewardExists) return;
       const recipientData = snapshot.data() || {};
       const recipientGemPoints = Number(recipientData.gemPoints || 0);
@@ -233,6 +258,7 @@ exports.completePurchase = onCall({ region: 'asia-southeast1' }, async (request)
         gemPoints: (Number.isFinite(recipientGemPoints) ? recipientGemPoints : 0) + amount,
         dailyGemReward: Math.max(recipientDailyGemReward, amount),
         nextGemRewardAt: nextRewardAt,
+        hasNotifications: true,
         updatedAt: now,
       });
       transaction.set(rewardRef, {
@@ -243,6 +269,19 @@ exports.completePurchase = onCall({ region: 'asia-southeast1' }, async (request)
         sourceUserId: request.auth.uid,
         tier: selectedPackage.tier,
         createdAt: now,
+      });
+      const recipientNotificationRef = recipientNotificationRefs[index].notificationRef;
+      transaction.set(recipientNotificationRef, {
+        type: 'purchase_distribution',
+        title: 'GEM Distribution Received',
+        message: `You received ${amount} GEM${amount === 1 ? '' : 's'} from ${userData.name || userData.username || request.auth.uid}'s ${selectedPackage.name} purchase.`,
+        amount,
+        role,
+        sourceUserId: request.auth.uid,
+        read: false,
+        purchaseId: purchaseRef.id,
+        createdAt: now,
+        updatedAt: now,
       });
     });
     transaction.set(purchaseRef, {
@@ -270,6 +309,26 @@ exports.completePurchase = onCall({ region: 'asia-southeast1' }, async (request)
       completedAt: now,
     });
   });
+
+  await sendWebPushToUser(
+    userRef,
+    purchaserData,
+    selectedPackage.dailyGemReward,
+    'membership_purchase',
+    'Payment Confirmed',
+    `Your ${selectedPackage.name} purchase has been confirmed. ${selectedPackage.dailyGemReward} GEM reward has been added to your account.`,
+  );
+
+  for (const recipient of distributionRecipients) {
+    await sendWebPushToUser(
+      recipient.document.ref,
+      recipient.document.data() || {},
+      selectedPackage.distributionReward,
+      'purchase_distribution',
+      'GEM Distribution Received',
+      `You received ${selectedPackage.distributionReward} GEM${selectedPackage.distributionReward === 1 ? '' : 's'} from ${purchaserData.name || purchaserData.username || request.auth.uid}'s ${selectedPackage.name} purchase.`,
+    );
+  }
 
   return {
     success: true,

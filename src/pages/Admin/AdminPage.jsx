@@ -222,6 +222,23 @@ export default function AdminPage() {
           </div>
           <div className="admin-dashboard-column">
             <GemValueChart />
+            <section className="admin-dashboard-panel admin-pond-panel">
+              <div className="admin-panel-heading">
+                <div>
+                  <p className="admin-panel-eyebrow">GEM pond</p>
+                  <h2>GEM Pond</h2>
+                </div>
+                <MdDiamond className="admin-heading-icon" />
+              </div>
+              <div className="admin-pond-content">
+                <strong className="admin-pond-total">
+                  {Number(gemPond ?? 0).toLocaleString("en-PH")}
+                </strong>
+                <span className="admin-pond-copy">
+                  Total GEM points available
+                </span>
+              </div>
+            </section>
             <section className="admin-dashboard-panel admin-burn-panel">
               <div className="admin-panel-heading">
                 <div>
@@ -231,24 +248,6 @@ export default function AdminPage() {
                 <MdLocalFireDepartment className="admin-heading-icon" />
               </div>
               <div className="admin-burn-panel-layout">
-                <aside className="admin-burn-pond-wrapper">
-                  <section className="admin-burn-pond-card">
-                    <div className="admin-burn-pond-card-head">
-                      <span className="admin-burn-pond-title">
-                        <MdDiamond className="admin-burn-pond-icon" />
-                        Gem Pond
-                      </span>
-                    </div>
-                    <div className="admin-burn-pond-content">
-                      <strong className="admin-burn-pond-total">
-                        {Number(gemPond ?? 0).toLocaleString("en-PH")}
-                      </strong>
-                      <span className="admin-burn-pond-copy">
-                        Total GEM points available
-                      </span>
-                    </div>
-                  </section>
-                </aside>
                 <section className="admin-burn-detail">
                   <div className="admin-burn-summary">
                     <strong>{formatPeso(currentBurnRate)}</strong>
