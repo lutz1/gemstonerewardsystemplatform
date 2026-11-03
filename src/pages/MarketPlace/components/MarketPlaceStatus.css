@@ -1,0 +1,282 @@
+.marketplace-status-root {
+  min-height: 100vh;
+  min-height: 100svh;
+  color: #152341;
+  background: #f2f5fb;
+  font-family: "Hanken Grotesk", sans-serif;
+}
+
+.marketplace-status-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  min-height: calc(52px + env(safe-area-inset-top, 0px));
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  padding:
+    env(safe-area-inset-top, 0px)
+    max(12px, env(safe-area-inset-right, 0px))
+    0
+    max(12px, env(safe-area-inset-left, 0px));
+  color: #fff;
+  background: linear-gradient(135deg, #071b40, #123b77);
+  box-shadow: 0 2px 12px rgba(7, 27, 64, 0.18);
+}
+
+.marketplace-status-header h1 {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.marketplace-status-header button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+}
+
+.marketplace-status-content {
+  display: grid;
+  width: min(100%, 560px);
+  gap: 12px;
+  margin: 0 auto;
+  padding: 20px 16px 36px;
+}
+
+.marketplace-status-summary,
+.marketplace-status-card,
+.marketplace-status-message {
+  padding: 17px;
+  border: 1px solid #e3eaf4;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(19, 42, 78, 0.05);
+}
+
+.marketplace-status-summary {
+  text-align: center;
+}
+
+.marketplace-status-summary > .material-symbols-outlined {
+  color: #1762d5;
+  font-size: 30px;
+}
+
+.marketplace-status-eyebrow {
+  margin-top: 7px;
+  color: #1762d5;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.marketplace-status-summary h2,
+.marketplace-status-message h2 {
+  margin-top: 5px;
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.marketplace-status-badge {
+  display: inline-flex;
+  margin-top: 9px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  color: #765914;
+  background: #fff4d4;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.marketplace-status-approved {
+  color: #12643e;
+  background: #e3f5e9;
+}
+
+.marketplace-status-reapplication {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 15px;
+  border: 1px solid #f0d7d1;
+  border-radius: 13px;
+  color: #713e34;
+  background: #fff8f5;
+}
+
+.marketplace-status-reapplication > .material-symbols-outlined {
+  color: #a64b37;
+  font-size: 24px;
+}
+
+.marketplace-status-reapplication h3 {
+  margin: 0;
+  color: #713e34;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.marketplace-status-reapplication p {
+  margin: 7px 0 0;
+  color: #76574f;
+  font-size: 11px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.marketplace-status-reapplication .marketplace-status-rejection-reason {
+  padding: 8px 9px;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.marketplace-status-reapplication .marketplace-status-primary {
+  margin-top: 12px;
+}
+
+.marketplace-status-reapplication .marketplace-status-primary:disabled {
+  color: #7d8580;
+  background: #e6e9e7;
+  cursor: not-allowed;
+}
+
+.marketplace-status-rejected,
+.marketplace-status-needs_changes {
+  color: #8d3022;
+  background: #fff1ed;
+}
+
+.marketplace-status-submitted,
+.marketplace-status-reference {
+  margin-top: 8px;
+  color: #68758d;
+  font-size: 11px;
+}
+
+.marketplace-status-reference {
+  overflow-wrap: anywhere;
+  font-size: 10px;
+}
+
+.marketplace-status-card h3 {
+  margin-bottom: 12px;
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.marketplace-status-card dl {
+  display: grid;
+  gap: 9px;
+}
+
+.marketplace-status-card dl > div {
+  display: grid;
+  grid-template-columns: minmax(95px, 0.65fr) minmax(0, 1.35fr);
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e9eef5;
+}
+
+.marketplace-status-card dl > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.marketplace-status-card dt {
+  color: #68758d;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.marketplace-status-card dd {
+  overflow-wrap: anywhere;
+  color: #23395f;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.marketplace-status-message {
+  display: flex;
+  min-height: 260px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.marketplace-status-message-icon {
+  color: #1762d5;
+  font-size: 42px;
+}
+
+.marketplace-status-message > p {
+  max-width: 310px;
+  margin-top: 7px;
+  color: #68758d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.marketplace-status-primary {
+  min-height: 42px;
+  margin-top: 17px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: #1762d5;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.marketplace-status-back-link {
+  min-height: 40px;
+  border: 0;
+  color: #1762d5;
+  background: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.marketplace-status-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #dce4ef;
+  border-top-color: #1762d5;
+  border-radius: 50%;
+  animation: marketplace-status-spin 750ms linear infinite;
+}
+
+.marketplace-status-root button:focus-visible {
+  outline: 2px solid #1762d5;
+  outline-offset: 3px;
+}
+
+@keyframes marketplace-status-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-status-spinner {
+    animation-duration: 2s;
+  }
+}

@@ -8,8 +8,56 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   padding: 20px 20px 4px 20px;
+}
+
+.gem-chart__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gem-chart__type-controls {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 9px;
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.gem-chart__type-button {
+  width: 34px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+}
+
+.gem-chart__type-button svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gem-chart__type-button--active {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.gem-chart__type-button:focus-visible {
+  outline: 2px solid #59DE9B;
+  outline-offset: 2px;
 }
 
 .gem-chart__eyebrow {
@@ -53,6 +101,68 @@
   pointer-events: none;
 }
 
+.gem-chart__price-scale {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 56px;
+  height: 160px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.gem-chart__price-tick {
+  position: absolute;
+  right: 0;
+  padding: 2px 3px;
+  border-radius: 3px;
+  background-color: rgba(16, 25, 19, 0.88);
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-hanken);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.gem-chart__grid line {
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 1;
+  stroke-dasharray: 1 4;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.gem-chart__endpoint-pulse {
+  fill: #59DE9B;
+  opacity: 0.65;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gem-chart-endpoint-pulse 1.8s ease-out infinite;
+}
+
+@keyframes gem-chart-endpoint-pulse {
+  from {
+    opacity: 0.65;
+    transform: scale(0.75);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gem-chart__endpoint-pulse {
+    animation: none;
+    opacity: 0.25;
+  }
+}
+
 .gem-chart__point-label-wrap {
   position: absolute;
   display: flex;
@@ -70,6 +180,18 @@
   border: 1px solid rgba(89, 222, 155, 0.5);
 }
 
+.gem-chart__touch-datetime {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-hanken);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .gem-chart__point-label-text {
   font-family: var(--font-hanken);
   font-weight: 700;
@@ -78,15 +200,42 @@
   white-space: nowrap;
 }
 
-.gem-chart__tab-row {
+.gem-chart__range-controls,
+.gem-chart__candle-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 10px 0;
+}
+
+.gem-chart__control-label {
+  flex: 0 0 auto;
+  font-family: var(--font-hanken);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.gem-chart__tab-row,
+.gem-chart__interval-row {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  padding: 12px 16px;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.gem-chart__tab-row::-webkit-scrollbar,
+.gem-chart__interval-row::-webkit-scrollbar {
+  display: none;
 }
 
 .gem-chart__tab {
-  padding: 5px 10px;
+  flex: 0 0 auto;
+  min-width: 32px;
+  padding: 5px 8px;
   border-radius: 999px;
   background: none;
   border: none;
@@ -162,4 +311,119 @@
 
 .gem-chart__standalone-range-label {
   margin-top: 10px;
+}
+
+.gem-chart--admin {
+  --gem-chart-positive: #1762d5;
+  --gem-chart-negative: #f04452;
+  --gem-chart-accent-wash: rgba(23, 98, 213, 0.07);
+  border: 1px solid #e8edf5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(19, 42, 78, 0.05);
+}
+
+.gem-chart--admin .gem-chart__header {
+  padding: 20px 20px 6px;
+}
+
+.gem-chart--admin .gem-chart__eyebrow {
+  color: #68758d;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.gem-chart--admin .gem-chart__title {
+  color: #152341;
+  font-size: 20px;
+  letter-spacing: -0.3px;
+}
+
+.gem-chart--admin .gem-chart__type-controls {
+  border-color: #e5eaf2;
+  border-radius: 10px;
+  background: #f8faff;
+}
+
+.gem-chart--admin .gem-chart__type-button {
+  color: #68758d;
+}
+
+.gem-chart--admin .gem-chart__type-button--active {
+  color: #fff;
+  background: var(--gem-chart-positive);
+}
+
+.gem-chart--admin .gem-chart__type-button:focus-visible,
+.gem-chart--admin .gem-chart__tab:focus-visible {
+  outline: 2px solid var(--gem-chart-positive);
+  outline-offset: 2px;
+}
+
+.gem-chart--admin .gem-chart__grid line {
+  stroke: #e9eef6;
+}
+
+.gem-chart--admin .gem-chart__price-scale {
+  border-left-color: #e8edf5;
+}
+
+.gem-chart--admin .gem-chart__price-tick,
+.gem-chart--admin .gem-chart__point-label-chip {
+  border: 1px solid #dce6f7;
+  background: rgba(21, 35, 65, 0.92);
+}
+
+.gem-chart--admin .gem-chart__touch-chip {
+  border-color: #1762d5;
+}
+
+.gem-chart--admin .gem-chart__control-label {
+  color: #68758d;
+}
+
+.gem-chart--admin .gem-chart__tab {
+  min-height: 28px;
+  color: #68758d;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.gem-chart--admin .gem-chart__tab--active {
+  color: #fff;
+  background: var(--gem-chart-positive);
+}
+
+.gem-chart--admin .gem-chart__tab:not(.gem-chart__tab--active):hover,
+.gem-chart--admin .gem-chart__type-button:not(.gem-chart__type-button--active):hover {
+  color: #152341;
+  background: #eaf2ff;
+}
+
+.gem-chart--admin .gem-chart__endpoint-pulse {
+  fill: var(--gem-chart-positive);
+}
+
+.gem-chart--admin .gem-chart__stat-panel {
+  margin: 8px 10px 10px;
+  padding: 16px 14px;
+  border: 1px solid #e5eaf2;
+  border-radius: 12px;
+  background: linear-gradient(125deg, var(--gem-chart-accent-wash), #fff 80%);
+}
+
+.gem-chart--admin .gem-chart__big-value {
+  color: #152341;
+  font-size: 30px;
+  letter-spacing: -0.7px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gem-chart--admin .gem-chart__big-value-unit,
+.gem-chart--admin .gem-chart__range-label {
+  color: #68758d;
+}
+
+.gem-chart--admin .gem-chart__change-row {
+  margin-top: 7px;
 }

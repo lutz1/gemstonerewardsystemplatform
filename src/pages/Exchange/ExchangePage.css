@@ -30,7 +30,8 @@
   cursor: pointer;
 }
 .exchange-main {
-  width: min(100% - 32px, 520px);
+  width: min(520px, calc(100% - 32px));
+  min-width: 0;
   margin: 0 auto;
   padding: 24px 0 48px;
 }
@@ -80,6 +81,9 @@
   font-size: 12px;
 }
 .exchange-card {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
   gap: 18px;
   padding: 20px;
 }
@@ -104,6 +108,198 @@
   letter-spacing: 1.5px;
   text-transform: uppercase;
 }
+.exchange-deposit-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+  gap: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.exchange-deposit-method {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 68px;
+  padding: 12px;
+  border: 1px solid rgba(89, 222, 155, 0.2);
+  border-radius: 8px;
+  background: rgba(89, 222, 155, 0.06);
+}
+.exchange-deposit-method > .material-symbols-outlined:first-child {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(89, 222, 155, 0.12);
+  color: var(--primary);
+  font-size: 21px;
+}
+.exchange-deposit-method > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+.exchange-deposit-method strong {
+  font: 700 14px var(--font-jakarta);
+}
+.exchange-deposit-method small {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+.exchange-deposit-method .exchange-deposit-secure {
+  margin-left: auto;
+  color: var(--on-surface-variant);
+  font-size: 18px;
+}
+.exchange-deposit-quick-amounts {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: 7px;
+}
+.exchange-deposit-quick-amounts > span {
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.exchange-deposit-quick-amounts > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+.exchange-deposit-quick-amounts button {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 4px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--on-surface);
+  font: 600 12px var(--font-hanken);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.exchange-deposit-quick-amounts button.is-selected {
+  border-color: var(--primary);
+  background: rgba(89, 222, 155, 0.12);
+  color: var(--primary);
+}
+.exchange-deposit-amount {
+  width: 100%;
+  min-width: 0;
+  gap: 8px !important;
+  font-size: 12px !important;
+}
+.exchange-deposit-amount .exchange-input-wrap {
+  width: 100%;
+  min-width: 0;
+  min-height: 76px;
+  gap: 12px;
+  padding: 0 16px;
+}
+.exchange-deposit-amount .exchange-input-wrap > span {
+  color: var(--on-surface-variant);
+  font: 600 25px var(--font-jakarta);
+}
+.exchange-deposit-amount .exchange-input-wrap input {
+  min-width: 0;
+  min-height: 70px;
+  color: var(--on-surface);
+  font: 700 28px var(--font-jakarta);
+}
+.exchange-deposit-note {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 8px;
+  margin: -10px 0 0;
+  color: var(--on-surface-variant);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.exchange-deposit-note > span {
+  flex: 0 0 auto;
+  overflow-wrap: anywhere;
+  color: var(--primary);
+  font-size: 17px;
+}
+.exchange-deposit-note p {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+.exchange-gems-overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  border-block: 1px solid var(--color-border-faint);
+}
+.exchange-gems-metric {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  padding: 13px 10px;
+}
+.exchange-gems-metric + .exchange-gems-metric {
+  border-left: 1px solid var(--color-border-faint);
+  padding-left: 16px;
+}
+.exchange-withdrawal-overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-block: 1px solid var(--color-border-faint);
+  min-width: 0;
+}
+.exchange-withdrawal-overview > div {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+@media (max-width: 480px) {
+  .exchange-deposit-quick-amounts > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+  padding: 12px 10px;
+}
+.exchange-withdrawal-overview > div:nth-child(even) {
+  border-left: 1px solid var(--color-border-faint);
+  padding-left: 16px;
+}
+.exchange-withdrawal-overview span {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+.exchange-withdrawal-overview strong {
+  overflow-wrap: anywhere;
+  color: var(--on-surface);
+  font: 600 15px var(--font-jakarta);
+}
+.exchange-withdrawal-overview > .exchange-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: 0;
+}
+.exchange-gems-metric span {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+.exchange-gems-metric strong {
+  overflow-wrap: anywhere;
+  color: var(--on-surface);
+  font: 700 17px var(--font-jakarta);
+}
 .exchange-card label {
   display: grid;
   gap: 6px;
@@ -121,6 +317,83 @@
   background: var(--surface-container-low);
   color: var(--on-surface);
   font: 14px var(--font-hanken);
+}
+.exchange-card select {
+  min-height: 44px;
+  width: 100%;
+  padding: 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: var(--surface-container-low);
+  color: var(--on-surface);
+  font: 14px var(--font-hanken);
+}
+.exchange-provider-field {
+  margin-top: -6px;
+}
+.exchange-qr-field {
+  display: grid;
+  gap: 7px;
+}
+.exchange-qr-field > label {
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.exchange-qr-field > input[type="file"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 12px;
+}
+.exchange-qr-field > small,
+.exchange-qr-progress span {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+.exchange-qr-progress {
+  display: grid;
+  gap: 5px;
+}
+.exchange-qr-progress progress {
+  width: 100%;
+  height: 8px;
+  accent-color: var(--primary);
+}
+.exchange-qr-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding-top: 4px;
+}
+.exchange-qr-preview img {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  border: 1px solid var(--color-border-faint);
+  border-radius: 6px;
+  background: white;
+}
+.exchange-qr-preview span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--on-surface-variant);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.exchange-qr-preview button {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--on-surface);
+  font: 600 12px var(--font-hanken);
+  cursor: pointer;
 }
 .exchange-input-wrap {
   display: flex;
@@ -178,6 +451,114 @@
   color: var(--primary);
   font: 700 26px var(--font-jakarta);
 }
+.exchange-error {
+  margin: -8px 0 0;
+  color: var(--error, #ff8b8b);
+  font-size: 13px;
+}
+.exchange-modal-backdrop {
+  position: fixed;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  min-width: 0;
+  max-width: 100%;
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(5px);
+}
+.exchange-confirm-modal {
+  width: min(100%, 440px);
+  display: grid;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+}
+.exchange-confirm-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--primary);
+}
+.exchange-confirm-heading > span {
+  font-size: 24px;
+}
+.exchange-modal-close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+.exchange-modal-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--on-surface);
+}
+.exchange-confirm-modal h2 {
+  margin: 0;
+  font: 700 20px var(--font-jakarta);
+}
+.exchange-confirm-modal > p {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.exchange-confirm-summary {
+  display: grid;
+  gap: 12px;
+  margin: 2px 0;
+  padding: 14px 0;
+  border-block: 1px solid var(--color-border-faint);
+}
+.exchange-confirm-summary > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.exchange-confirm-summary dt {
+  color: var(--on-surface-variant);
+  font-size: 13px;
+}
+.exchange-confirm-summary dd {
+  margin: 0;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
+}
+.exchange-confirm-summary .exchange-confirm-receive dd {
+  color: var(--primary);
+  font: 700 20px var(--font-jakarta);
+}
+.exchange-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.exchange-confirm-actions button {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  font: 600 13px var(--font-hanken);
+  cursor: pointer;
+}
+.exchange-cancel {
+  background: transparent;
+  color: var(--on-surface);
+}
+.exchange-confirm-submit {
+  border-color: var(--primary) !important;
+  background: var(--primary);
+  color: var(--on-primary-container);
+}
+.exchange-confirm-actions button:disabled,
+.exchange-modal-close:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
 .exchange-success {
   border: 1px solid rgba(89, 222, 155, 0.2);
   color: var(--primary);
@@ -195,4 +576,182 @@
 .exchange-submit:disabled {
   cursor: not-allowed;
   opacity: 0.4;
+}
+.exchange-deposit-submit {
+  width: 100%;
+  min-height: 50px;
+  font-size: 14px;
+}
+.exchange-form-stage[hidden] {
+  display: none;
+}
+.exchange-summary-card {
+  display: grid;
+  gap: 18px;
+  padding: 0;
+}
+.exchange-withdrawal-success {
+  min-height: 60vh;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+}
+.exchange-submission-check {
+  display: grid;
+  width: 76px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgba(89, 222, 155, 0.35);
+  border-radius: 50%;
+  background: rgba(89, 222, 155, 0.12);
+  color: var(--primary);
+  animation: exchange-check-pop 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.exchange-submission-check span {
+  font-size: 42px;
+  font-variation-settings: 'FILL' 1;
+}
+@keyframes exchange-check-pop {
+  from { opacity: 0; transform: scale(0.55); }
+  to { opacity: 1; transform: scale(1); }
+}
+.exchange-withdrawal-success h1 {
+  margin: -10px 0 0;
+  font: 700 22px var(--font-jakarta);
+}
+.exchange-withdrawal-success-caption {
+  max-width: 380px;
+  margin: -10px 0 0;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.exchange-push-status {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: 380px;
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+.exchange-push-status button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--on-surface);
+  font: 600 13px var(--font-hanken);
+  cursor: pointer;
+}
+.exchange-push-status button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.exchange-withdrawal-reference {
+  display: grid;
+  gap: 5px;
+  width: min(100%, 360px);
+  padding: 14px;
+  border-block: 1px solid var(--color-border-faint);
+}
+.exchange-withdrawal-reference span {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+.exchange-withdrawal-reference strong {
+  overflow-wrap: anywhere;
+  font: 700 16px var(--font-jakarta);
+}
+.exchange-withdrawal-success > button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  font: 600 13px var(--font-hanken);
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+  .exchange-submission-check {
+    animation: none;
+  }
+}
+.exchange-summary-details {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 0;
+  border-block: 1px solid var(--color-border-faint);
+}
+.exchange-summary-details > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.exchange-summary-details dt {
+  flex: 0 0 auto;
+  color: var(--on-surface-variant);
+  font-size: 13px;
+}
+.exchange-summary-details dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
+}
+.exchange-summary-details .exchange-summary-total-deduction {
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-faint);
+}
+.exchange-summary-total-deduction dd {
+  color: var(--primary);
+  font: 700 17px var(--font-jakarta);
+}
+.exchange-summary-qr {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: var(--on-surface-variant);
+  font-size: 12px;
+  text-align: center;
+}
+.exchange-summary-qr img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border: 1px solid var(--color-border-faint);
+  border-radius: 6px;
+  background: white;
+}
+.exchange-summary-qr small {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.exchange-summary-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.exchange-summary-actions button {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 8px;
+  font: 600 13px var(--font-hanken);
+  cursor: pointer;
+}
+.exchange-summary-back {
+  background: transparent;
+  color: var(--on-surface);
+}
+.exchange-summary-done {
+  border-color: var(--primary) !important;
+  background: var(--primary);
+  color: var(--on-primary-container);
 }

@@ -1,52 +1,7 @@
 import { onIdTokenChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { getToken } from "firebase/messaging";
 import { createContext, useContext, useEffect, useState } from "react";
-import { app, auth, messaging } from "../src/firebase";
-
-const webPushSave = async (token) => {
-  if (!token || !auth.currentUser) return;
-
-  const saveWebPushToken = httpsCallable(
-    getFunctions(app, "asia-southeast1"),
-    "saveWebPushToken",
-  );
-
-  try {
-    await saveWebPushToken({ token });
-  } catch (error) {
-    console.error("Failed to save web push token:", error);
-  }
-};
-
-const requestBrowserPush = async () => {
-  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-    return null;
-  }
-
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') {
-    return null;
-  }
-
-  try {
-    await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-    await navigator.serviceWorker.ready;
-
-    const token = await getToken(messaging, {
-      vapidKey: 'BHIQi5JLMrYQwl0I4aDSjS3G0WNO1J3Aq4P7wE5C2gKpVjYb9Lk1cR2nT6mQ4uU0',
-    });
-
-    if (token) {
-      await webPushSave(token);
-    }
-
-    return token;
-  } catch (error) {
-    console.error('Push registration error:', error);
-    return null;
-  }
-};
+import { app, auth } from "../src/firebase";
 
 const PIN_VERIFIED_KEY = "gemstone_pin_verified";
 
@@ -73,6 +28,7 @@ async function getAccountStatus() {
     return {
       mpinSetup: result.data?.mpinSetup === true,
       role: result.data?.role || "member",
+      seller: result.data?.seller === true,
       username: result.data?.username || "",
       referralCode: result.data?.referralCode || "",
     };
@@ -80,6 +36,7 @@ async function getAccountStatus() {
     return {
       mpinSetup: false,
       role: "member",
+      seller: false,
       username: "",
       referralCode: "",
     };
@@ -89,8 +46,10 @@ async function getAccountStatus() {
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
+  const [seller, setSeller] = useState(false);
   const [username, setUsername] = useState("");
   const [referralCode, setReferralCode] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [pinVerified, setPinVerified] = useState(() => readStoredPinVerified());
   const [mpinSetup, setMpinSetup] = useState(false);
   const [authReady, setAuthReady] = useState(false);
@@ -99,45 +58,45 @@ export function AuthProvider({ children }) {
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
       try {
         setIsLoggedIn(Boolean(user));
+        setAvatarUrl(user?.photoURL || "");
 
         if (!user) {
           setRole(null);
+          setSeller(false);
           setUsername("");
           setReferralCode("");
           setMpinSetup(false);
           setPinVerified(false);
           writeStoredPinVerified(false);
+          setAuthReady(true);
           return;
         }
 
-        const token = await user.getIdTokenResult();
         const status = await getAccountStatus();
+        const token = await user.getIdTokenResult(true);
         const nextRole = status.role || token.claims.role || token.claims.userRole || "member";
         const hasValidatedPin = readStoredPinVerified();
 
         setRole(nextRole);
+        setSeller(status.seller);
         setUsername(status.username || "");
         setReferralCode(status.referralCode || "");
         setMpinSetup(status.mpinSetup);
         setPinVerified(hasValidatedPin);
 
-        if (typeof window !== 'undefined') {
-          try {
-            await requestBrowserPush();
-          } catch (error) {
-            console.error('Browser push setup failed:', error);
-          }
-        }
+        setAuthReady(true);
+
       } catch {
         setRole(user ? "member" : null);
+        setSeller(false);
+        setAvatarUrl(user?.photoURL || "");
         setUsername("");
         setReferralCode("");
         setMpinSetup(false);
         setPinVerified(false);
         writeStoredPinVerified(false);
-      } finally {
-        setAuthReady(true);
       }
+      setAuthReady(true);
     });
 
     return unsubscribe;
@@ -149,8 +108,10 @@ export function AuthProvider({ children }) {
     const status = await getAccountStatus();
     const nextRole = status.role || token.claims.role || token.claims.userRole || "member";
     setRole(nextRole);
+    setSeller(status.seller);
     setUsername(status.username || "");
     setReferralCode(status.referralCode || "");
+    setAvatarUrl(credential.user.photoURL || "");
     setMpinSetup(status.mpinSetup);
     setPinVerified(readStoredPinVerified());
   };
@@ -174,7 +135,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, role, username, referralCode, pinVerified, mpinSetup, authReady, login, verifyPin, completeMpinSetup, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, role, seller, username, referralCode, avatarUrl, setAvatarUrl, pinVerified, mpinSetup, authReady, login, verifyPin, completeMpinSetup, logout }}>
       {children}
     </AuthContext.Provider>
   );

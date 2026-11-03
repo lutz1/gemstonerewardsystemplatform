@@ -7,7 +7,6 @@ import TopBar from "../../components/TopBar/TopBar";
 import { app } from "../../firebase";
 import { getTransactions } from "../../utils/TransactionsData";
 import "./PurchaseCodesPage.css";
-import ReferralActionsModal from "./ReferralActions/ReferralActionsModal";
 
 const BG_IMAGE = bgImage;
 
@@ -108,16 +107,10 @@ const referralHistory = [
 ];
 
 export default function PurchaseCodesPage() {
-  const { username, referralCode } = useAuth();
+  const { username } = useAuth();
   const [profile, setProfile] = useState(null);
   const [search, setSearch] = useState("");
   const [transactions] = useState(() => getTransactions());
-  const [copied, setCopied] = useState(false);
-  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
-  const referralIdentifier = referralCode || username;
-  const referralLink = referralIdentifier
-    ? `https://gemstonecode.store/register?ref=${encodeURIComponent(referralIdentifier)}`
-    : "";
   const activeReferrals = referralHistory.filter(
     (referral) => referral.purchased,
   ).length;
@@ -137,42 +130,6 @@ export default function PurchaseCodesPage() {
       c.id.toLowerCase().includes(search.toLowerCase()) ||
       c.tier.toLowerCase().includes(search.toLowerCase()),
   );
-
-  const handleCopyReferral = async () => {
-    try {
-      await navigator.clipboard.writeText(referralLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy referral link:", err);
-    }
-  };
-
-  const handleShareReferral = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Join Gemstone Code",
-          text: "Join me on Gemstone Code and get access to executive networking codes.",
-          url: referralLink,
-        });
-      } catch (err) {
-        // User cancelled the share sheet — nothing to do.
-      }
-    } else {
-      handleCopyReferral();
-    }
-  };
-
-  const handleInvite = () => setIsReferralModalOpen(true);
-
-  const handleRegisterMember = () => {
-    setIsReferralModalOpen(false);
-    const referralParam = referralIdentifier || "";
-    window.location.assign(
-      `/register${referralParam ? `?ref=${encodeURIComponent(referralParam)}` : ""}`,
-    );
-  };
 
   return (
     <div className="pc-root">
@@ -197,21 +154,6 @@ export default function PurchaseCodesPage() {
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="pc-main">
         <div className="pc-content">
-          {/* ── Direct referral ────────────────────────────── */}
-          <section className="pc-glass-panel pc-referral-box">
-            <label className="pc-referral-label">Direct Referral</label>
-            <p className="pc-referral-intro">
-              Share your link or register a new member yourself - both count
-              toward your referrals.
-            </p>
-            <button className="pc-invite-button" onClick={handleInvite}>
-              <span className="material-symbols-outlined" aria-hidden="true">
-                person_add
-              </span>
-              {copied ? "Referral Link Copied" : "Invite Gem Buddy"}
-            </button>
-          </section>
-
           <section className="pc-referral-summary">
             <div className="pc-glass-panel pc-reward-card">
               <p className="pc-referral-summary-label">Referral Rewards</p>
@@ -637,15 +579,6 @@ export default function PurchaseCodesPage() {
         </footer>
       </main>
       <BottomNav activeItem="codes" />
-      <ReferralActionsModal
-        isOpen={isReferralModalOpen}
-        referralLink={referralLink}
-        copied={copied}
-        onCopy={handleCopyReferral}
-        onShare={handleShareReferral}
-        onRegister={handleRegisterMember}
-        onClose={() => setIsReferralModalOpen(false)}
-      />
     </div>
   );
 }

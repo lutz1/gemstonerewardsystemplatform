@@ -318,9 +318,44 @@
   font-size: 14px;
 }
 
+.qr-order-free {
+  text-transform: uppercase;
+}
+
 .qr-review-fees {
   padding: 10px 0 2px;
   border-top: 1px solid rgba(61, 74, 65, 0.3);
+}
+
+.qr-delivery-review {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.qr-delivery-review h3 {
+  color: var(--on-surface);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+}
+
+.qr-delivery-review .qr-detail-rows {
+  padding: 8px 0;
+}
+
+.qr-delivery-review .qr-detail-row {
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.qr-delivery-review .qr-detail-value {
+  max-width: 65%;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.qr-delivery-review .qr-delivery-address {
+  line-height: 1.5;
 }
 
 .qr-review-meta {
@@ -675,6 +710,12 @@
 
 .qr-complete-btn:hover,
 .qr-merchant-btn:hover { opacity: 0.92; }
+
+.qr-complete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 
 .qr-complete-btn:active,
 .qr-merchant-btn:active { transform: scale(0.97); }

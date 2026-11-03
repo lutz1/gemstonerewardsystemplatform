@@ -1,0 +1,55 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /package-images/{packageId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.token.role == 'admin'
+        && request.resource.contentType.matches('image/.*')
+        && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    match /withdrawal-qr-codes/{userId}/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && (request.resource == null
+          || (request.resource.contentType.matches('image/(png|jpeg|webp)')
+            && request.resource.size <= 5 * 1024 * 1024));
+    }
+
+    match /profile-images/{userId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.contentType.matches('image/(jpeg|png|webp)')
+        && request.resource.size <= 5 * 1024 * 1024;
+    }
+
+    match /seller-applications/{userId}/{applicationId}/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && applicationId.matches('[0-9a-fA-F-]{36}')
+        && fileName.matches('(profilePhoto|storeLogo|businessCertificate|idFront|idBack|selfieWithId)')
+        && (request.resource == null
+          || (request.resource.contentType.matches('image/(jpeg|png|webp)|application/pdf')
+            && request.resource.size > 0
+            && request.resource.size <= 10 * 1024 * 1024));
+    }
+
+    match /seller-applications/{userId}/{applicationId}/updates/{uploadId}/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && applicationId.matches('[0-9a-fA-F-]{36}')
+        && uploadId.matches('[0-9a-fA-F-]{36}')
+        && fileName.matches('(profilePhoto|storeLogo|businessCertificate|idFront|idBack|selfieWithId)')
+        && (request.resource == null
+          || (request.resource.contentType.matches('image/(jpeg|png|webp)|application/pdf')
+            && request.resource.size > 0
+            && request.resource.size <= 10 * 1024 * 1024));
+    }
+  }
+}

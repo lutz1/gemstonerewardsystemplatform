@@ -1,0 +1,24 @@
+{
+  "name": "Gemstone Rewards",
+  "short_name": "Gemstone",
+  "description": "Gemstone Code executive networking portal",
+  "start_url": "/login",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0e1510",
+  "theme_color": "#0e1510",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

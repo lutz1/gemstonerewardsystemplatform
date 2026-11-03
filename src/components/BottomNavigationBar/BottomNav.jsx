@@ -3,10 +3,30 @@ import { Link } from "react-router-dom";
 import "./BottomNav.css";
 
 const memberNavItems = [
-  { key: "dashboard", icon: "dashboard", label: "Dashboard", to: "/dashboard" },
-  { key: "products", icon: "inventory_2", label: "Products", to: "/products" },
-  { key: "codes", icon: "qr_code_2", label: "Codes", to: "/purchase-codes" },
-  { key: "profile", icon: "person", label: "Profile", to: "/profile" },
+  {
+    key: "dashboard",
+    fontAwesomeIcon: "fa-solid fa-house",
+    label: "Home",
+    to: "/dashboard",
+  },
+  {
+    key: "products",
+    fontAwesomeIcon: "fa-solid fa-box-open",
+    label: "Packages",
+    to: "/products",
+  },
+  {
+    key: "codes",
+    fontAwesomeIcon: "fa-brands fa-shopify",
+    label: "Market Place",
+    to: "/store",
+  },
+  {
+    key: "profile",
+    fontAwesomeIcon: "fa-solid fa-circle-user",
+    label: "Profile",
+    to: "/profile",
+  },
 ];
 
 const adminNavItems = [
@@ -16,14 +36,14 @@ const adminNavItems = [
     label: "Dashboard",
     to: "/admin/dashboard",
   },
+  {
+    key: "packages",
+    icon: "inventory_2",
+    label: "Packages",
+    to: "/admin/packages",
+  },
   { key: "users", icon: "group", label: "User", to: "/admin/users" },
   { key: "profile", icon: "person", label: "Profile", to: "/admin/profile" },
-  {
-    key: "settings",
-    icon: "settings",
-    label: "Settings",
-    to: "/admin/settings",
-  },
 ];
 
 // How much shorter the visual viewport has to be than the layout viewport
@@ -171,12 +191,19 @@ export default function BottomNav({ activeItem, variant = "member" }) {
             aria-current={isActive ? "page" : undefined}
             tabIndex={isKeyboardOpen ? -1 : undefined}
           >
-            <span
-              className="material-symbols-outlined bn-icon"
-              style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
-            >
-              {item.icon}
-            </span>
+            {item.fontAwesomeIcon ? (
+              <i
+                className={`${item.fontAwesomeIcon} bn-icon`}
+                aria-hidden="true"
+              />
+            ) : (
+              <span
+                className="material-symbols-outlined bn-icon"
+                style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+              >
+                {item.icon}
+              </span>
+            )}
             <span className="bn-label">{item.label}</span>
           </Link>
         );

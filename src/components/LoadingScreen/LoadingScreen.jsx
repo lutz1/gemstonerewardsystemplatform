@@ -1,3 +1,4 @@
+import appLogo from "../../assets/app_logo.png";
 import "./LoadingScreen.css";
 
 /**
@@ -12,8 +13,12 @@ import "./LoadingScreen.css";
 export default function LoadingScreen({ label = "Loading..." }) {
   return (
     <div className="loading-screen" role="status" aria-live="polite">
-      <div className="loading-spinner" aria-hidden="true" />
-      <p className="loading-label">{label}</p>
+      <div className="loading-card">
+        <div className="loading-spinner" aria-hidden="true">
+          <img src={appLogo} alt="" />
+        </div>
+        <p className="loading-label">{label}</p>
+      </div>
     </div>
   );
 }

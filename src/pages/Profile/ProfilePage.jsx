@@ -1,15 +1,23 @@
-import { signOut } from "firebase/auth";
+import { sendEmailVerification, signOut, updateProfile } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import bgImage from "../../assets/bg_dashboard.jpg";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
+import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import TopBar from "../../components/TopBar/TopBar";
-import { app, auth } from "../../firebase";
+import { app, auth, storage } from "../../firebase";
+import { enablePushNotifications } from "../../utils/pushNotifications";
+import "../PurchaseCodes/PurchaseCodesPage.css";
+import ReferralActionsModal from "../PurchaseCodes/ReferralActions/ReferralActionsModal";
 import "./ProfilePage.css";
 
 const BG_IMAGE = bgImage;
+const EMAIL_VERIFICATION_URL = "https://gemstonecode.store/verify-email";
+const PROFILE_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
+const PROFILE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 const preferenceToggles = [
   {
@@ -92,6 +100,8 @@ function buildProfile(data, currentUser) {
     name,
     handle: data.username ? `@${data.username}` : "—",
     email: data.email || currentUser.email || "—",
+    avatarUrl: data.avatarUrl || data.photoURL || currentUser.photoURL || "",
+    emailVerified: data.emailVerified === true,
     phone: data.phone || "—",
     location: data.address || "—",
     memberSince: formatDate(data.joinDate || data.createdAt),
@@ -136,12 +146,31 @@ function buildProfile(data, currentUser) {
 }
 
 export default function ProfilePage() {
-  const { username } = useAuth();
+  const { username, referralCode, setAvatarUrl } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isSendingVerification, setIsSendingVerification] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState("");
+  const [isEnablingPush, setIsEnablingPush] = useState(false);
+  const [pushStatus, setPushStatus] = useState("");
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarUploadProgress, setAvatarUploadProgress] = useState(0);
+  const [avatarUploadStatus, setAvatarUploadStatus] = useState("");
+  const [avatarUploadError, setAvatarUploadError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const avatarInputRef = useRef(null);
+  const avatarUploadTaskRef = useRef(null);
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(
+    () => location.state?.openReferralModal === true,
+  );
+  const referralIdentifier = referralCode || username;
+  const referralLink = referralIdentifier
+    ? `https://gemstonecode.store/register?ref=${encodeURIComponent(referralIdentifier)}`
+    : "";
 
   useEffect(() => {
     const currentUser = auth.currentUser;
@@ -174,6 +203,8 @@ export default function ProfilePage() {
     };
   }, []);
 
+  useEffect(() => () => avatarUploadTaskRef.current?.cancel(), []);
+
   useEffect(() => {
     if (!showLogoutModal) return undefined;
 
@@ -197,7 +228,132 @@ export default function ProfilePage() {
     }
   };
 
+  const handleVerifyAccount = async () => {
+    if (profile.emailVerified || !auth.currentUser) return;
+
+    setIsSendingVerification(true);
+    setVerificationStatus("");
+    try {
+      await sendEmailVerification(auth.currentUser, {
+        url: EMAIL_VERIFICATION_URL,
+        handleCodeInApp: true,
+      });
+      setVerificationStatus("Verification email sent.");
+    } catch {
+      setVerificationStatus("Unable to send verification email.");
+    } finally {
+      setIsSendingVerification(false);
+    }
+  };
+
+  const handleAvatarUpload = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    setAvatarUploadStatus("");
+    setAvatarUploadError("");
+    if (!PROFILE_IMAGE_TYPES.includes(file.type)) {
+      setAvatarUploadError("Choose a JPG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > PROFILE_IMAGE_MAX_SIZE) {
+      setAvatarUploadError("Profile images must be 5 MB or smaller.");
+      return;
+    }
+
+    const currentUser = auth.currentUser;
+    if (!currentUser?.uid) {
+      setAvatarUploadError("Sign in again before changing your profile image.");
+      return;
+    }
+
+    avatarUploadTaskRef.current?.cancel();
+    setIsUploadingAvatar(true);
+    setAvatarUploadProgress(0);
+    const avatarRef = ref(storage, `profile-images/${currentUser.uid}/avatar`);
+    const uploadTask = uploadBytesResumable(avatarRef, file, {
+      contentType: file.type,
+    });
+    avatarUploadTaskRef.current = uploadTask;
+
+    try {
+      await new Promise((resolve, reject) => {
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            setAvatarUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100));
+          },
+          reject,
+          resolve,
+        );
+      });
+      const photoURL = await getDownloadURL(avatarRef);
+      await updateProfile(currentUser, { photoURL });
+      setAvatarUrl(photoURL);
+      setProfile((current) => ({ ...current, avatarUrl: photoURL }));
+      setAvatarUploadStatus("Profile photo updated.");
+    } catch (uploadError) {
+      if (uploadError?.code !== "storage/canceled") {
+        setAvatarUploadError(uploadError?.message || "Unable to upload your profile image.");
+      }
+    } finally {
+      avatarUploadTaskRef.current = null;
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleEnablePush = async () => {
+    setIsEnablingPush(true);
+    setPushStatus("");
+    try {
+      await enablePushNotifications();
+      setPushStatus("Push notifications are enabled on this device.");
+    } catch (error) {
+      setPushStatus(error?.message || "Unable to enable push notifications.");
+    } finally {
+      setIsEnablingPush(false);
+    }
+  };
+
+  const handleCopyReferral = async () => {
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const handleShareReferral = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Join Gemstone Code",
+          text: "Join me on Gemstone Code and get access to executive networking codes.",
+          url: referralLink,
+        });
+      } catch {
+        // User cancelled the share sheet.
+      }
+      return;
+    }
+    await handleCopyReferral();
+  };
+
+  const handleRegisterMember = () => {
+    setIsReferralModalOpen(false);
+    window.location.assign(
+      `/register${referralIdentifier ? `?ref=${encodeURIComponent(referralIdentifier)}` : ""}`,
+    );
+  };
+
   if (!profile) {
+    if (!profileError) {
+      return <LoadingScreen label="Loading profile..." />;
+    }
+
     return (
       <div className="prof-root">
         <div className="prof-bg" aria-hidden="true">
@@ -209,9 +365,7 @@ export default function ProfilePage() {
         <TopBar userName="Member" userRole="Member" />
         <main className="prof-main">
           <div className="prof-content">
-            <p role={profileError ? "alert" : "status"}>
-              {profileError || "Loading profile..."}
-            </p>
+            <p role="alert">{profileError}</p>
           </div>
         </main>
       </div>
@@ -231,7 +385,7 @@ export default function ProfilePage() {
       <div className="prof-glow prof-glow-bl" />
 
       {/* ── Top App Bar ──────────────────────────────────────── */}
-      <TopBar userName={profile.name} userRole={profile.tier} />
+      <TopBar userName={profile.name} userRole={profile.tier} avatarUrl={profile.avatarUrl} />
 
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="prof-main">
@@ -239,7 +393,37 @@ export default function ProfilePage() {
           {/* ── Identity hero ──────────────────────────────── */}
           <section className="prof-glass-panel prof-hero">
             <div className="prof-hero-identity">
-              <div className="prof-avatar">{profile.initials}</div>
+              <button
+                className="prof-avatar prof-avatar-button"
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={isUploadingAvatar}
+                aria-label={profile.avatarUrl ? "Change profile photo" : "Upload profile photo"}
+                title={profile.avatarUrl ? "Change profile photo" : "Upload profile photo"}
+              >
+                {profile.avatarUrl ? (
+                  <img className="prof-avatar-photo" src={profile.avatarUrl} alt={`${profile.name} profile`} />
+                ) : (
+                  <span>{profile.initials}</span>
+                )}
+                {isUploadingAvatar ? (
+                  <span className="prof-avatar-progress">{avatarUploadProgress}%</span>
+                ) : (
+                  <span className="material-symbols-outlined prof-avatar-camera" aria-hidden="true">
+                    photo_camera
+                  </span>
+                )}
+              </button>
+              <input
+                ref={avatarInputRef}
+                className="prof-avatar-file-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleAvatarUpload}
+                disabled={isUploadingAvatar}
+                tabIndex={-1}
+                aria-hidden="true"
+              />
               <div>
                 <div className="prof-name-row">
                   <h2 className="prof-name">{profile.name}</h2>
@@ -255,49 +439,48 @@ export default function ProfilePage() {
                 </p>
               </div>
             </div>
-            <button
-              className="prof-edit-btn"
-              type="button"
-              onClick={() => navigate("/edit-profile")}
+            <span
+              className={`prof-verification-badge${profile.emailVerified ? " is-verified" : " is-unverified"}`}
+              title={profile.emailVerified ? "Email verified" : "Email not verified"}
             >
-              <span className="material-symbols-outlined">edit</span>
-              Edit Profile
-            </button>
-          </section>
-
-          {/* ── Tier progress ──────────────────────────────── */}
-          <section className="prof-glass-panel prof-progress-card">
-            <div className="prof-progress-top">
-              <div>
-                <p className="prof-progress-label">Tier Progress</p>
-                <p className="prof-progress-title">
-                  {profile.currentTier}{" "}
-                  <span className="material-symbols-outlined prof-progress-arrow">
-                    arrow_forward
-                  </span>{" "}
-                  {profile.nextTier}
-                </p>
-              </div>
-              <p className="prof-progress-remaining">
-                <span className="material-symbols-outlined prof-progress-diamond">
-                  diamond
+              <span className="material-symbols-outlined" aria-hidden="true">
+                {profile.emailVerified ? "verified" : "warning"}
+              </span>
+              {profile.emailVerified ? "Verified" : "Unverified"}
+            </span>
+            <div className="prof-hero-actions">
+              <button
+                className="prof-verify-btn"
+                type="button"
+                onClick={handleVerifyAccount}
+                disabled={profile.emailVerified || isSendingVerification}
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  {profile.emailVerified ? "verified" : "mark_email_read"}
                 </span>
-                {profile.gemsToNext == null
-                  ? "—"
-                  : `${Number(profile.gemsToNext).toLocaleString()} GEMS to go`}
-              </p>
+                {isSendingVerification ? "Sending..." : "Verify Account"}
+              </button>
+              <button
+                className="prof-edit-btn"
+                type="button"
+                onClick={() => navigate("/edit-profile")}
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">edit</span>
+                Edit Profile
+              </button>
             </div>
-            <div className="prof-progress-track">
-              <div
-                className="prof-progress-fill"
-                style={{ width: `${profile.progressPercent}%` }}
-              />
-            </div>
-            <p className="prof-progress-caption">
-              Reach {profile.nextTier} to unlock priority code drops and higher
-              batch limits.
-            </p>
           </section>
+          {avatarUploadStatus && (
+            <p className="prof-avatar-upload-message" role="status">{avatarUploadStatus}</p>
+          )}
+          {avatarUploadError && (
+            <p className="prof-avatar-upload-message is-error" role="alert">{avatarUploadError}</p>
+          )}
+          {verificationStatus && (
+            <p className="prof-verification-status" role="status">
+              {verificationStatus}
+            </p>
+          )}
 
           {/* ── Quick stats ────────────────────────────────── */}
           <section className="prof-stats-grid">
@@ -312,6 +495,25 @@ export default function ProfilePage() {
                 </div>
               </div>
             ))}
+          </section>
+
+          {/* ── Direct referral ────────────────────────────── */}
+          <section className="pc-glass-panel pc-referral-box prof-referral-box">
+            <label className="pc-referral-label">Direct Referral</label>
+            <p className="pc-referral-intro">
+              Share your link or register a new member yourself - both count
+              toward your referrals.
+            </p>
+            <button
+              className="pc-invite-button"
+              type="button"
+              onClick={() => setIsReferralModalOpen(true)}
+            >
+              <span className="material-symbols-outlined" aria-hidden="true">
+                person_add
+              </span>
+              {copied ? "Referral Link Copied" : "Invite Gem Buddy"}
+            </button>
           </section>
 
           {/* ── Account details ────────────────────────────── */}
@@ -386,6 +588,33 @@ export default function ProfilePage() {
             </div>
           </section>
 
+          <section className="prof-glass-panel prof-panel">
+            <div className="prof-panel-header">
+              <h3 className="prof-panel-title">Push Notifications</h3>
+              <p className="prof-panel-sub">
+                Enable payment updates on this device. This does not make a purchase.
+              </p>
+            </div>
+            <div className="prof-security-row">
+              <div className="prof-security-icon">
+                <span className="material-symbols-outlined" aria-hidden="true">notifications_active</span>
+              </div>
+              <div className="prof-security-info">
+                <p className="prof-security-label">This device</p>
+                <p className="prof-security-caption">Allow browser notifications to receive payment confirmations.</p>
+              </div>
+              <button
+                className="prof-outline-btn"
+                type="button"
+                onClick={handleEnablePush}
+                disabled={isEnablingPush}
+              >
+                {isEnablingPush ? "Enabling..." : "Enable"}
+              </button>
+            </div>
+            {pushStatus && <p className="prof-verification-status" role="status">{pushStatus}</p>}
+          </section>
+
           {/* ── Danger zone ─────────────────────────────────── */}
           <section className="prof-glass-panel prof-danger-panel">
             <div>
@@ -426,6 +655,16 @@ export default function ProfilePage() {
         </footer>
       </main>
       <BottomNav activeItem="profile" />
+
+      <ReferralActionsModal
+        isOpen={isReferralModalOpen}
+        referralLink={referralLink}
+        copied={copied}
+        onCopy={handleCopyReferral}
+        onShare={handleShareReferral}
+        onRegister={handleRegisterMember}
+        onClose={() => setIsReferralModalOpen(false)}
+      />
 
       {showLogoutModal && (
         <div

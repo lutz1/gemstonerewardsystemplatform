@@ -1,0 +1,840 @@
+.seller-management-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  background: #f3f5fb;
+  color: #172541;
+  font-family: var(--font-hanken, Arial, sans-serif);
+}
+
+.seller-management-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  min-height: calc(48px + env(safe-area-inset-top, 0px));
+  align-items: center;
+  padding:
+    env(safe-area-inset-top, 0px)
+    max(10px, env(safe-area-inset-right, 0px))
+    0
+    max(10px, env(safe-area-inset-left, 0px));
+  color: #fff;
+  background: linear-gradient(135deg, #082755, #123f87);
+  box-shadow: 0 2px 8px rgba(8, 39, 85, 0.18);
+}
+
+.seller-management-header > a {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: #fff;
+  text-decoration: none;
+}
+
+.seller-management-header > a .material-symbols-outlined {
+  font-size: 24px;
+}
+
+.seller-management-header h1 {
+  margin: 0;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.seller-management-content {
+  display: grid;
+  width: min(100%, 680px);
+  gap: 12px;
+  margin: 0 auto;
+  padding: 14px 12px 24px;
+}
+
+.seller-management-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.seller-management-summary-card {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid #e7ebf2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(26, 47, 83, 0.05);
+}
+
+.seller-management-summary-card-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.seller-management-summary-card-heading > .material-symbols-outlined {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 16px;
+}
+
+.seller-management-summary-tag {
+  overflow: hidden;
+  padding: 4px 7px;
+  border-radius: 12px;
+  font-size: 8px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-management-summary-card > p {
+  margin: 3px 0 0;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.seller-management-summary-card > strong {
+  color: #172541;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.seller-management-summary-card.is-active {
+  border-color: #e1eee8;
+}
+
+.seller-management-summary-card.is-active .material-symbols-outlined {
+  color: #03966a;
+  background: #e7faf3;
+}
+
+.seller-management-summary-card.is-active .seller-management-summary-tag {
+  color: #07875d;
+  background: #e1f8ef;
+}
+
+.seller-management-summary-card.is-active > p {
+  color: #728078;
+}
+
+.seller-management-summary-card.is-suspended {
+  border-color: #f7dddd;
+}
+
+.seller-management-summary-card.is-suspended .material-symbols-outlined {
+  color: #e11d48;
+  background: #fff0f2;
+}
+
+.seller-management-summary-card.is-suspended .seller-management-summary-tag {
+  color: #e11d48;
+  background: #fff0f2;
+}
+
+.seller-management-summary-card.is-suspended > p {
+  color: #e11d48;
+}
+
+.seller-management-summary-card.is-inactive .material-symbols-outlined {
+  color: #65748b;
+  background: #eef2f7;
+}
+
+.seller-management-summary-card.is-inactive .seller-management-summary-tag {
+  color: #65748b;
+  background: #eef2f7;
+}
+
+.seller-management-summary-card.is-inactive > p {
+  color: #718096;
+}
+
+.seller-management-search-container {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 40px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px 0 11px;
+  border: 1px solid #e0e6f2;
+  border-radius: 12px;
+  color: #77859d;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(26, 47, 83, 0.03);
+}
+
+.seller-management-search {
+  display: flex;
+  min-width: 0;
+  min-height: 38px;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+}
+
+.seller-management-search .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.seller-management-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #172541;
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+}
+
+.seller-management-search input::placeholder {
+  color: #91a0b7;
+}
+
+.seller-management-filter-button {
+  position: relative;
+  display: grid;
+  width: 34px;
+  height: 32px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  color: #52627c;
+  background: #f0f3f8;
+  cursor: pointer;
+}
+
+.seller-management-filter-button .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.seller-management-filter-button.has-filter::after {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: #1762d5;
+  content: "";
+}
+
+.seller-management-filter-button:focus-visible,
+.seller-management-filter-option:focus-within {
+  outline: 2px solid #1762d5;
+  outline-offset: 2px;
+}
+
+.seller-management-filter-menu {
+  position: absolute;
+  z-index: 15;
+  top: calc(100% + 6px);
+  right: 0;
+  width: min(220px, calc(100vw - 24px));
+  padding: 5px;
+  border: 1px solid #e0e6f2;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(19, 42, 78, 0.16);
+}
+
+.seller-management-filter-option {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 16px;
+  min-height: 37px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  border-radius: 7px;
+  color: #34445e;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.seller-management-filter-option:hover {
+  background: #f4f7fb;
+}
+
+.seller-management-filter-option input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #1762d5;
+}
+
+.seller-management-filter-option > .material-symbols-outlined {
+  color: #1762d5;
+  font-size: 16px;
+}
+
+.seller-management-filter-row {
+  display: grid;
+  grid-template-columns: minmax(125px, 1.25fr) minmax(98px, 0.85fr) minmax(105px, 0.9fr);
+  gap: 7px;
+}
+
+.seller-management-select-filter,
+.seller-management-date-filter > button {
+  display: flex;
+  min-width: 0;
+  min-height: 34px;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  border: 1px solid #e0e6f2;
+  border-radius: 9px;
+  color: #243650;
+  background: #fff;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.seller-management-select-filter > .material-symbols-outlined,
+.seller-management-date-filter > button > .material-symbols-outlined {
+  flex: 0 0 auto;
+  color: #74839b;
+  font-size: 14px;
+}
+
+.seller-management-select-filter select {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: #142c51;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+.seller-management-select-filter .seller-management-filter-chevron {
+  margin-left: auto;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.seller-management-date-filter {
+  position: relative;
+  min-width: 0;
+}
+
+.seller-management-date-filter > button {
+  width: 100%;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.seller-management-date-filter > button.has-filter {
+  border-color: #9ab9eb;
+  color: #1456ad;
+}
+
+.seller-management-date-filter > button:focus-visible,
+.seller-management-select-filter:focus-within {
+  outline: 2px solid #1762d5;
+  outline-offset: 2px;
+}
+
+.seller-management-date-menu {
+  position: absolute;
+  z-index: 15;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  width: min(230px, calc(100vw - 24px));
+  gap: 9px;
+  padding: 11px;
+  border: 1px solid #e0e6f2;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(19, 42, 78, 0.16);
+}
+
+.seller-management-date-menu > label {
+  display: grid;
+  gap: 4px;
+  color: #52627c;
+  font-size: 10px;
+}
+
+.seller-management-date-menu input {
+  width: 100%;
+  min-height: 33px;
+  padding: 0 7px;
+  border: 1px solid #e0e6f2;
+  border-radius: 7px;
+  color: #243650;
+  background: #fff;
+  font: inherit;
+}
+
+.seller-management-date-clear {
+  justify-self: start;
+  padding: 3px 0;
+  border: 0;
+  color: #1456ad;
+  background: transparent;
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.seller-management-status-filters {
+  display: flex;
+  min-width: 0;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 1px 1px 4px;
+  scrollbar-width: none;
+}
+
+.seller-management-status-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.seller-management-status-filter {
+  display: inline-flex;
+  min-height: 31px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border: 1px solid #e3e9f2;
+  border-radius: 18px;
+  color: #47566e;
+  background: #fff;
+  font: inherit;
+  font-size: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.seller-management-status-filter strong {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.seller-management-status-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: #95a3b8;
+}
+
+.seller-management-status-filter.is-active .seller-management-status-dot {
+  background: #08b783;
+}
+
+.seller-management-status-filter.is-suspended .seller-management-status-dot {
+  background: #fa4165;
+}
+
+.seller-management-status-filter.is-inactive .seller-management-status-dot {
+  background: #95a3b8;
+}
+
+.seller-management-status-filter.is-selected {
+  border-color: #102a5c;
+  color: #fff;
+  background: #102a5c;
+}
+
+.seller-management-status-filter:focus-visible {
+  outline: 2px solid #1762d5;
+  outline-offset: 2px;
+}
+
+.seller-management-list {
+  display: grid;
+  gap: 9px;
+}
+
+.seller-management-card {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #dce8e7;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(26, 61, 71, 0.1);
+}
+
+.seller-management-avatar {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(145deg, #3048db, #2938b9);
+  box-shadow: 0 3px 7px rgba(44, 64, 194, 0.22);
+}
+
+.seller-management-avatar .material-symbols-outlined {
+  font-size: 21px;
+}
+
+.seller-management-card-content {
+  min-width: 0;
+}
+
+.seller-management-card-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.seller-management-card-heading h2 {
+  overflow: hidden;
+  margin: 0;
+  color: #1c2639;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-management-id {
+  overflow: hidden;
+  max-width: 180px;
+  margin: 2px 0 0;
+  color: #94a0b3;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-management-owner,
+.seller-management-contact {
+  overflow-wrap: anywhere;
+  margin: 3px 0 0;
+  color: #66748c;
+  font-size: 10px;
+}
+
+.seller-management-owner {
+  color: #52617a;
+  font-weight: 600;
+}
+
+.seller-management-contact {
+  margin-top: 2px;
+}
+
+.seller-management-status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.seller-management-status.is-active {
+  border-color: #c8f3e2;
+  color: #07875d;
+  background: #ecfbf5;
+}
+
+.seller-management-status.is-suspended {
+  border-color: #ffd2da;
+  color: #c72c49;
+  background: #fff2f4;
+}
+
+.seller-management-status.is-inactive {
+  border-color: #dce3ed;
+  color: #65748b;
+  background: #f3f5f8;
+}
+
+.seller-management-status > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.seller-management-category {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 5px 9px;
+  border: 1px solid #dceaff;
+  border-radius: 7px;
+  color: #2458b7;
+  background: #f2f7ff;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-management-card-divider {
+  height: 1px;
+  margin: 11px 0 9px;
+  background: #eef1f5;
+}
+
+.seller-management-card-details {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.seller-management-date {
+  margin: 0;
+  color: #64728a;
+  font-size: 9px;
+  text-align: right;
+}
+
+.seller-management-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.seller-management-card-status {
+  position: relative;
+  display: flex;
+  min-height: 30px;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  overflow: hidden;
+  padding: 8px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  color: #4a5870;
+  background: #f8fafc;
+  font-size: 9px;
+  text-transform: capitalize;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.seller-management-card-status-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seller-management-card-status.is-active strong {
+  color: #07875d;
+}
+
+.seller-management-card-status.is-suspended strong {
+  color: #c72c49;
+}
+
+.seller-management-card-status.is-inactive strong {
+  color: #65748b;
+}
+
+.seller-management-card-status select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.seller-management-card-status select:disabled {
+  cursor: wait;
+}
+
+.seller-management-card-status > .material-symbols-outlined {
+  flex: 0 0 auto;
+  color: #65748b;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.seller-management-action-error {
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid #ffd2da;
+  border-radius: 9px;
+  color: #a8203a;
+  background: #fff2f4;
+  font-size: 10px;
+}
+
+.seller-management-no-profile {
+  color: #8490a5;
+  font-size: 9px;
+}
+
+.seller-management-application-link {
+  display: inline-flex;
+  min-height: 30px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 16px;
+  color: #3c43d2;
+  background: #f0f0ff;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.seller-management-application-link .material-symbols-outlined {
+  font-size: 13px;
+}
+
+.seller-management-state {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 30px 16px;
+  border: 1px solid #e3e9f2;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+}
+
+.seller-management-state > .material-symbols-outlined {
+  color: #3978e3;
+  font-size: 30px;
+}
+
+.seller-management-state h2 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.seller-management-state p {
+  margin: 0;
+  color: #66748c;
+  font-size: 11px;
+}
+
+.seller-management-state button {
+  min-height: 32px;
+  margin-top: 4px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  color: #fff;
+  background: #1762d5;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.seller-management-bottom-nav {
+  position: fixed;
+  z-index: 20;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  min-height: 58px;
+  padding: 5px max(8px, calc((100% - 720px) / 2)) max(5px, env(safe-area-inset-bottom));
+  border-top: 1px solid #e5eaf2;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 -3px 12px rgba(19, 42, 78, 0.06);
+}
+
+.seller-management-bottom-nav > a,
+.seller-management-bottom-nav > button {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 1px;
+  border: 0;
+  color: #8490a5;
+  background: transparent;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.seller-management-applications-badge {
+  position: absolute;
+  top: 2px;
+  left: calc(50% + 5px);
+  display: grid !important;
+  min-width: 16px;
+  height: 16px;
+  place-items: center;
+  margin: 0 !important;
+  padding: 0 4px;
+  border: 1px solid #fff;
+  border-radius: 9px;
+  color: #fff;
+  background: #f04452;
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.seller-management-bottom-nav .material-symbols-outlined {
+  font-size: 19px;
+  font-variation-settings: "FILL" 1;
+}
+
+.seller-management-bottom-nav small {
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.seller-management-bottom-nav > .is-active {
+  color: #1762d5;
+}
+
+.seller-management-header > a:focus-visible,
+.seller-management-application-link:focus-visible,
+.seller-management-bottom-nav > a:focus-visible,
+.seller-management-bottom-nav > button:focus-visible {
+  outline: 2px solid #1762d5;
+  outline-offset: 2px;
+}
+
+@media (min-width: 700px) {
+  .seller-management-content {
+    gap: 14px;
+    padding: 18px 14px 30px;
+  }
+
+  .seller-management-card {
+    padding: 14px;
+  }
+}

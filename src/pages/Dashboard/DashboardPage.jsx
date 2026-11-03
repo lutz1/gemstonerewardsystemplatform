@@ -1,16 +1,16 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import {
-    MdAccountBalanceWallet,
-    MdArrowForward,
-    MdCampaign,
-    MdChevronRight,
-    MdContentCopy,
-    MdDiamond,
-    MdHub,
-    MdPersonAdd,
-    MdReceiptLong,
-    MdSwapHoriz,
+  MdAccountBalanceWallet,
+  MdArrowForward,
+  MdCampaign,
+  MdChevronRight,
+  MdContentCopy,
+  MdDiamond,
+  MdHub,
+  MdPersonAdd,
+  MdReceiptLong,
+  MdSwapHoriz,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import bgImage from "../../assets/bg_dashboard.jpg";
@@ -18,6 +18,7 @@ import emeraldIcon from "../../assets/emerald_icon.png";
 import gemVideo from "../../assets/gemvideo.mp4";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav.jsx";
 import GemValueChart from "../../components/GemValueChart/GemValueChart.jsx";
+import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import TopBar from "../../components/TopBar/TopBar.jsx";
 import { app } from "../../firebase";
 import "./DashboardPage.css";
@@ -51,6 +52,27 @@ export default function Dashboard() {
   const [dashboardError, setDashboardError] = useState("");
   const [showInviteTooltip, setShowInviteTooltip] = useState(false);
   const [walletCopied, setWalletCopied] = useState(false);
+  const [transactionPage, setTransactionPage] = useState(1);
+
+  const transactions = [
+    ...(dashboard?.recentTransactions || []),
+    ...(dashboard?.gemTransactions || []),
+  ].sort(
+    (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
+  );
+  const transactionPageSize = 5;
+  const transactionPageCount = Math.max(
+    1,
+    Math.ceil(transactions.length / transactionPageSize),
+  );
+  const currentTransactionPage = Math.min(
+    transactionPage,
+    transactionPageCount,
+  );
+  const visibleTransactions = transactions.slice(
+    (currentTransactionPage - 1) * transactionPageSize,
+    currentTransactionPage * transactionPageSize,
+  );
 
   useEffect(() => {
     const getUserDashboard = httpsCallable(
@@ -111,23 +133,21 @@ export default function Dashboard() {
 
       <div className="dash-content">
         {!dashboard ? (
-          <p role={dashboardError ? "alert" : "status"}>
-            {dashboardError || "Loading dashboard..."}
-          </p>
+          dashboardError ? (
+            <p role="alert">{dashboardError}</p>
+          ) : (
+            <LoadingScreen label="Loading dashboard..." />
+          )
         ) : (
           <>
             {/* Welcome */}
             <div className="dash-welcome">
-              <p className="dash-eyebrow">Dashboard Overview</p>
+              <p className="dash-eyebrow">Member Overview</p>
               <h1 className="dash-hello">
                 Hello, {dashboard.name || "Member"}
               </h1>
               <p className="dash-welcome-sub">
-                Welcome back to your member portal. Your network expanded by{" "}
-                <span className="dash-highlight">
-                  {displayPercent(dashboard.networkGrowthPercent)}
-                </span>{" "}
-                this week.
+                Welcome back to your member portal. Here’s a quick look at your latest activities and benefits.
               </p>
             </div>
 
@@ -239,7 +259,7 @@ export default function Dashboard() {
                   <MdPersonAdd size={20} color="var(--color-primary)" />
                 </div>
                 <div>
-                  <p className="dash-stat-mini-label">DIRECT GEM REWARD</p>
+                  <p className="dash-stat-mini-label">Referred Members</p>
                   <p className="dash-stat-mini-value">
                     {displayNumber(dashboard.directReferrals)}
                   </p>
@@ -263,7 +283,7 @@ export default function Dashboard() {
                   <MdHub size={20} color="var(--color-secondary)" />
                 </div>
                 <div>
-                  <p className="dash-stat-mini-label">NETWORK</p>
+                  <p className="dash-stat-mini-label">Community Members</p>
                   <p className="dash-stat-mini-value">
                     {displayNumber(dashboard.networkReferrals)}
                   </p>
@@ -275,7 +295,7 @@ export default function Dashboard() {
             is where the referral link itself lives. */}
             <button
               className="dash-glass-card dash-referral-card"
-              onClick={() => navigate("/purchase-codes")}
+              onClick={() => navigate("/profile", { state: { openReferralModal: true } })}
             >
               <div className="dash-referral-inner">
                 <div className="dash-referral-icon-wrap">
@@ -284,7 +304,7 @@ export default function Dashboard() {
                 <div className="dash-referral-text">
                   <p className="dash-referral-title">Invite Friends</p>
                   <p className="dash-referral-sub">
-                    Earn Gems if your friends sign up and purchase
+                    Share your invitation and receive member rewards when your friends join.
                   </p>
                 </div>
               </div>
@@ -308,19 +328,9 @@ export default function Dashboard() {
             {/* Transaction summary */}
             <h2 className="dash-insights-title">Transaction Logs Summary</h2>
             <div className="dash-glass-card dash-insights-card">
-              {[
-                ...(dashboard.recentTransactions || []),
-                ...(dashboard.gemTransactions || []),
-              ].length ? (
-                [
-                  ...(dashboard.recentTransactions || []),
-                  ...(dashboard.gemTransactions || []),
-                ]
-                  .sort(
-                    (a, b) =>
-                      new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
-                  )
-                  .map((transaction) => (
+              {transactions.length ? (
+                <>
+                  {visibleTransactions.map((transaction) => (
                     <div className="dash-insight-row" key={transaction.id}>
                       <img
                         src={emeraldIcon}
@@ -340,7 +350,29 @@ export default function Dashboard() {
                         {formatTransactionAmount(transaction)}
                       </strong>
                     </div>
-                  ))
+                  ))}
+                  <div className="dash-transaction-pagination">
+                    <button
+                      type="button"
+                      onClick={() => setTransactionPage((page) => page - 1)}
+                      disabled={currentTransactionPage === 1}
+                      aria-label="Previous transaction page"
+                    >
+                      Previous
+                    </button>
+                    <span>
+                      Page {currentTransactionPage} of {transactionPageCount}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setTransactionPage((page) => page + 1)}
+                      disabled={currentTransactionPage === transactionPageCount}
+                      aria-label="Next transaction page"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </>
               ) : (
                 <p className="dash-insight-empty">No transactions yet.</p>
               )}

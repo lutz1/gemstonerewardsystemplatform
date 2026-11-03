@@ -1,0 +1,944 @@
+.seller-application-root {
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color: #152341;
+  background: #f2f5fb;
+  font-family: "Hanken Grotesk", sans-serif;
+}
+
+.seller-application-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  min-height: calc(52px + env(safe-area-inset-top, 0px));
+  padding:
+    env(safe-area-inset-top, 0px)
+    max(12px, env(safe-area-inset-right, 0px))
+    0
+    max(12px, env(safe-area-inset-left, 0px));
+  color: #fff;
+  background: linear-gradient(135deg, #071b40, #123b77);
+}
+
+.seller-application-header h1 {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.seller-application-back {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.seller-application-back .material-symbols-outlined {
+  font-size: 21px;
+}
+
+.seller-application-content {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 23px 20px 46px;
+}
+
+.seller-application-progress {
+  margin-bottom: 25px;
+}
+
+.seller-application-progress-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #53627a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.seller-application-progress-copy span:last-child {
+  color: #8793a7;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.seller-application-progress-track {
+  height: 5px;
+  overflow: hidden;
+  margin-top: 9px;
+  border-radius: 99px;
+  background: #dce4ef;
+}
+
+.seller-application-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #1762d5;
+  transition: width 180ms ease;
+}
+
+.seller-application-step-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 15px;
+  list-style: none;
+}
+
+.seller-application-step-list li {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  color: #8793a7;
+  text-align: center;
+}
+
+.seller-application-step-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid #dce4ef;
+  border-radius: 50%;
+  color: #8793a7;
+  background: #fff;
+}
+
+.seller-application-step-icon .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.seller-application-step-title {
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.seller-application-step-list li.is-current {
+  color: #1555b0;
+}
+
+.seller-application-step-list li.is-current .seller-application-step-icon,
+.seller-application-step-list li.is-complete .seller-application-step-icon {
+  border-color: #1762d5;
+  color: #fff;
+  background: #1762d5;
+}
+
+.seller-application-step-list li.is-current .seller-application-step-title {
+  font-weight: 800;
+}
+
+.seller-application-intro {
+  margin-bottom: 21px;
+  text-align: center;
+}
+
+.seller-application-intro > .material-symbols-outlined {
+  color: #1762d5;
+  font-size: 36px;
+  font-variation-settings: "FILL" 1;
+}
+
+.seller-application-intro h2,
+.seller-application-success h2 {
+  margin-top: 7px;
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.seller-application-intro p,
+.seller-application-success p {
+  max-width: 380px;
+  margin: 7px auto 0;
+  color: #68758d;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.seller-application-form {
+  display: grid;
+  gap: 20px;
+}
+
+.seller-application-account-types {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+  border: 0;
+}
+
+.seller-application-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.seller-application-account-option {
+  position: relative;
+  display: grid;
+  min-height: 91px;
+  grid-template-columns: 34px 1fr;
+  align-content: center;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 13px;
+  border: 1px solid #dce4ef;
+  border-radius: 12px;
+  color: #53627a;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-application-account-option.is-selected {
+  border-color: #1762d5;
+  color: #173b73;
+  background: #f2f7ff;
+  box-shadow: 0 0 0 1px rgba(23, 98, 213, 0.1);
+}
+
+.seller-application-account-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.seller-application-account-option > .material-symbols-outlined:first-of-type {
+  grid-row: span 2;
+  color: #1762d5;
+  font-size: 25px;
+}
+
+.seller-application-option-check {
+  display: none;
+  grid-column: 2;
+  color: #1762d5;
+  font-size: 16px;
+}
+
+.seller-application-account-option.is-selected .seller-application-option-check {
+  display: none;
+}
+
+.seller-application-account-option:focus-within {
+  outline: 2px solid #1762d5;
+  outline-offset: 2px;
+}
+
+.seller-application-form-section {
+  display: grid;
+  gap: 13px;
+  padding: 18px;
+  border: 1px solid #e3eaf4;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(19, 42, 78, 0.04);
+}
+
+.seller-application-form-section h3 {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9eef5;
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.seller-application-form-section label {
+  display: grid;
+  gap: 6px;
+  color: #425675;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.seller-application-business-type {
+  display: grid;
+  gap: 9px;
+  padding: 0;
+  border: 0;
+}
+
+.seller-application-business-type legend,
+.seller-application-business-fields h4 {
+  margin-bottom: 2px;
+  color: #425675;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.seller-application-business-type label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 12px;
+  border: 1px solid #dce4ef;
+  border-radius: 8px;
+  background: #f8faff;
+  cursor: pointer;
+}
+
+.seller-application-form-section .seller-application-business-type input[type="radio"] {
+  width: 17px;
+  min-height: 17px;
+  flex: 0 0 17px;
+  margin: 0;
+  padding: 0;
+  accent-color: #1762d5;
+}
+
+.seller-application-business-fields {
+  display: grid;
+  gap: 13px;
+}
+
+.seller-application-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.seller-application-fields-grid .seller-application-field-full {
+  grid-column: 1 / -1;
+}
+
+.seller-application-upload-preview {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  padding: 8px;
+  border: 1px solid #dce4ef;
+  border-radius: 10px;
+  background: #f8faff;
+}
+
+.seller-application-optional {
+  color: #8793a7;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.seller-application-section-description {
+  margin-top: -5px;
+  color: #68758d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.seller-application-field-error {
+  color: #a44c24;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.seller-application-form-section input,
+.seller-application-form-section select,
+.seller-application-form-section textarea {
+  width: 100%;
+  min-height: 43px;
+  padding: 10px 12px;
+  border: 1px solid #dce4ef;
+  border-radius: 8px;
+  outline-color: #1762d5;
+  color: #152341;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.seller-application-form-section input[type="email"] {
+  text-transform: none;
+}
+
+.seller-application-form-section textarea {
+  min-height: 78px;
+  resize: vertical;
+}
+
+.seller-application-form-section input::placeholder,
+.seller-application-form-section textarea::placeholder {
+  color: #8793a7;
+}
+
+.seller-application-submit,
+.seller-application-success button {
+  display: flex;
+  min-height: 47px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 1px;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  background: #1762d5;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-application-submit:hover,
+.seller-application-success button:hover {
+  background: #124fae;
+}
+
+.seller-application-submit:disabled {
+  color: #71809a;
+  background: #dce4ef;
+  cursor: not-allowed;
+}
+
+.seller-application-submit:disabled:hover {
+  background: #dce4ef;
+}
+
+.seller-application-previous:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.seller-application-submit .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.seller-application-spinner {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: seller-application-spin 700ms linear infinite;
+}
+
+@keyframes seller-application-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.seller-application-note {
+  margin-top: -13px;
+  color: #68758d;
+  font-size: 11px;
+  text-align: center;
+}
+
+.seller-application-actions {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+}
+
+.seller-application-actions.is-first-step {
+  grid-template-columns: 1fr;
+}
+
+.seller-application-submit {
+  width: 100%;
+}
+
+.seller-application-review-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.seller-application-review-actions > button {
+  min-width: 0;
+  min-height: 47px;
+  padding: 7px 9px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.seller-application-review-note {
+  margin-top: 0;
+  line-height: 1.45;
+}
+
+.seller-application-previous {
+  display: flex;
+  min-height: 47px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 15px;
+  border: 1px solid #cbd7e8;
+  border-radius: 9px;
+  color: #425675;
+  background: #fff;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-application-previous .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.seller-application-character-count {
+  justify-self: end;
+  margin-top: -2px;
+  color: #8793a7;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.seller-application-declaration-copy {
+  color: #53627a;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.seller-application-form-section .seller-application-declaration {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid #dce4ef;
+  border-radius: 9px;
+  color: #425675;
+  background: #f8faff;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.seller-application-declaration input {
+  width: 18px;
+  min-height: 18px;
+  flex: 0 0 18px;
+  margin-top: 1px;
+  accent-color: #1762d5;
+}
+
+.seller-application-review {
+  padding: 17px;
+  border: 1px solid #e3eaf4;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.seller-application-review h3 {
+  margin-bottom: 12px;
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.seller-application-review dl {
+  display: grid;
+  gap: 10px;
+}
+
+.seller-application-review dl > div {
+  display: grid;
+  grid-template-columns: minmax(100px, 0.7fr) 1.3fr;
+  gap: 12px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #e9eef5;
+}
+
+.seller-application-review dl > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.seller-application-review dt {
+  color: #68758d;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.seller-application-review dd {
+  overflow-wrap: anywhere;
+  color: #23395f;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.seller-application-notice {
+  padding: 12px 14px;
+  border: 1px solid #cfe7d8;
+  border-radius: 9px;
+  color: #15583b;
+  background: #eaf7ef;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.seller-application-error {
+  padding: 12px 14px;
+  border: 1px solid #f0c8bf;
+  border-radius: 9px;
+  color: #8d3022;
+  background: #fff1ed;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.seller-application-success-view {
+  position: relative;
+  display: grid;
+  min-height: calc(100svh - 52px);
+  align-content: center;
+  justify-items: center;
+  gap: 14px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.seller-application-success-view h2 {
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.seller-application-success-view > p {
+  max-width: 380px;
+  color: #68758d;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.seller-application-success-view .seller-application-reference {
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+
+.seller-application-success-view .seller-application-submit {
+  width: 100%;
+  max-width: 340px;
+  margin-top: 10px;
+}
+
+.seller-application-success-check {
+  width: 92px;
+  height: 92px;
+  animation: seller-application-success-pop 450ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.seller-application-success-check svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.seller-application-success-check circle,
+.seller-application-success-check path {
+  fill: none;
+  stroke: #08734f;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.seller-application-success-check circle {
+  fill: #e3f5e9;
+  stroke-width: 3;
+  stroke-dasharray: 182;
+  stroke-dashoffset: 182;
+  animation: seller-application-circle-draw 600ms 100ms ease-out forwards;
+}
+
+.seller-application-success-check path {
+  stroke: #08734f;
+  stroke-width: 5;
+  stroke-dasharray: 42;
+  stroke-dashoffset: 42;
+  animation: seller-application-check-draw 350ms 550ms ease-out forwards;
+}
+
+@keyframes seller-application-success-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes seller-application-circle-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes seller-application-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.seller-application-confetti {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 240px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.seller-application-confetti span {
+  position: absolute;
+  top: -12px;
+  left: var(--confetti-left);
+  width: 8px;
+  height: 13px;
+  border-radius: 2px;
+  background: var(--confetti-color);
+  animation: seller-application-confetti-fall 1.8s var(--confetti-delay) ease-in both;
+}
+
+.seller-application-confetti span:nth-child(1) { --confetti-left: 6%; --confetti-color: #e8ba51; --confetti-delay: 0ms; --confetti-drift: -18px; }
+.seller-application-confetti span:nth-child(2) { --confetti-left: 15%; --confetti-color: #078355; --confetti-delay: 110ms; --confetti-drift: 22px; }
+.seller-application-confetti span:nth-child(3) { --confetti-left: 24%; --confetti-color: #e86c6e; --confetti-delay: 50ms; --confetti-drift: -12px; }
+.seller-application-confetti span:nth-child(4) { --confetti-left: 34%; --confetti-color: #e8ba51; --confetti-delay: 180ms; --confetti-drift: 16px; }
+.seller-application-confetti span:nth-child(5) { --confetti-left: 43%; --confetti-color: #59de9b; --confetti-delay: 80ms; --confetti-drift: -20px; }
+.seller-application-confetti span:nth-child(6) { --confetti-left: 53%; --confetti-color: #e86c6e; --confetti-delay: 210ms; --confetti-drift: 20px; }
+.seller-application-confetti span:nth-child(7) { --confetti-left: 63%; --confetti-color: #e8ba51; --confetti-delay: 30ms; --confetti-drift: -15px; }
+.seller-application-confetti span:nth-child(8) { --confetti-left: 72%; --confetti-color: #078355; --confetti-delay: 150ms; --confetti-drift: 15px; }
+.seller-application-confetti span:nth-child(9) { --confetti-left: 82%; --confetti-color: #e86c6e; --confetti-delay: 90ms; --confetti-drift: -22px; }
+.seller-application-confetti span:nth-child(10) { --confetti-left: 92%; --confetti-color: #e8ba51; --confetti-delay: 240ms; --confetti-drift: 12px; }
+.seller-application-confetti span:nth-child(11) { --confetti-left: 30%; --confetti-color: #078355; --confetti-delay: 270ms; --confetti-drift: 18px; }
+.seller-application-confetti span:nth-child(12) { --confetti-left: 78%; --confetti-color: #59de9b; --confetti-delay: 300ms; --confetti-drift: -16px; }
+.seller-application-confetti span:nth-child(13) { --confetti-left: 49%; --confetti-color: #e8ba51; --confetti-delay: 330ms; --confetti-drift: 24px; }
+.seller-application-confetti span:nth-child(14) { --confetti-left: 10%; --confetti-color: #e86c6e; --confetti-delay: 360ms; --confetti-drift: 20px; }
+
+@keyframes seller-application-confetti-fall {
+  to {
+    opacity: 0;
+    transform: translate3d(var(--confetti-drift), 260px, 0) rotate(650deg);
+  }
+}
+
+.seller-application-statuses {
+  margin-top: 45px;
+  padding-top: 29px;
+  border-top: 1px solid #dce4ef;
+}
+
+.seller-application-status-heading {
+  margin-bottom: 17px;
+  text-align: center;
+}
+
+.seller-application-status-eyebrow {
+  color: #1762d5;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.seller-application-status-heading h2 {
+  margin-top: 6px;
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.seller-application-status-heading p {
+  margin-top: 5px;
+  color: #68758d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.seller-application-status-list {
+  display: grid;
+  gap: 10px;
+}
+
+.seller-application-status-card {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: start;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid #e3eaf4;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.seller-application-status-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  color: #956d11;
+  background: #fff4d4;
+  font-size: 20px;
+}
+
+.seller-application-status-approved .seller-application-status-icon {
+  color: #08734f;
+  background: #e3f5e9;
+}
+
+.seller-application-status-action .seller-application-status-icon {
+  color: #a44c24;
+  background: #fff0e7;
+}
+
+.seller-application-status-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.seller-application-status-title-row h3 {
+  color: #23395f;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.seller-application-status-badge {
+  padding: 3px 7px;
+  border-radius: 99px;
+  color: #82600d;
+  background: #fff4d4;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.seller-application-status-approved .seller-application-status-badge {
+  color: #08734f;
+  background: #e3f5e9;
+}
+
+.seller-application-status-action .seller-application-status-badge {
+  color: #a44c24;
+  background: #fff0e7;
+}
+
+.seller-application-status-card p {
+  margin-top: 4px;
+  color: #68758d;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.seller-application-success {
+  padding: 40px 18px;
+  text-align: center;
+}
+
+.seller-application-success > .material-symbols-outlined {
+  color: #1762d5;
+  font-size: 52px;
+}
+
+.seller-application-success button {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.seller-application-root button:focus-visible,
+.seller-application-root input:focus-visible,
+.seller-application-root select:focus-visible,
+.seller-application-root textarea:focus-visible {
+  outline: 2px solid #1762d5;
+  outline-offset: 2px;
+}
+
+@media (max-width: 420px) {
+  .seller-application-content {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .seller-application-fields-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .seller-application-fields-grid .seller-application-field-full {
+    grid-column: auto;
+  }
+
+  .seller-application-account-types {
+    gap: 8px;
+  }
+
+  .seller-application-step-title {
+    font-size: 8px;
+  }
+
+  .seller-application-account-option {
+    min-height: 80px;
+    grid-template-columns: 27px 1fr;
+    gap: 6px;
+    padding: 10px;
+    font-size: 11px;
+  }
+
+  .seller-application-form-section {
+    padding: 15px;
+  }
+
+  .seller-application-step-title {
+    font-size: 8px;
+  }
+
+  .seller-application-step-icon {
+    width: 27px;
+    height: 27px;
+  }
+
+  .seller-application-actions {
+    grid-template-columns: 1fr 1.3fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .seller-application-form-section input:not([type="file"]):not([type="radio"]):not([type="checkbox"]),
+  .seller-application-form-section select,
+  .seller-application-form-section textarea {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seller-application-spinner,
+  .seller-application-success-check,
+  .seller-application-success-check circle,
+  .seller-application-success-check path,
+  .seller-application-confetti span {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}

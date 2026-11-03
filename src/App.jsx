@@ -1,39 +1,53 @@
 import {
-  BrowserRouter,
-  Navigate,
-  Outlet,
-  Route,
-  Routes,
-  useLocation,
+    BrowserRouter,
+    Navigate,
+    Outlet,
+    Route,
+    Routes,
+    useLocation,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import ComingSoonPage from "./components/ComingSoonPage";
+import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import PinVerification from "./components/PinVerification/PinVerification";
+import PushNotificationPrompt from "./components/PushNotificationPrompt/PushNotificationPrompt";
 import AdminPage from "./pages/Admin/AdminPage";
+import AdminPackagesPage from "./pages/Admin/Packages/AdminPackagesPage";
 import AdminProfilePage from "./pages/Admin/Profile/AdminProfilePage";
 import AdminSettingsPage from "./pages/Admin/Settings/AdminSettingsPage";
+import SellerApplicationDashboard from "./pages/Admin/SellerApplications/SellerApplicationDashboard";
+import SellerApplicationList from "./pages/Admin/SellerApplications/SellerApplicationList";
+import SellerManagementList from "./pages/Admin/SellerApplications/SellerManagementList";
+import SellerApplicationDetailsPage from "./pages/Admin/SellerApplications/components/SellerApplicationDetailsPage";
 import UserManagementPage from "./pages/Admin/UserManagement/UserManagementPage";
+import WithdrawalRequestsPage from "./pages/Admin/Withdrawals/WithdrawalRequestsPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import DirectReferralsPage from "./pages/DirectReferrals/DirectReferralsPage";
 import ExchangePage from "./pages/Exchange/ExchangePage";
+import ForgotPasswordPage from "./pages/ForgotPassword/ForgotPasswordPage";
 import LoginPage from "./pages/Login/LoginPage";
+import MarketPlaceDashboard from "./pages/MarketPlace/MarketPlaceDashboard";
+import MarketPlaceCart from "./pages/MarketPlace/MarketPlaceCart";
 import NotificationsPage from "./pages/Notifications/NotificationsPage";
 import PackageDetailPage from "./pages/PackageDetail/ProductsPage";
+import PrivacyPage from "./pages/Privacy/PrivacyPage";
 import ProductsPage from "./pages/Products/ProductsPage";
 import TransactionHistoryPage from "./pages/Profile/ProfilePage";
 import ChangePasswordPage from "./pages/ProfileAccount/ChangePasswordPage";
 import ChangeTinPage from "./pages/ProfileAccount/ChangeTinPage";
 import EditProfilePage from "./pages/ProfileAccount/EditProfilePage";
-import PurchaseCodesPage from "./pages/PurchaseCodes/PurchaseCodesPage";
 import QrPaymentPage from "./pages/QrPayment/QrPaymentPage";
 import RegisterPage from "./pages/Register/RegisterPage";
+import TermsPage from "./pages/Terms/TermsPage";
+import TransactionLogsPage from "./pages/TransactionLogs/TransactionLogsPage";
+import VerifyEmailPage from "./pages/VerifyEmail/VerifyEmailPage";
 
 function ProtectedRoute({ children, allowedRoles, requirePin = true }) {
   const location = useLocation();
   const { isLoggedIn, role, pinVerified, authReady } = useAuth();
 
   if (!authReady) {
-    return <main className="auth-loading" role="status">Loading your account...</main>;
+    return <LoadingScreen label="Loading your account..." />;
   }
 
   if (!isLoggedIn) {
@@ -55,6 +69,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <PushNotificationPrompt />
         <Routes>
           {/* ── Auth ─────────────────────────────────────────────── */}
           <Route path="/login" element={<LoginPage />} />
@@ -66,17 +81,33 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/forgot-password"
-            element={<ComingSoonPage title="Forgot Password" />}
-          />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
 
           {/* ── App pages ─────────────────────────────────────────── */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/dashboard" element={<AdminPage />} />
+            <Route path="/admin/packages" element={<AdminPackagesPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
+            <Route path="/admin/withdrawals" element={<WithdrawalRequestsPage />} />
+            <Route
+              path="/admin/seller-applications"
+              element={<SellerApplicationDashboard />}
+            />
+            <Route
+              path="/admin/seller-applications/list"
+              element={<SellerApplicationList />}
+            />
+            <Route
+              path="/admin/seller-applications/sellers"
+              element={<SellerManagementList />}
+            />
+            <Route
+              path="/admin/seller-applications/:userId/:applicationId"
+              element={<SellerApplicationDetailsPage />}
+            />
             <Route path="/admin/settings" element={<AdminSettingsPage />} />
             <Route path="/admin/profile" element={<AdminProfilePage />} />
             <Route
@@ -96,7 +127,9 @@ export default function App() {
               path="/network-referrals"
               element={<DirectReferralsPage referralType="network" />}
             />
-            <Route path="/purchase-codes" element={<PurchaseCodesPage />} />
+            <Route path="/purchase-codes" element={<TransactionLogsPage />} />
+            <Route path="/store" element={<MarketPlaceDashboard />} />
+            <Route path="/store/cart" element={<MarketPlaceCart />} />
             <Route path="/profile" element={<TransactionHistoryPage />} />
             <Route path="/transactions" element={<TransactionHistoryPage />} />
             <Route path="/edit-profile" element={<EditProfilePage />} />
@@ -119,11 +152,11 @@ export default function App() {
           {/* ── Footer / legal ─────────────────────────────────────── */}
           <Route
             path="/privacy"
-            element={<ComingSoonPage title="Privacy Policy" />}
+            element={<PrivacyPage />}
           />
           <Route
             path="/terms"
-            element={<ComingSoonPage title="Terms of Service" />}
+            element={<TermsPage />}
           />
           <Route
             path="/help"

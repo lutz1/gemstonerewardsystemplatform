@@ -1,0 +1,1143 @@
+.seller-application-details-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+  background: #f3f5fb;
+  color: #172541;
+  font-family: var(--font-hanken, Arial, sans-serif);
+}
+
+.seller-application-details-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  min-height: calc(48px + env(safe-area-inset-top, 0px));
+  align-items: center;
+  padding:
+    env(safe-area-inset-top, 0px)
+    max(8px, env(safe-area-inset-right, 0px))
+    0
+    max(8px, env(safe-area-inset-left, 0px));
+  color: #fff;
+  background: linear-gradient(135deg, #082755, #123f87);
+  box-shadow: 0 2px 8px rgba(8, 39, 85, 0.18);
+}
+
+.seller-application-details-header > a {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: #fff;
+  text-decoration: none;
+}
+
+.seller-application-details-header > a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.seller-application-details-header .material-symbols-outlined {
+  font-size: 24px;
+}
+
+.seller-application-details-header h1 {
+  margin: 0;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.seller-application-details-content {
+  display: grid;
+  gap: 10px;
+  width: min(680px, 100%);
+  margin: 0 auto;
+  padding: 12px 10px 24px;
+}
+
+.seller-application-details-summary,
+.seller-application-details-card,
+.seller-application-details-state {
+  border: 1px solid #e6eaf2;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(26, 47, 83, 0.05);
+}
+
+.seller-application-details-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+}
+
+.seller-application-details-store-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #1350ad;
+}
+
+.seller-application-details-store-icon .material-symbols-outlined {
+  font-size: 26px;
+  font-variation-settings: "FILL" 1;
+}
+
+.seller-application-details-summary-copy {
+  min-width: 0;
+}
+
+.seller-application-details-summary-copy > p {
+  overflow: hidden;
+  margin: 2px 0 1px;
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-application-details-summary-copy h2 {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+  margin: 0;
+  color: #172541;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-application-details-summary-copy h2 .material-symbols-outlined {
+  flex: 0 0 auto;
+  color: #1762d5;
+  font-size: 13px;
+  font-variation-settings: "FILL" 1;
+}
+
+.seller-application-details-summary-copy small {
+  color: #64748b;
+  font-size: 8px;
+}
+
+.seller-application-details-summary > .seller-application-details-status {
+  align-self: flex-start;
+  margin-left: auto;
+}
+
+.seller-application-details-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: #a86500;
+  background: #fff0cc;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.seller-application-details-status.is-approved,
+.seller-application-details-status.is-active_seller {
+  color: #17713a;
+  background: #d9f4df;
+}
+
+.seller-application-details-status.is-rejected {
+  color: #b4232f;
+  background: #ffe0e2;
+}
+
+.seller-application-details-card {
+  padding: 13px;
+}
+
+.seller-application-details-card > h2 {
+  margin: 0 0 5px;
+  color: #1d2b45;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.seller-application-details-card dl {
+  margin: 0;
+}
+
+.seller-application-details-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 0.38fr) minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #edf0f5;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.seller-application-details-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.seller-application-details-row dt {
+  color: #64748b;
+}
+
+.seller-application-details-row dd {
+  overflow-wrap: anywhere;
+  margin: 0;
+  color: #172541;
+  font-weight: 600;
+  white-space: pre-wrap;
+}
+
+.seller-application-details-reference {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border-radius: 9px;
+  color: #566780;
+  background: #eaf0ff;
+  font-size: 8px;
+}
+
+.seller-application-details-reference .material-symbols-outlined {
+  font-size: 12px;
+}
+
+.seller-application-details-reference strong {
+  overflow: hidden;
+  margin-left: auto;
+  color: #1457cf;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-application-details-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.seller-application-details-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.seller-application-details-tabs button {
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid #e4e9f2;
+  border-radius: 16px;
+  color: #596a84;
+  background: #fff;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.seller-application-details-tabs button.is-active {
+  border-color: #2355df;
+  color: #fff;
+  background: #2355df;
+}
+
+.seller-application-details-tabs button:focus-visible,
+.seller-application-details-actions button:focus-visible,
+.seller-application-details-input :is(input, select, textarea):focus-visible {
+  outline: 2px solid #2355df;
+  outline-offset: 2px;
+}
+
+.seller-application-details-section-heading {
+  display: flex;
+  min-height: 28px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 3px;
+}
+
+.seller-application-details-section-heading > .material-symbols-outlined {
+  color: #1457cf;
+  font-size: 15px;
+}
+
+.seller-application-details-section-heading h2 {
+  margin: 0;
+  color: #1d2b45;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.seller-application-details-registration {
+  margin-left: auto;
+  padding: 3px 6px;
+  border-radius: 8px;
+  color: #3357c7;
+  background: #e0e8ff;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.seller-application-details-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.seller-application-details-field {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  padding: 7px;
+  border-radius: 8px;
+  background: #f0f4ff;
+}
+
+.seller-application-details-field.is-wide {
+  grid-column: 1 / -1;
+}
+
+.seller-application-details-field > span {
+  color: #687a99;
+  font-size: 7px;
+}
+
+.seller-application-details-field > strong {
+  overflow-wrap: anywhere;
+  color: #1d2b45;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.seller-application-details-document-list {
+  display: grid;
+}
+
+.seller-application-details-document-list > div {
+  display: grid;
+  grid-template-columns: 19px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  border-bottom: 1px solid #edf0f5;
+  color: #30425f;
+  font-size: 9px;
+}
+
+.seller-application-details-document-list > div:last-child {
+  border-bottom: 0;
+}
+
+.seller-application-details-document-list .material-symbols-outlined {
+  color: #54708f;
+  font-size: 15px;
+}
+
+.seller-application-details-document-list strong {
+  color: #a86500;
+  font-size: 8px;
+}
+
+.seller-application-details-document-list strong.is-submitted {
+  color: #168050;
+}
+
+.seller-application-details-declarations {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #edf0f5;
+}
+
+.seller-application-details-declarations h3 {
+  margin: 0 0 7px;
+  font-size: 10px;
+}
+
+.seller-application-details-declarations p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 5px 0;
+  color: #43536d;
+  font-size: 9px;
+}
+
+.seller-application-details-declarations .material-symbols-outlined {
+  color: #13966b;
+  font-size: 13px;
+}
+
+.seller-application-details-input {
+  display: grid;
+  gap: 5px;
+  margin: 9px 0;
+}
+
+.seller-application-details-input > span {
+  color: #64748b;
+  font-size: 8px;
+}
+
+.seller-application-details-input :is(input, select, textarea) {
+  width: 100%;
+  min-height: 32px;
+  padding: 7px 8px;
+  border: 1px solid #e4e9f2;
+  border-radius: 7px;
+  color: #263a5b;
+  background: #fff;
+  font: inherit;
+  font-size: 9px;
+}
+
+.seller-application-details-input textarea {
+  min-height: 62px;
+  resize: vertical;
+}
+
+.seller-application-details-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.seller-application-details-save-notes {
+  min-height: 30px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 7px;
+  color: #fff;
+  background: #2453df;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-application-details-save-notes:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.seller-application-details-action-message {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #b7e5cd;
+  border-radius: 8px;
+  color: #176b43;
+  background: #eaf8f0;
+  font-size: 9px;
+}
+
+.seller-application-details-action-message.is-error {
+  border-color: #f3c4c6;
+  color: #a8232d;
+  background: #fff0f0;
+}
+
+.seller-application-details-actions {
+  display: grid;
+  gap: 6px;
+  padding: 9px;
+  border: 1px solid #e8edf5;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(26, 47, 83, 0.05);
+}
+
+.seller-application-details-actions button {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-application-details-actions button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.seller-application-details-actions button .material-symbols-outlined {
+  font-size: 13px;
+}
+
+.seller-application-details-actions button.is-primary {
+  color: #fff;
+  background: #2453df;
+}
+
+.seller-application-details-actions button.is-secondary {
+  color: #fff;
+  background: #2453df;
+}
+
+.seller-application-details-actions button.is-info {
+  color: #2453df;
+  background: #e7efff;
+}
+
+.seller-application-details-actions button.is-danger {
+  color: #bd242d;
+  background: #ffdcda;
+}
+
+.seller-application-details-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.seller-application-details-saving {
+  color: #64748b;
+  font-size: 9px;
+  text-align: center;
+}
+
+.seller-application-request-info-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  align-items: end;
+  padding: 12px;
+  background: rgba(12, 24, 44, 0.55);
+}
+
+.seller-application-request-info-dialog {
+  width: min(520px, 100%);
+  max-height: min(90dvh, 760px);
+  overflow-y: auto;
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px solid #e6eaf2;
+  border-radius: 17px 17px 12px 12px;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(8, 24, 51, 0.25);
+}
+
+.seller-application-request-info-dialog > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.seller-application-request-info-dialog > header p {
+  margin: 0 0 4px;
+  color: #64748b;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.seller-application-request-info-dialog > header h2 {
+  margin: 0;
+  color: #172541;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 15px;
+}
+
+.seller-application-request-info-dialog > header button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #55647c;
+  background: #f1f4f8;
+}
+
+.seller-application-request-info-recipient {
+  margin: 12px 0;
+  padding: 8px 9px;
+  border-radius: 8px;
+  color: #566780;
+  background: #f0f4ff;
+  font-size: 9px;
+  overflow-wrap: anywhere;
+}
+
+.seller-application-request-info-recipient strong {
+  color: #1d2b45;
+}
+
+.seller-application-request-info-dialog fieldset {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid #e4e9f2;
+  border-radius: 9px;
+}
+
+.seller-application-request-info-dialog legend {
+  padding: 0 4px;
+  color: #263a5b;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.seller-application-request-info-dialog fieldset label {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  min-height: 31px;
+  color: #30425f;
+  font-size: 9px;
+}
+
+.seller-application-request-info-dialog fieldset input {
+  width: 14px;
+  height: 14px;
+  accent-color: #2453df;
+}
+
+.seller-application-request-info-dialog fieldset small {
+  color: #73819a;
+  font-size: 8px;
+}
+
+.seller-application-request-info-message {
+  display: grid;
+  gap: 5px;
+  margin-top: 11px;
+}
+
+.seller-application-request-info-message > span {
+  color: #64748b;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.seller-application-request-info-message textarea {
+  width: 100%;
+  min-height: 78px;
+  padding: 8px;
+  border: 1px solid #e4e9f2;
+  border-radius: 8px;
+  color: #263a5b;
+  background: #fff;
+  font: inherit;
+  font-size: 9px;
+  resize: vertical;
+}
+
+.seller-application-request-info-error {
+  margin: 8px 0 0;
+  color: #b4232f;
+  font-size: 9px;
+}
+
+.seller-application-request-info-note {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.seller-application-request-info-actions {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.seller-application-request-info-actions button {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.seller-application-request-info-actions button:disabled {
+  opacity: 0.6;
+}
+
+.seller-application-request-info-actions .is-cancel {
+  color: #53627a;
+  background: #edf1f7;
+}
+
+.seller-application-request-info-actions .is-send {
+  color: #fff;
+  background: #2453df;
+}
+
+.seller-application-request-info-actions .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.seller-application-reject-backdrop {
+  position: fixed;
+  z-index: 21;
+  inset: 0;
+  display: grid;
+  align-items: center;
+  padding: 16px;
+  background: rgba(12, 24, 44, 0.58);
+}
+
+.seller-application-reject-dialog {
+  display: grid;
+  width: min(440px, 100%);
+  gap: 14px;
+  margin: 0 auto;
+  padding: 18px;
+  border: 1px solid #e6eaf2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(8, 24, 51, 0.25);
+}
+
+.seller-application-reject-dialog > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.seller-application-reject-dialog > header p {
+  margin: 0 0 4px;
+  color: #64748b;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.seller-application-reject-dialog > header h2 {
+  margin: 0;
+  color: #172541;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 15px;
+}
+
+.seller-application-reject-dialog > header button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #55647c;
+  background: #f1f4f8;
+  cursor: pointer;
+}
+
+.seller-application-reject-reason {
+  display: grid;
+  gap: 6px;
+}
+
+.seller-application-reject-reason > span {
+  color: #42526b;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.seller-application-reject-reason textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 9px;
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+  color: #263a5b;
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.seller-application-reject-reason textarea:focus {
+  border-color: #bd242d;
+  outline: 2px solid rgba(189, 36, 45, 0.15);
+}
+
+.seller-application-reject-reason small {
+  color: #b4232f;
+  font-size: 9px;
+}
+
+.seller-application-reject-confirmation > p {
+  margin: 0;
+  color: #465772;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.seller-application-reject-confirmation-reason {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid #f0d7d8;
+  border-radius: 8px;
+  color: #74353a;
+  background: #fff7f7;
+  font-size: 9px;
+}
+
+.seller-application-reject-confirmation-reason p {
+  margin: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.seller-application-reject-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.seller-application-reject-actions button {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-application-reject-actions button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.seller-application-reject-actions .is-cancel {
+  color: #53627a;
+  background: #edf1f7;
+}
+
+.seller-application-reject-actions .is-continue {
+  color: #fff;
+  background: #2453df;
+}
+
+.seller-application-reject-actions .is-reject {
+  color: #fff;
+  background: #bd242d;
+}
+
+.seller-application-approve-backdrop {
+  position: fixed;
+  z-index: 22;
+  inset: 0;
+  display: grid;
+  align-items: center;
+  padding: 16px;
+  background: rgba(12, 24, 44, 0.58);
+}
+
+.seller-application-approve-dialog {
+  display: grid;
+  width: min(440px, 100%);
+  gap: 12px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #e6eaf2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(8, 24, 51, 0.25);
+}
+
+.seller-application-approve-dialog.is-success {
+  justify-items: center;
+  padding: 24px 20px 20px;
+  text-align: center;
+}
+
+.seller-application-approve-dialog.is-success .seller-application-approve-eyebrow {
+  color: #1762d5;
+}
+
+.seller-application-approve-dialog.is-success .seller-application-approve-confirm {
+  color: #fff;
+  background: #1762d5;
+}
+
+.seller-application-approve-dialog.is-success .seller-application-approve-confirm:hover {
+  background: #124fae;
+}
+
+.seller-application-approve-icon {
+  color: #2453df;
+  font-size: 30px;
+}
+
+.seller-application-approve-eyebrow {
+  margin: 0;
+  color: #176b43;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.seller-application-approve-dialog h2 {
+  margin: 0;
+  color: #172541;
+  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-size: 16px;
+}
+
+.seller-application-approve-description {
+  margin: 0;
+  color: #53627a;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.seller-application-approve-review {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #dfe7f3;
+  border-radius: 8px;
+  color: #34445e;
+  background: #f7f9fc;
+  font-size: 10px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.seller-application-approve-review input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: #176b43;
+}
+
+.seller-application-approve-missing {
+  padding: 9px 10px;
+  border: 1px solid #f0c4c0;
+  border-radius: 8px;
+  color: #91352f;
+  background: #fff2f0;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.seller-application-approve-missing ul {
+  margin: 5px 0;
+  padding-left: 18px;
+}
+
+.seller-application-approve-error {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #f3c4c6;
+  border-radius: 8px;
+  color: #a8232d;
+  background: #fff0f0;
+  font-size: 9px;
+}
+
+.seller-application-approve-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.seller-application-approve-actions button,
+.seller-application-approve-confirm {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.seller-application-approve-actions button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.seller-application-approve-actions .is-cancel {
+  color: #53627a;
+  background: #edf1f7;
+}
+
+.seller-application-approve-actions .is-confirm,
+.seller-application-approve-confirm {
+  color: #fff;
+  background: #176b43;
+}
+
+.seller-application-approve-actions .is-confirm:disabled {
+  background: #91a99b;
+  cursor: not-allowed;
+}
+
+.seller-application-approve-checkmark {
+  width: 68px;
+  height: 68px;
+  overflow: visible;
+}
+
+.seller-application-approve-checkmark-circle,
+.seller-application-approve-checkmark-tick {
+  fill: none;
+  stroke: #1762d5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.seller-application-approve-checkmark-circle {
+  stroke-dasharray: 176;
+  stroke-dashoffset: 176;
+  animation: seller-application-check-circle 600ms ease-out forwards;
+}
+
+.seller-application-approve-checkmark-tick {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: seller-application-check-tick 360ms 420ms ease-out forwards;
+}
+
+.seller-application-approve-confirm {
+  width: 100%;
+  margin-top: 3px;
+}
+
+@keyframes seller-application-check-circle {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes seller-application-check-tick {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seller-application-approve-checkmark-circle,
+  .seller-application-approve-checkmark-tick {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+}
+
+.seller-application-details-state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 30px 16px;
+  text-align: center;
+}
+
+.seller-application-details-state > .material-symbols-outlined {
+  color: #3978e3;
+  font-size: 30px;
+}
+
+.seller-application-details-state h2 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.seller-application-details-state p {
+  margin: 0;
+  color: #66748c;
+  font-size: 11px;
+}
+
+.seller-application-details-state > a {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  margin-top: 3px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: #fff;
+  background: #1762d5;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.seller-application-details-state > button {
+  min-height: 34px;
+  margin-top: 3px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  color: #1762d5;
+  background: #eaf2ff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+@media (min-width: 700px) {
+  .seller-application-details-header {
+    min-height: 56px;
+  }
+
+  .seller-application-details-header h1 {
+    font-size: 18px;
+  }
+
+  .seller-application-details-content {
+    gap: 14px;
+    padding: 18px 14px 30px;
+  }
+
+  .seller-application-details-summary {
+    padding: 18px;
+  }
+
+  .seller-application-details-card {
+    padding: 17px;
+  }
+
+  .seller-application-details-card > h2 {
+    font-size: 14px;
+  }
+
+  .seller-application-details-row {
+    font-size: 12px;
+  }
+}

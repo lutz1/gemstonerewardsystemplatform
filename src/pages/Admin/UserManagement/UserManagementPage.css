@@ -381,6 +381,40 @@
   white-space: nowrap;
 }
 
+.admin-user-email {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-user-verified {
+  display: inline-grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--on-primary-container);
+  animation: admin-user-verified-pop 0.45s ease-out both;
+}
+
+.admin-user-verified .material-symbols-outlined {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@keyframes admin-user-verified-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-15deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
 .admin-user-avatar {
   display: grid;
   width: 36px;

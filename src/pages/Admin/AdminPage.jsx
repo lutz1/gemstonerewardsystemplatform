@@ -2,22 +2,28 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import {
     MdAccountBalanceWallet,
+    MdAdd,
     MdArrowForward,
     MdCheckCircle,
     MdClose,
     MdDiamond,
     MdGroup,
+    MdHistory,
     MdLocalFireDepartment,
     MdPayments,
     MdPendingActions,
+    MdStorefront,
     MdTrendingUp,
     MdWorkspacePremium,
 } from "react-icons/md";
+import { Link } from "react-router-dom";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
 import GemValueChart from "../../components/GemValueChart/GemValueChart";
 import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import TopBar from "../../components/TopBar/TopBar";
 import { app } from "../../firebase";
+import PumpValueModal from "./PumpValueModal";
+import PumpValueHistoryModal from "./PumpValueHistoryModal";
 import "./AdminPage.css";
 
 function formatPeso(value) {
@@ -41,7 +47,11 @@ const emptyDashboard = {
 export default function AdminPage() {
   const [dashboard, setDashboard] = useState(emptyDashboard);
   const [showSalesDetails, setShowSalesDetails] = useState(false);
+  const [showPumpValueModal, setShowPumpValueModal] = useState(false);
+  const [showPumpHistoryModal, setShowPumpHistoryModal] = useState(false);
+  const [gemValueRefreshKey, setGemValueRefreshKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [pendingSellerApplications, setPendingSellerApplications] = useState(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -63,6 +73,32 @@ export default function AdminPage() {
     void loadDashboard();
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+    const getAdminSellerApplications = httpsCallable(
+      getFunctions(app, "asia-southeast1"),
+      "getAdminSellerApplications",
+    );
+
+    getAdminSellerApplications()
+      .then(({ data }) => {
+        if (!isMounted) return;
+        const count = data?.pendingCount;
+        setPendingSellerApplications(
+          Number.isSafeInteger(count) && count >= 0 ? count : 0,
+        );
+      })
+      .catch((error) => {
+        if (!isMounted) return;
+        console.error("Failed to load pending seller application count:", error);
+        setPendingSellerApplications(-1);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const {
     totalSales,
     totalGemValueAccumulated,
@@ -76,6 +112,7 @@ export default function AdminPage() {
     purchaseTotalsByTier,
     activities,
     gemPond,
+    totalGemBurn,
     gemBurnRate,
   } = dashboard;
 
@@ -140,16 +177,130 @@ export default function AdminPage() {
               <span>Total value earned across all members</span>
             </div>
           </article>
-          <article className="admin-summary-card">
+          <Link
+            className="admin-summary-card admin-withdrawal-summary-card"
+            to="/admin/withdrawals"
+            aria-label={`Review ${pendingWithdrawals} pending withdrawal requests`}
+          >
             <div className="admin-summary-icon">
               <MdAccountBalanceWallet />
             </div>
             <div>
               <p>Pending withdrawals</p>
               <strong>{pendingWithdrawals}</strong>
-              <span>Awaiting your review</span>
+              <span>Awaiting your review <MdArrowForward /></span>
             </div>
-          </article>
+          </Link>
+          <Link
+            className="admin-summary-card admin-withdrawal-summary-card admin-seller-applications-summary-card"
+            to="/admin/seller-applications"
+            aria-label={
+              pendingSellerApplications === null
+                ? "Manage seller applications"
+                : pendingSellerApplications < 0
+                  ? "Manage seller applications; count unavailable"
+                  : `Manage seller applications; ${pendingSellerApplications} awaiting review`
+            }
+          >
+            <div className="admin-summary-icon">
+              <MdStorefront />
+            </div>
+            <div className="admin-seller-applications-summary-copy">
+              <p>Seller's Application Management</p>
+              <strong>
+                {pendingSellerApplications === null
+                  ? "—"
+                  : pendingSellerApplications < 0
+                    ? "!"
+                    : pendingSellerApplications}
+              </strong>
+              <span>
+                {pendingSellerApplications < 0
+                  ? "Count unavailable"
+                  : "Awaiting review"}
+                <MdArrowForward />
+              </span>
+            </div>
+            {pendingSellerApplications > 0 && (
+              <span className="admin-seller-applications-badge" aria-hidden="true">
+                {pendingSellerApplications > 99
+                  ? "99+"
+                  : pendingSellerApplications}
+              </span>
+            )}
+          </Link>
+        </section>
+
+        <section className="admin-gem-chart-row" aria-label="GEM value">
+          <GemValueChart refreshKey={gemValueRefreshKey} variant="admin" />
+        </section>
+
+        <section className="admin-pond-burn-row" aria-label="GEM pool and burn summary">
+          <section className="admin-dashboard-panel admin-pond-panel">
+            <div className="admin-panel-heading">
+              <div>
+                <p className="admin-panel-eyebrow">GEM pond</p>
+                <h2>GEM Pond</h2>
+              </div>
+              <div className="admin-pond-actions">
+                <button
+                  className="admin-pond-history-button"
+                  type="button"
+                  onClick={() => setShowPumpHistoryModal(true)}
+                  aria-label="View GEM Pond pump history"
+                  title="Pump history"
+                >
+                  <MdHistory />
+                </button>
+                <button
+                  className="admin-pond-pump-button"
+                  type="button"
+                  onClick={() => setShowPumpValueModal(true)}
+                >
+                  <MdAdd /> Pump value
+                </button>
+                <MdDiamond className="admin-heading-icon" />
+              </div>
+            </div>
+            <div className="admin-pond-content">
+              <strong className="admin-pond-total">
+                {`₱${Number(gemPond ?? 0).toLocaleString("en-PH", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`}
+              </strong>
+              <span className="admin-pond-copy">Value available in the GEM Pond</span>
+            </div>
+          </section>
+
+          <section className="admin-dashboard-panel admin-burn-panel">
+            <div className="admin-panel-heading">
+              <div>
+                <p className="admin-panel-eyebrow">GEM panel</p>
+                <h2>GEM burn rate</h2>
+              </div>
+              <MdLocalFireDepartment className="admin-heading-icon" />
+            </div>
+            <div className="admin-burn-panel-layout">
+              <section className="admin-burn-detail">
+                <div className="admin-burn-summary">
+                  <strong>{Number(totalGemBurn ?? 0).toLocaleString("en-PH")} GEM</strong>
+                  <span>Total GEM Burn · {formatPeso(currentBurnRate)} value per day average</span>
+                </div>
+                <div className="admin-burn-chart" role="img" aria-label="GEM burn rate over recent days">
+                  {gemBurnRate.map((point) => (
+                    <div className="admin-burn-bar" key={point.label}>
+                      <span style={{ height: `${maxBurn ? (point.amount / maxBurn) * 100 : 0}%` }} />
+                      <small>{point.label}</small>
+                    </div>
+                  ))}
+                  {gemBurnRate.length === 0 && (
+                    <p className="admin-users-empty">No burn rate data yet.</p>
+                  )}
+                </div>
+              </section>
+            </div>
+          </section>
         </section>
 
         <section className="admin-dashboard-grid">
@@ -220,64 +371,32 @@ export default function AdminPage() {
               </div>
             </section>
           </div>
-          <div className="admin-dashboard-column">
-            <GemValueChart />
-            <section className="admin-dashboard-panel admin-pond-panel">
-              <div className="admin-panel-heading">
-                <div>
-                  <p className="admin-panel-eyebrow">GEM pond</p>
-                  <h2>GEM Pond</h2>
-                </div>
-                <MdDiamond className="admin-heading-icon" />
-              </div>
-              <div className="admin-pond-content">
-                <strong className="admin-pond-total">
-                  {Number(gemPond ?? 0).toLocaleString("en-PH")}
-                </strong>
-                <span className="admin-pond-copy">
-                  Total GEM points available
-                </span>
-              </div>
-            </section>
-            <section className="admin-dashboard-panel admin-burn-panel">
-              <div className="admin-panel-heading">
-                <div>
-                  <p className="admin-panel-eyebrow">GEM panel</p>
-                  <h2>GEM burn rate</h2>
-                </div>
-                <MdLocalFireDepartment className="admin-heading-icon" />
-              </div>
-              <div className="admin-burn-panel-layout">
-                <section className="admin-burn-detail">
-                  <div className="admin-burn-summary">
-                    <strong>{formatPeso(currentBurnRate)}</strong>
-                    <span>GEM value redeemed per day, 7-day average</span>
-                  </div>
-                  <div
-                    className="admin-burn-chart"
-                    role="img"
-                    aria-label="GEM burn rate over recent days"
-                  >
-                    {gemBurnRate.map((point) => (
-                      <div className="admin-burn-bar" key={point.label}>
-                        <span
-                          style={{
-                            height: `${maxBurn ? (point.amount / maxBurn) * 100 : 0}%`,
-                          }}
-                        />
-                        <small>{point.label}</small>
-                      </div>
-                    ))}
-                    {gemBurnRate.length === 0 && (
-                      <p className="admin-users-empty">No burn rate data yet.</p>
-                    )}
-                  </div>
-                </section>
-              </div>
-            </section>
-          </div>
         </section>
       </main>
+
+      {showPumpValueModal && (
+        <PumpValueModal
+          currentPond={gemPond}
+          onClose={() => setShowPumpValueModal(false)}
+          onPumped={(amount) => {
+            if (Number.isFinite(amount) && amount > 0) {
+              setDashboard((current) => ({
+                ...current,
+                gemPond: Number(current.gemPond ?? 0) + amount,
+                totalGemPump: Number(current.totalGemPump ?? 0) + amount,
+              }));
+              setGemValueRefreshKey((key) => key + 1);
+            }
+            setShowPumpValueModal(false);
+          }}
+        />
+      )}
+
+      {showPumpHistoryModal && (
+        <PumpValueHistoryModal
+          onClose={() => setShowPumpHistoryModal(false)}
+        />
+      )}
 
       {showSalesDetails && (
         <div

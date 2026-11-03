@@ -76,6 +76,26 @@
   font-size: 18px;
 }
 
+.nd-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nd-clear-all {
+  min-height: 36px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--error, #ff8b8b);
+  font: 600 12px var(--font-hanken);
+  cursor: pointer;
+}
+
+.nd-clear-all:hover {
+  color: #ffd0ce;
+}
+
 .nd-close-btn {
   display: grid;
   place-items: center;
@@ -111,11 +131,60 @@
   font-size: 32px;
 }
 
+.nd-action-error {
+  margin: 10px 16px 0;
+  color: var(--error, #ff8b8b);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.nd-swipe-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  touch-action: pan-y;
+}
+
+.nd-swipe-row:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .nd-item {
+  position: relative;
+  z-index: 1;
   padding: 12px 14px;
   border: 1px solid rgba(61, 74, 65, 0.3);
   border-radius: 10px;
   background: rgba(26, 33, 28, 0.6);
+  transition: transform 180ms ease;
+}
+
+.nd-delete-btn {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: grid;
+  width: 66px;
+  place-items: center;
+  border: 0;
+  border-radius: 0 10px 10px 0;
+  background: #8b3434;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 180ms ease, visibility 180ms ease;
+}
+
+.nd-delete-btn:hover {
+  background: #a54141;
+}
+
+.nd-delete-btn:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.nd-delete-btn .material-symbols-outlined {
+  font-size: 20px;
 }
 
 .nd-item.nd-unread {
@@ -148,6 +217,42 @@
   color: var(--on-surface-variant);
   font-size: 13px;
   line-height: 1.5;
+}
+
+.nd-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(61, 74, 65, 0.3);
+}
+
+.nd-pagination > span {
+  color: var(--on-surface-variant);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.nd-pagination button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 34px;
+  padding: 0 7px;
+  border: 1px solid rgba(61, 74, 65, 0.4);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--on-surface);
+  font: 600 11px var(--font-hanken);
+  cursor: pointer;
+}
+
+.nd-pagination button:disabled {
+  cursor: default;
+  opacity: 0.4;
 }
 
 .nd-view-all {

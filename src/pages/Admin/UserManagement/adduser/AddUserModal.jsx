@@ -1,3 +1,10 @@
+import { deleteApp, initializeApp } from "firebase/app";
+import {
+    getAuth,
+    sendEmailVerification,
+    signInWithEmailAndPassword,
+    signOut,
+} from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useRef, useState } from "react";
 import { app } from "../../../../firebase";
@@ -16,6 +23,29 @@ const emptyNewUser = {
   role: "member",
   status: "active",
 };
+
+const DEFAULT_USER_PASSWORD = "gemstonecode";
+const EMAIL_VERIFICATION_URL = "https://gemstonecode.store/verify-email";
+
+async function sendVerificationEmail(email) {
+  const verificationApp = initializeApp(app.options, `verification-${Date.now()}`);
+  const verificationAuth = getAuth(verificationApp);
+
+  try {
+    const credential = await signInWithEmailAndPassword(
+      verificationAuth,
+      email,
+      DEFAULT_USER_PASSWORD,
+    );
+    await sendEmailVerification(credential.user, {
+      url: EMAIL_VERIFICATION_URL,
+      handleCodeInApp: true,
+    });
+  } finally {
+    await signOut(verificationAuth).catch(() => {});
+    await deleteApp(verificationApp);
+  }
+}
 
 /**
  * Modal form for creating a new user.
@@ -127,6 +157,7 @@ export default function AddUserModal({
         role: newUser.role,
         status: newUser.status,
       });
+      await sendVerificationEmail(email);
       setIsSuccess(true);
       await onUserCreated?.();
       window.setTimeout(() => closeAddUserModal(true), 1200);
@@ -144,7 +175,6 @@ export default function AddUserModal({
     <div
       className="admin-users-modal-backdrop"
       role="presentation"
-      onMouseDown={closeAddUserModal}
     >
       <form
         className="admin-users-modal"

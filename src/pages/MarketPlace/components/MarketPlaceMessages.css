@@ -1,0 +1,356 @@
+.marketplace-messages-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color: #152341;
+  background: #f2f5fb;
+  font-family: "Hanken Grotesk", sans-serif;
+}
+
+.marketplace-messages-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  min-height: calc(52px + env(safe-area-inset-top, 0px));
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  padding:
+    env(safe-area-inset-top, 0px)
+    max(12px, env(safe-area-inset-right, 0px))
+    0
+    max(12px, env(safe-area-inset-left, 0px));
+  color: #fff;
+  background: linear-gradient(135deg, #071b40, #123b77);
+  box-shadow: 0 2px 12px rgba(7, 27, 64, 0.18);
+}
+
+.marketplace-messages-header button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+}
+
+.marketplace-messages-header button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.marketplace-messages-header .is-refreshing {
+  animation: marketplace-messages-spin 800ms linear infinite;
+}
+
+@keyframes marketplace-messages-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.marketplace-messages-header h1 {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.marketplace-messages-content {
+  display: grid;
+  width: min(100%, 620px);
+  gap: 10px;
+  margin: 0 auto;
+  padding: 14px 12px 28px;
+}
+
+.marketplace-messages-list {
+  display: grid;
+  gap: 9px;
+}
+
+.marketplace-message-swipe-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #d93838;
+  touch-action: pan-y;
+}
+
+.marketplace-message-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e3eaf4;
+  border-radius: 12px;
+  color: inherit;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(19, 42, 78, 0.05);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.marketplace-message-swipe-row.is-delete-open .marketplace-message-card {
+  transform: translateX(-60px);
+}
+
+.marketplace-message-delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  width: 60px;
+  height: 100%;
+  place-items: center;
+  border: 0;
+  color: #fff;
+  background: #d93838;
+  cursor: pointer;
+}
+
+.marketplace-message-delete:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.marketplace-message-delete .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.marketplace-message-delete .is-deleting {
+  animation: marketplace-messages-spin 800ms linear infinite;
+}
+
+.marketplace-message-delete-error {
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid #f0c4c0;
+  border-radius: 8px;
+  color: #91352f;
+  background: #fff2f0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.marketplace-message-card:hover,
+.marketplace-message-card:focus-visible {
+  border-color: #b7ccef;
+  box-shadow: 0 4px 14px rgba(19, 42, 78, 0.1);
+}
+
+.marketplace-message-card:focus-visible {
+  outline: 2px solid #1762d5;
+  outline-offset: 2px;
+}
+
+.marketplace-message-delete:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
+
+.marketplace-message-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  color: #1762d5;
+  background: #edf4ff;
+}
+
+.marketplace-message-icon .material-symbols-outlined {
+  font-size: 19px;
+}
+
+.marketplace-message-copy {
+  min-width: 0;
+}
+
+.marketplace-message-heading {
+  display: grid;
+  gap: 3px;
+}
+
+.marketplace-message-heading h2 {
+  margin: 0;
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12px;
+}
+
+.marketplace-message-heading time {
+  color: #8793a7;
+  font-size: 9px;
+}
+
+.marketplace-message-copy > p {
+  margin: 8px 0 0;
+  color: #53627a;
+  font-size: 11px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.marketplace-message-read {
+  color: #8793a7;
+  font-size: 9px;
+}
+
+.marketplace-message-detail {
+  padding: 16px;
+  border: 1px solid #e3eaf4;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(19, 42, 78, 0.05);
+}
+
+.marketplace-message-read-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 13px;
+  padding: 9px 10px;
+  border: 1px solid #f0c4bd;
+  border-radius: 8px;
+  color: #8c3328;
+  background: #fff3f1;
+}
+
+.marketplace-message-read-error p {
+  margin: 0;
+  font-size: 11px;
+}
+
+.marketplace-message-read-error button {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  color: inherit;
+  background: #fff;
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-message-card {
+    transition: none;
+  }
+
+  .marketplace-message-delete .is-deleting {
+    animation-duration: 2s;
+  }
+}
+
+.marketplace-message-detail-heading {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #e9eef5;
+}
+
+.marketplace-message-detail-heading h2 {
+  margin: 0 0 4px;
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.marketplace-message-detail-heading time {
+  color: #8793a7;
+  font-size: 10px;
+}
+
+.marketplace-message-detail > p {
+  margin: 15px 0 0;
+  color: #425675;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.marketplace-message-update-hint {
+  margin: 15px 0 0;
+  color: #68758d;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.marketplace-message-update-application {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #1762d5;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.marketplace-message-update-application .material-symbols-outlined {
+  font-size: 15px;
+  vertical-align: middle;
+}
+
+.marketplace-message-update-application:hover,
+.marketplace-message-update-application:focus-visible {
+  color: #124fae;
+}
+
+.marketplace-message-update-application:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid #1762d5;
+  outline-offset: 2px;
+}
+
+.marketplace-messages-state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 38px 18px;
+  border: 1px solid #e3eaf4;
+  border-radius: 13px;
+  background: #fff;
+  text-align: center;
+}
+
+.marketplace-messages-state > .material-symbols-outlined {
+  color: #1762d5;
+  font-size: 32px;
+}
+
+.marketplace-messages-state h2 {
+  margin: 0;
+  color: #172646;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 14px;
+}
+
+.marketplace-messages-state p {
+  margin: 0;
+  color: #68758d;
+  font-size: 11px;
+}

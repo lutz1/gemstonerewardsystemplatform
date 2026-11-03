@@ -1,0 +1,121 @@
+.terms-page {
+  min-height: 100vh;
+  padding: 48px 24px;
+  background: linear-gradient(rgba(14, 21, 16, 0.94), rgba(14, 21, 16, 0.98)), #0e1510;
+  color: #dde4dd;
+  font-family: "Hanken Grotesk", sans-serif;
+}
+
+.terms-shell {
+  width: min(100%, 860px);
+  margin: 0 auto;
+}
+
+.terms-back-link {
+  display: inline-flex;
+  margin-bottom: 28px;
+  color: #59de9b;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.terms-back-link:hover {
+  color: #78fbb6;
+}
+
+.terms-document {
+  padding: clamp(28px, 6vw, 64px);
+  border: 1px solid rgba(198, 198, 198, 0.2);
+  border-radius: 8px;
+  background: rgba(14, 21, 16, 0.76);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+}
+
+.terms-eyebrow,
+.terms-effective {
+  color: #59de9b;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.terms-document h1 {
+  margin-top: 10px;
+  color: #ffffff;
+  font-size: clamp(30px, 5vw, 48px);
+  line-height: 1.1;
+}
+
+.terms-effective {
+  margin-top: 12px;
+  color: #9eada2;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.terms-document > p:not(.terms-eyebrow):not(.terms-effective) {
+  margin-top: 24px;
+}
+
+.terms-document section {
+  margin-top: 36px;
+}
+
+.terms-document h2 {
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.terms-document p,
+.terms-document li {
+  color: #bccabe;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.terms-document section p {
+  margin-top: 10px;
+}
+
+.terms-document ul {
+  margin: 12px 0 0 24px;
+}
+
+.terms-document li {
+  padding-left: 6px;
+}
+
+.terms-acceptance {
+  padding-top: 28px;
+  border-top: 1px solid rgba(198, 198, 198, 0.2);
+}
+
+.terms-signature-grid {
+  display: grid;
+  gap: 8px 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 24px;
+}
+
+.terms-signature-grid p {
+  margin-top: 0;
+}
+
+@media (max-width: 600px) {
+  .terms-page {
+    padding: 28px 16px;
+  }
+
+  .terms-document {
+    padding: 28px 22px;
+  }
+
+  .terms-signature-grid {
+    grid-template-columns: 1fr;
+  }
+}

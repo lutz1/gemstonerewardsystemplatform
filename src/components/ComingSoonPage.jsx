@@ -26,10 +26,10 @@ export default function ComingSoonPage({ title }) {
         {title}
       </h1>
       <p style={{ color: "var(--on-surface-variant)" }}>
-        This page hasn't been built yet.
+        This page is coming soon. Please check back shortly.
       </p>
-      <Link to="/login" style={{ color: "var(--primary)" }}>
-        ← Back to Login
+      <Link to="/dashboard" style={{ color: "var(--primary)" }}>
+        ← Back to Dashboard
       </Link>
     </div>
   );

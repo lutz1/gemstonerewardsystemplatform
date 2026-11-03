@@ -60,7 +60,11 @@ export default function PinVerification() {
       setVerified(true);
       setTimeout(goToDestination, 1100);
     } catch (err) {
-      setError(err?.message || "Incorrect PIN. Please try again.");
+      setError(
+        err?.code === "functions/permission-denied"
+          ? "Incorrect MPIN. Please try again."
+          : "Unable to verify your PIN. Please try again.",
+      );
       setPin("");
     }
   };

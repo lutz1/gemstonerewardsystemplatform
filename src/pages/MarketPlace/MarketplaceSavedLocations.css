@@ -1,0 +1,228 @@
+.marketplace-location-overlay {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.48);
+  animation: marketplace-location-fade-in 180ms ease-out;
+}
+
+.marketplace-location-sheet {
+  display: flex;
+  width: min(100%, 520px);
+  max-height: min(78vh, 680px);
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px 14px 0 0;
+  background: #fff;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
+  animation: marketplace-location-slide-up 240ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.marketplace-location-sheet-heading {
+  position: relative;
+  display: grid;
+  min-height: 54px;
+  flex: 0 0 auto;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  padding: 0 12px;
+  border-bottom: 1px solid #edf0ee;
+}
+
+.marketplace-location-sheet-heading h2 {
+  color: #202923;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.marketplace-location-close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  justify-self: end;
+  border: 0;
+  border-radius: 50%;
+  color: #303b34;
+  background: transparent;
+  cursor: pointer;
+}
+
+.marketplace-location-close .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.marketplace-location-list {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 14px 0;
+}
+
+.marketplace-location-option {
+  display: flex;
+  width: 100%;
+  min-height: 120px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 2px;
+  border: 0;
+  border-bottom: 1px solid #ecefed;
+  color: #363e39;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.marketplace-location-option-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.marketplace-location-option-copy strong {
+  margin-bottom: 3px;
+  color: #252c27;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.marketplace-location-default {
+  width: fit-content;
+  margin-top: 2px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: #59665e;
+  background: #f0f2f1;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.marketplace-location-radio {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  place-items: center;
+  margin-top: 1px;
+  border: 2px solid #d5dad7;
+  border-radius: 50%;
+}
+
+.marketplace-location-radio.is-selected {
+  border-color: #078355;
+}
+
+.marketplace-location-radio.is-selected::after {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #078355;
+  content: "";
+}
+
+.marketplace-location-sheet-footer {
+  flex: 0 0 auto;
+  padding: 12px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid #f0f2f1;
+  background: #fff;
+}
+
+.marketplace-location-add-button {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 24px;
+  color: #fff;
+  background: #078355;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.marketplace-location-form {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  gap: 14px;
+  overflow-y: auto;
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+}
+
+.marketplace-location-form label {
+  display: grid;
+  gap: 6px;
+  color: #29372f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.marketplace-location-form label > span {
+  color: #7a8980;
+  font-weight: 400;
+}
+
+.marketplace-location-form input,
+.marketplace-location-form textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 11px;
+  border: 1px solid #dce5df;
+  border-radius: 7px;
+  outline-color: #078355;
+  color: #243d31;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.marketplace-location-form textarea {
+  resize: vertical;
+}
+
+.marketplace-location-cancel {
+  min-height: 38px;
+  border: 0;
+  color: #078355;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.marketplace-location-error {
+  margin: 12px 16px 0;
+  color: #b6423b;
+  font-size: 12px;
+}
+
+@keyframes marketplace-location-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes marketplace-location-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-location-overlay,
+  .marketplace-location-sheet {
+    animation: none;
+  }
+}

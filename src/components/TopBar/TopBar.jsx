@@ -1,21 +1,30 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { app, auth } from "../../firebase";
+import { useAuth } from "../../../context/AuthContext";
+import { app } from "../../firebase";
 import NotificationDrawer from "./notification/NotificationDrawer";
 import "./TopBar.css";
 
-const DEFAULT_AVATAR_URL =
-  "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=80&q=80";
+function formatNotificationDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 /**
  * Shared top app bar used across pages.
  *
  * Props:
  * - logoText:   brand text shown top-left            (default "Gemstone Code")
- * - userName:   member's display name                (default "Alex Sterling")
- * - userRole:   member tier/role label                (default "Executive Member")
- * - avatarUrl:  avatar image src                      (default sample avatar)
+ * - userName:   member's display name                (optional)
+ * - userRole:   member tier/role label                (optional)
+ * - avatarUrl:  avatar image src                      (optional)
  * - profilePath: route opened by the avatar             (default "/profile")
  * - notifications: array of { id, title, message, time, unread } shown in the
  *                   notification drawer (default [])
@@ -26,55 +35,58 @@ const DEFAULT_AVATAR_URL =
  */
 export default function TopBar({
   logoText = "Gemstone Code",
-  userName = "Alex Sterling",
-  userRole = "Executive Member",
-  avatarUrl = DEFAULT_AVATAR_URL,
+  userName = "",
+  userRole = "",
+  avatarUrl = "",
   profilePath = "/profile",
   showNotifDot = false,
-  notifications = [],
+  notifications,
   onNotifClick,
   onAvatarClick,
 }) {
   const navigate = useNavigate();
+  const auth = useAuth();
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
-  const [drawerNotifications, setDrawerNotifications] = useState(notifications);
+  const [loadedNotifications, setLoadedNotifications] = useState([]);
+  const [hiddenNotificationIds, setHiddenNotificationIds] = useState(() => new Set());
+  const [deletingNotificationId, setDeletingNotificationId] = useState("");
+  const [notificationDeleteError, setNotificationDeleteError] = useState("");
 
   useEffect(() => {
-    setDrawerNotifications(notifications);
+    if (notifications !== undefined) return undefined;
+
+    let isMounted = true;
+    const getUserNotifications = httpsCallable(
+      getFunctions(app, "asia-southeast1"),
+      "getUserNotifications",
+    );
+    getUserNotifications()
+      .then(({ data }) => {
+        if (isMounted) setLoadedNotifications(data?.notifications || []);
+      })
+      .catch(() => {
+        if (isMounted) setLoadedNotifications([]);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, [notifications]);
 
-  useEffect(() => {
-    if (!auth.currentUser || notifications.length > 0) return undefined;
-
-    let cancelled = false;
-    const loadNotifications = async () => {
-      try {
-        const getUserNotifications = httpsCallable(
-          getFunctions(app, "asia-southeast1"),
-          "getUserNotifications",
-        );
-        const { data } = await getUserNotifications();
-        const next = (data?.notifications || []).map((item) => ({
-          id: item.id,
-          title: item.title,
-          message: item.message,
-          time: item.time,
-          unread: item.unread,
-        }));
-
-        if (!cancelled) {
-          setDrawerNotifications(next);
-        }
-      } catch (error) {
-        console.warn("Unable to load notification drawer data:", error);
-      }
-    };
-
-    void loadNotifications();
-    return () => {
-      cancelled = true;
-    };
-  }, [auth.currentUser, notifications]);
+  const resolvedUserName = userName || auth?.username || "";
+  const resolvedUserRole = userRole || auth?.role || "";
+  const resolvedAvatarUrl = avatarUrl || auth?.avatarUrl || "";
+  const displayedNotifications = (notifications ?? loadedNotifications)
+    .filter((notification) => !hiddenNotificationIds.has(notification.id))
+    .map(
+    (notification) => ({
+      ...notification,
+      time: formatNotificationDate(notification.time),
+    }),
+  );
+  const hasUnreadNotifications = showNotifDot || displayedNotifications.some(
+    (notification) => notification.unread,
+  );
 
   const handleAvatarClick = () => {
     if (onAvatarClick) {
@@ -101,6 +113,44 @@ export default function TopBar({
     navigate(notificationsPath);
   };
 
+  const deleteNotifications = httpsCallable(
+    getFunctions(app, "asia-southeast1"),
+    "deleteUserNotifications",
+  );
+
+  const handleDeleteNotification = async (notificationId) => {
+    setDeletingNotificationId(notificationId);
+    setNotificationDeleteError("");
+    try {
+      await deleteNotifications({ notificationIds: [notificationId] });
+      setHiddenNotificationIds((current) => new Set(current).add(notificationId));
+      setLoadedNotifications((current) => current.filter((notification) => notification.id !== notificationId));
+      return true;
+    } catch (error) {
+      setNotificationDeleteError(error?.message || "Unable to delete this notification.");
+      return false;
+    } finally {
+      setDeletingNotificationId("");
+    }
+  };
+
+  const handleClearAllNotifications = async () => {
+    setNotificationDeleteError("");
+    try {
+      await deleteNotifications({ deleteAll: true });
+      setHiddenNotificationIds((current) => {
+        const next = new Set(current);
+        displayedNotifications.forEach((notification) => next.add(notification.id));
+        return next;
+      });
+      setLoadedNotifications([]);
+      return true;
+    } catch (error) {
+      setNotificationDeleteError(error?.message || "Unable to clear notifications.");
+      return false;
+    }
+  };
+
   return (
     <>
       <header className="tb-topbar">
@@ -111,8 +161,8 @@ export default function TopBar({
 
           <div className="tb-topbar-right">
             <div className="tb-user-info">
-              <p className="tb-user-role">{userRole}</p>
-              <p className="tb-user-name">{userName}</p>
+              <p className="tb-user-role">{resolvedUserRole}</p>
+              <p className="tb-user-name">{resolvedUserName}</p>
             </div>
             <button
               className="tb-notif-btn"
@@ -121,17 +171,29 @@ export default function TopBar({
               onClick={handleNotifClick}
             >
               <span className="material-symbols-outlined">notifications</span>
-              {showNotifDot && <span className="tb-notif-dot" />}
+              {hasUnreadNotifications && <span className="tb-notif-dot" />}
             </button>
-            <div
-              className="tb-topbar-avatar"
-              onClick={handleAvatarClick}
-              role="button"
-              tabIndex={0}
-              aria-label="View profile"
-            >
-              <img src={avatarUrl} alt={userName} />
-            </div>
+            {resolvedAvatarUrl ? (
+              <div
+                className="tb-topbar-avatar"
+                onClick={handleAvatarClick}
+                role="button"
+                tabIndex={0}
+                aria-label="View profile"
+              >
+                <img src={resolvedAvatarUrl} alt={resolvedUserName} />
+              </div>
+            ) : (
+              <div
+                className="tb-topbar-avatar tb-topbar-avatar-placeholder"
+                onClick={handleAvatarClick}
+                role="button"
+                tabIndex={0}
+                aria-label="View profile"
+              >
+                <span className="material-symbols-outlined">account_circle</span>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -139,8 +201,12 @@ export default function TopBar({
       <NotificationDrawer
         isOpen={isNotifDrawerOpen}
         onClose={() => setIsNotifDrawerOpen(false)}
-        notifications={drawerNotifications}
+        notifications={displayedNotifications}
         onViewAll={handleViewAllNotifications}
+        onDeleteNotification={handleDeleteNotification}
+        onClearAll={handleClearAllNotifications}
+        deletingNotificationId={deletingNotificationId}
+        deleteError={notificationDeleteError}
       />
     </>
   );

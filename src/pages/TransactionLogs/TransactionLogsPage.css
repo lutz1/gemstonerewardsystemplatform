@@ -1,0 +1,284 @@
+.transaction-logs-root {
+  min-height: 100vh;
+  padding-bottom: 96px;
+  background: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-hanken);
+}
+
+.transaction-logs-main {
+  width: min(100% - 32px, 960px);
+  margin: 0 auto;
+  padding: 96px 0 32px;
+}
+
+.transaction-logs-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.transaction-logs-eyebrow {
+  margin: 0 0 8px;
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.transaction-logs-header h1 {
+  margin: 0;
+  font-family: var(--font-jakarta);
+  font-size: 32px;
+}
+
+.transaction-logs-header p:last-child {
+  margin-top: 8px;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+}
+
+.transaction-logs-header > svg {
+  flex-shrink: 0;
+  color: var(--primary);
+  font-size: 34px;
+}
+
+.transaction-logs-panel {
+  overflow: hidden;
+  border: 1px solid var(--color-border-faint);
+  border-radius: 14px;
+  background: rgba(26, 33, 28, 0.72);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+.transaction-logs-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid rgba(198, 198, 198, 0.12);
+}
+
+.transaction-logs-toolbar h2 {
+  margin: 0;
+  font-family: var(--font-jakarta);
+  font-size: 18px;
+}
+
+.transaction-logs-toolbar p,
+.transaction-logs-table span,
+.transaction-logs-mobile-list span,
+.transaction-logs-mobile-list small {
+  color: var(--on-surface-variant);
+}
+
+.transaction-logs-toolbar p {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.transaction-logs-controls {
+  display: flex;
+  gap: 8px;
+  width: min(100%, 400px);
+}
+
+.transaction-logs-controls input,
+.transaction-logs-controls select {
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid rgba(198, 198, 198, 0.18);
+  border-radius: 7px;
+  background: rgba(10, 15, 12, 0.35);
+  color: var(--on-surface);
+  font: inherit;
+  font-size: 12px;
+}
+
+.transaction-logs-controls input {
+  flex: 1;
+}
+
+.transaction-logs-controls select {
+  flex: 0 0 136px;
+}
+
+.transaction-logs-table-wrap {
+  overflow-x: auto;
+}
+
+.transaction-logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.transaction-logs-table th,
+.transaction-logs-table td {
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(198, 198, 198, 0.1);
+  white-space: nowrap;
+}
+
+.transaction-logs-table th {
+  color: var(--on-surface-variant);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.transaction-logs-table td:first-child {
+  min-width: 260px;
+  white-space: normal;
+}
+
+.transaction-logs-table td > strong,
+.transaction-logs-table td > span {
+  display: block;
+}
+
+.transaction-logs-table td > span {
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.transaction-logs-table td {
+  font-size: 13px;
+}
+
+.transaction-logs-table td span span {
+  display: block;
+  margin-top: 3px;
+}
+
+.transaction-logs-table .is-positive,
+.transaction-logs-mobile-list .is-positive {
+  color: var(--primary);
+}
+
+.transaction-logs-table td:last-child b {
+  color: var(--primary);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.transaction-logs-empty {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 64px 20px;
+  text-align: center;
+}
+
+.transaction-logs-empty svg {
+  color: var(--primary);
+  font-size: 32px;
+}
+
+.transaction-logs-empty h2 {
+  font-family: var(--font-jakarta);
+  font-size: 18px;
+}
+
+.transaction-logs-empty p {
+  color: var(--on-surface-variant);
+  font-size: 13px;
+}
+
+.transaction-logs-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid rgba(198, 198, 198, 0.1);
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+
+.transaction-logs-pagination > div {
+  display: flex;
+  gap: 8px;
+}
+
+.transaction-logs-pagination button {
+  padding: 7px 10px;
+  border: 1px solid rgba(198, 198, 198, 0.18);
+  border-radius: 6px;
+  background: rgba(10, 15, 12, 0.35);
+  color: var(--on-surface);
+  font: inherit;
+  cursor: pointer;
+}
+
+.transaction-logs-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.transaction-logs-mobile-list {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .transaction-logs-main {
+    width: min(100% - 24px, 520px);
+    padding-top: 88px;
+  }
+
+  .transaction-logs-header h1 {
+    font-size: 27px;
+  }
+
+  .transaction-logs-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .transaction-logs-controls {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .transaction-logs-controls input,
+  .transaction-logs-controls select {
+    width: 100%;
+    flex-basis: auto;
+  }
+
+  .transaction-logs-table-wrap {
+    display: none;
+  }
+
+  .transaction-logs-mobile-list {
+    display: grid;
+  }
+
+  .transaction-logs-mobile-list article {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
+    padding: 16px;
+    border-bottom: 1px solid rgba(198, 198, 198, 0.1);
+  }
+
+  .transaction-logs-mobile-list article > div {
+    min-width: 0;
+  }
+
+  .transaction-logs-mobile-list span,
+  .transaction-logs-mobile-list small {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+  }
+
+  .transaction-logs-mobile-list small {
+    grid-column: 1 / -1;
+  }
+}

@@ -9,12 +9,6 @@ import "./QrPaymentPage.css";
 
 const RECEIPT_REDIRECT_SECONDS = 5;
 
-const SERVICE_FEES = {
-  emerald: 50,
-  sapphire: 150,
-  diamond: 250,
-};
-
 function formatReceiptDate(value) {
   if (!value) return "—";
   const date = new Date(value);
@@ -29,9 +23,10 @@ export default function QrPaymentPage() {
   const navigate = useNavigate();
 
   const pkg = location.state?.package ?? getPackageById(packageId);
+  const inclusion = location.state?.inclusion || null;
+  const deliveryInformation = location.state?.deliveryInformation || null;
   const total = pkg ? calcTotal(pkg) : 0;
-  const serviceFee = pkg ? SERVICE_FEES[pkg.id] || 0 : 0;
-  const orderTotal = total + serviceFee;
+  const orderTotal = total;
 
   // "confirmed" -> "receipt"
   const [stage, setStage] = useState("confirmed");
@@ -51,7 +46,10 @@ export default function QrPaymentPage() {
         getFunctions(app, "asia-southeast1"),
         "completePurchase",
       );
-      const { data: result } = await completePurchase({ packageId: pkg.id });
+      const { data: result } = await completePurchase({
+        packageId: pkg.id,
+        deliveryInformation,
+      });
       setReceipt(result);
       setIsCompletingPayment(false);
       setPaymentSucceeded(true);
@@ -134,7 +132,7 @@ export default function QrPaymentPage() {
             <Link
               className="qr-back-link"
               to={`/purchase-codes/package/${pkg.id}`}
-              state={{ package: pkg }}
+              state={{ package: pkg, inclusion, deliveryInformation }}
             >
               <span className="material-symbols-outlined">arrow_back</span>
               Back to Package
@@ -167,6 +165,19 @@ export default function QrPaymentPage() {
                         <MdDiamond size={18} />
                       </span>
                       <span>
+                        <strong>{inclusion?.name || "Selected Inclusion"}</strong>
+                        <small>{inclusion?.description || "Included with membership"}</small>
+                      </span>
+                    </div>
+                    <span className="qr-order-qty" role="cell">x 1</span>
+                    <strong className="qr-order-total qr-order-free" role="cell">Free</strong>
+                  </div>
+                  <div className="qr-order-row" role="row">
+                    <div className="qr-order-product" role="cell">
+                      <span className="qr-gem-icon" aria-hidden="true">
+                        <MdDiamond size={18} />
+                      </span>
+                      <span>
                         <strong>{pkg.name}</strong>
                         <small>{pkg.tier} Membership</small>
                       </span>
@@ -178,11 +189,35 @@ export default function QrPaymentPage() {
                   </div>
                 </div>
 
+                {deliveryInformation && (
+                  <section className="qr-delivery-review" aria-labelledby="qr-delivery-title">
+                    <h3 id="qr-delivery-title">Delivery Information</h3>
+                    <div className="qr-detail-rows">
+                      <div className="qr-detail-row">
+                        <span className="qr-detail-label">Recipient</span>
+                        <span className="qr-detail-value">{deliveryInformation.recipientName}</span>
+                      </div>
+                      <div className="qr-detail-row">
+                        <span className="qr-detail-label">Contact number</span>
+                        <span className="qr-detail-value">{deliveryInformation.phone}</span>
+                      </div>
+                      <div className="qr-detail-row">
+                        <span className="qr-detail-label">Address</span>
+                        <span className="qr-detail-value qr-delivery-address">
+                          {[
+                            deliveryInformation.addressLine1,
+                            deliveryInformation.addressLine2,
+                            deliveryInformation.city,
+                            deliveryInformation.province,
+                            deliveryInformation.postalCode,
+                          ].filter(Boolean).join(", ")}
+                        </span>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
                 <div className="qr-review-fees">
-                  <div className="qr-detail-row">
-                    <span className="qr-detail-label">Service Fee</span>
-                    <span className="qr-detail-value">{formatCurrency(serviceFee)}</span>
-                  </div>
                   <div className="qr-detail-row qr-detail-total">
                     <span className="qr-detail-label">Total Amount</span>
                     <span className="qr-detail-value">{formatCurrency(orderTotal)}</span>
@@ -191,9 +226,16 @@ export default function QrPaymentPage() {
 
                 {paymentError && <p className="qr-payment-error" role="alert">{paymentError}</p>}
 
+                {!deliveryInformation && (
+                  <p className="qr-payment-error" role="alert">
+                    Delivery information is missing. Return to package details and complete the delivery form.
+                  </p>
+                )}
+
                 <button
                   className="qr-complete-btn"
                   type="button"
+                  disabled={!deliveryInformation}
                   onClick={() => setShowPaymentConfirmation(true)}
                 >
                   Complete Payment
@@ -213,10 +255,6 @@ export default function QrPaymentPage() {
                 </div>
 
                 <div className="qr-detail-rows">
-                  <div className="qr-detail-row">
-                    <span className="qr-detail-label">Service Fee</span>
-                    <span className="qr-detail-value">{formatCurrency(receipt.serviceFee || 0)}</span>
-                  </div>
                   <div className="qr-detail-row">
                     <span className="qr-detail-label">Total Amount</span>
                     <span className="qr-detail-value qr-receipt-total-value">{formatCurrency(receipt.total ?? total)}</span>
@@ -238,6 +276,12 @@ export default function QrPaymentPage() {
                     <span className="qr-detail-label">Product</span>
                     <span className="qr-detail-value">{pkg.name} x {pkg.quantity}</span>
                   </div>
+                  {inclusion?.name && (
+                    <div className="qr-detail-row">
+                      <span className="qr-detail-label">Inclusion</span>
+                      <span className="qr-detail-value">{inclusion.name} x 1 (Free)</span>
+                    </div>
+                  )}
                   <div className="qr-detail-row">
                     <span className="qr-detail-label">Created on</span>
                     <span className="qr-detail-value">{formatReceiptDate(receipt.completedAt)}</span>

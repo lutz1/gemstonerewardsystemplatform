@@ -71,7 +71,7 @@ export default function ProductsPage() {
               <div>
                 <h2 className="prod-page-title">Products</h2>
                 <p className="prod-page-sub">
-                  Choose the code package that matches your networking tier.
+                  Choose the package that best fits your needs and start earning rewards today!
                 </p>
               </div>
             </div>
@@ -114,7 +114,7 @@ export default function ProductsPage() {
                       <span className="prod-feature-list">
                         <FeatureRow>{pkg.totalGems} Total Gems</FeatureRow>
                         <FeatureRow>
-                          {pkg.dailyGems} Gems Daily Rewards
+                          {pkg.dailyGems} Gems Daily Cashback
                         </FeatureRow>
                         {pkg.features.map((feature) => (
                           <FeatureRow key={feature}>{feature}</FeatureRow>

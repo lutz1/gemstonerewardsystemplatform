@@ -2,6 +2,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
+import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import TopBar from "../../components/TopBar/TopBar";
 import { app } from "../../firebase";
 import "./NotificationsPage.css";
@@ -55,7 +56,7 @@ export default function NotificationsPage({ isAdmin = false }) {
       window.history.state?.idx > 0
         ? -1
         : isAdmin
-          ? "/admin/settings"
+          ? "/admin/dashboard"
           : "/dashboard";
 
     if (previousPage === -1) {
@@ -92,20 +93,18 @@ export default function NotificationsPage({ isAdmin = false }) {
                 arrow_back
               </span>
             </button>
-            <div>
-              <p className="notifications-eyebrow">Updates</p>
+            <div className="notifications-header-copy">
+              <p className="notifications-eyebrow">Your updates</p>
               <h1>Notifications</h1>
+              <p className="notifications-subtitle">
+                Stay up to date with your latest account activity.
+              </p>
             </div>
           </div>
         </header>
 
         {loading ? (
-          <div className="notifications-empty-state">
-            <span className="material-symbols-outlined" aria-hidden="true">
-              sync
-            </span>
-            <h2>Loading notifications...</h2>
-          </div>
+          <LoadingScreen label="Loading notifications..." />
         ) : notifications.length === 0 ? (
           <div className="notifications-empty-state">
             <span className="material-symbols-outlined" aria-hidden="true">
@@ -123,15 +122,17 @@ export default function NotificationsPage({ isAdmin = false }) {
               <article
                 key={item.id}
                 className={`notification-card notification-card--${
-                  item.type || "info"
-                }`}
+                  item.type === "gem_burn" ? "safety-net" : item.type || "info"
+                }${item.unread ? " is-unread" : ""}`}
               >
                 <div className="notification-icon-wrap">
                   <span
                     className="material-symbols-outlined"
                     aria-hidden="true"
                   >
-                    {item.type === "success"
+                    {item.type === "gem_burn"
+                      ? "local_fire_department"
+                      : item.type === "success"
                       ? "check_circle"
                       : item.type === "warning"
                         ? "warning"
@@ -143,6 +144,11 @@ export default function NotificationsPage({ isAdmin = false }) {
                 <div className="notification-content">
                   <div className="notification-head">
                     <h2>{item.title}</h2>
+                    {item.unread && (
+                      <span className="notification-unread-indicator">
+                        Unread
+                      </span>
+                    )}
                     <time>{item.time}</time>
                   </div>
                   <p>{item.message}</p>

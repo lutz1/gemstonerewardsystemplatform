@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { MdArrowBack, MdGroup, MdPerson } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav";
+import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import TopBar from "../../components/TopBar/TopBar";
 import { app } from "../../firebase";
 import "./DirectReferralsPage.css";
@@ -81,7 +82,7 @@ export default function DirectReferralsPage({ referralType = "direct" }) {
 
           {error && <p className="referrals-message" role="alert">{error}</p>}
           {!error && referrals === null && (
-            <p className="referrals-message" role="status">Loading referrals...</p>
+            <LoadingScreen label="Loading referrals..." />
           )}
           {!error && referrals?.length === 0 && (
             <div className="referrals-empty">

@@ -85,11 +85,23 @@ export default function UserManagementPage() {
         "getUsers",
       );
       const result = await getUsers();
-      const users = (result.data || []).map((user) => {
+      const users = await Promise.all((result.data || []).map(async (user) => {
         const fullName = [user.firstName, user.middleName, user.lastName]
           .filter(Boolean)
           .join(" ")
           .trim();
+        let emailVerified = false;
+
+        try {
+          const getUserAuthStatus = httpsCallable(
+            getFunctions(app, "asia-southeast1"),
+            "getUserAuthStatus",
+          );
+          const authStatus = await getUserAuthStatus({ userId: user.id });
+          emailVerified = authStatus.data?.emailVerified === true;
+        } catch (error) {
+          console.error("Failed to load email verification status:", error);
+        }
 
         return {
           id: user.id,
@@ -98,9 +110,10 @@ export default function UserManagementPage() {
           email: user.email || "",
           role: user.role || "member",
           status: user.status || "active",
+          emailVerified,
           totalSpent: Number(user.totalSpent ?? 0),
         };
-      });
+      }));
 
       setUserList(users);
     } catch (error) {
@@ -278,7 +291,20 @@ export default function UserManagementPage() {
                         <td>
                           <div className="admin-user-name-block">
                             <strong>{user.name}</strong>
-                            <small>{user.email}</small>
+                            <small className="admin-user-email">
+                              {user.email}
+                              {user.emailVerified && (
+                                <span
+                                  className="admin-user-verified"
+                                  title="Email verified"
+                                  aria-label="Email verified"
+                                >
+                                  <span className="material-symbols-outlined" aria-hidden="true">
+                                    check
+                                  </span>
+                                </span>
+                              )}
+                            </small>
                           </div>
                         </td>
                         <td>{formatJoinDate(user.joinDate)}</td>
