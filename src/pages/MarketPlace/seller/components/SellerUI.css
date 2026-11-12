@@ -1,0 +1,106 @@
+/* ===== Seller UI: tokens + shared primitives for Inventory, Orders and future seller pages =====
+   Tokens are prefixed --sl- so they never collide with SellerDashboard.css. */
+.sl-root {
+  --sl-navy-950: #071b40; --sl-navy-900: #0b2a5b; --sl-navy-800: #123b77;
+  --sl-blue-600: #0b5bc1; --sl-blue-500: #1d78eb; --sl-blue-100: #e9f2fe;
+  --sl-bg: #eef2f8; --sl-card: #fff; --sl-ink: #17273f; --sl-muted: #5d728d; --sl-line: #dfe8f4;
+  --sl-ok: #0c7a4a; --sl-ok-bg: #dff5ea; --sl-warn: #8b5a00; --sl-warn-bg: #fdf0d6; --sl-bad: #b92034; --sl-bad-bg: #fde7ea;
+  --sl-radius: 20px; --sl-shadow: 0 10px 20px rgba(17, 40, 74, 0.04);
+  display: contents;
+  font-family: var(--font-hanken, "Hanken Grotesk", sans-serif);
+}
+.sl-page, .sl-page *, .sl-page *::before, .sl-page *::after { box-sizing: border-box; }
+.sl-page { min-width: 0; color: var(--sl-ink); }
+.sl-page button { font-family: inherit; cursor: pointer; }
+.sl-page :focus-visible, .sl-overlay :focus-visible { outline: 3px solid var(--sl-blue-500); outline-offset: 2px; }
+.sl-page h1, .sl-page h2, .sl-page h3, .sl-drawer__head h2 { font-family: var(--font-jakarta, "Plus Jakarta Sans", sans-serif); }
+.sl-overlay, .sl-overlay * { box-sizing: border-box; }
+
+/* --- Page head --- */
+.sl-page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.sl-page-head h1 { margin: 6px 0 0; font-size: clamp(1.9rem, 3vw, 2.7rem); font-weight: 800; letter-spacing: -0.05em; line-height: 1.1; }
+.sl-kicker, .sl-page-head p.sl-kicker { margin: 0; color: #5d7eb5; font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.sl-page-head p { margin: 8px 0 0; color: var(--sl-muted); }
+
+/* --- Buttons --- */
+.sl-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 1px solid transparent; border-radius: 14px; font-size: 14px; font-weight: 700; transition: transform .1s, box-shadow .15s, background .15s; }
+.sl-btn:active { transform: translateY(1px); }
+.sl-btn--primary { color: #fff; background: linear-gradient(180deg, var(--sl-blue-500), var(--sl-blue-600)); box-shadow: 0 12px 18px rgba(11,91,193,.18); }
+.sl-btn--primary:hover { box-shadow: 0 12px 22px rgba(11,91,193,.28); }
+.sl-btn--ghost { color: var(--sl-navy-800); background: #fff; border-color: var(--sl-line); }
+.sl-btn--ghost:hover { background: var(--sl-blue-100); }
+.sl-btn--danger { color: var(--sl-bad); background: var(--sl-bad-bg); }
+.sl-btn--danger-solid { color: #fff; background: var(--sl-bad); }
+.sl-btn--sm { min-height: 36px; padding: 0 12px; border-radius: 12px; font-size: 13px; }
+.sl-btn:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+.sl-icon-btn { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: transparent; color: var(--sl-muted); }
+.sl-icon-btn:hover:not(:disabled) { background: var(--sl-blue-100); color: var(--sl-navy-800); }
+.sl-icon-btn.is-danger:hover { background: var(--sl-bad-bg); color: var(--sl-bad); }
+.sl-icon-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* --- Cards, tabs, search, badges --- */
+.sl-card { background: var(--sl-card); border: 1px solid var(--sl-line); border-radius: var(--sl-radius); box-shadow: var(--sl-shadow); }
+.sl-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.sl-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.sl-tab { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid var(--sl-line); border-radius: 99px; background: #fff; color: var(--sl-ink); font-size: 14px; font-weight: 600; white-space: nowrap; }
+.sl-tab span { padding: 1px 8px; border-radius: 99px; background: var(--sl-bg); color: var(--sl-muted); font-size: 12px; }
+.sl-tab.is-active { background: var(--sl-navy-900); border-color: var(--sl-navy-900); color: #fff; }
+.sl-tab.is-active span { background: rgba(255,255,255,.18); color: #fff; }
+.sl-search { position: relative; }
+.sl-search .material-symbols-outlined { pointer-events: none; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--sl-muted); }
+.sl-search input { width: 260px; max-width: 100%; padding: 11px 14px 11px 38px; }
+.sl-badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; white-space: nowrap; background: var(--sl-blue-100); color: var(--sl-blue-600); }
+.sl-badge--sl-ok { background: var(--sl-ok-bg); color: var(--sl-ok); }
+.sl-badge--sl-warn { background: var(--sl-warn-bg); color: var(--sl-warn); }
+.sl-badge--sl-bad { background: var(--sl-bad-bg); color: var(--sl-bad); }
+.sl-badge--mute { background: #eceff6; color: var(--sl-muted); }
+.sl-empty { display: grid; justify-items: center; gap: 8px; padding: 56px 20px; text-align: center; color: var(--sl-muted); }
+.sl-empty > .material-symbols-outlined { color: var(--sl-blue-500); }
+.sl-empty strong { color: var(--sl-ink); font-size: 17px; }
+
+/* --- Form fields --- */
+.sl-input, .sl-select, .sl-textarea { width: 100%; padding: 11px 14px; border: 1px solid var(--sl-line); border-radius: 12px; background: #fff; color: var(--sl-ink); font: inherit; font-size: 14px; }
+.sl-input:focus, .sl-select:focus, .sl-textarea:focus { outline: 3px solid rgba(47,134,240,.25); border-color: var(--sl-blue-500); }
+.sl-textarea { resize: vertical; min-height: 84px; }
+.sl-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sl-field { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
+.sl-field.is-wide { grid-column: 1 / -1; }
+.sl-field.has-error .sl-input { border-color: var(--sl-bad); }
+.sl-field__error { color: var(--sl-bad); font-weight: 600; font-size: 12px; }
+
+/* --- Drawer / dialog --- */
+.sl-overlay { position: fixed; inset: 0; z-index: 50; display: flex; justify-content: flex-end; background: rgba(7,22,50,.5); }
+.sl-overlay.is-dialog { align-items: center; justify-content: center; padding: 16px; }
+.sl-drawer { display: flex; flex-direction: column; width: min(520px, 100%); height: 100%; background: #fff; box-shadow: -12px 0 40px rgba(7,22,50,.25); animation: sl-slide .22s ease-out; }
+.sl-drawer.is-dialog { width: min(420px, 100%); height: auto; border-radius: 20px; animation: sl-pop .18s ease-out; }
+.sl-drawer__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 22px 24px 16px; border-bottom: 1px solid var(--sl-line); }
+.sl-drawer__head h2 { margin: 0; font-size: 21px; }
+.sl-drawer__head p { margin: 4px 0 0; color: var(--sl-muted); font-size: 14px; }
+.sl-drawer__body { flex: 1; overflow-y: auto; padding: 22px 24px; }
+.sl-drawer__foot { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--sl-line); background: #fafcff; }
+@keyframes sl-slide { from { transform: translateX(32px); opacity: 0; } }
+@keyframes sl-pop { from { transform: scale(.96); opacity: 0; } }
+
+/* --- Toast --- */
+.sl-toast { position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); z-index: 60; display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-radius: 14px; transform: translateX(-50%); background: var(--sl-navy-900); color: #fff; font-weight: 600; box-shadow: 0 12px 32px rgba(7,22,50,.35); }
+.sl-toast .material-symbols-outlined { color: #7fe0b8; }
+
+@media (max-width: 900px) {
+  .sl-form { grid-template-columns: 1fr; }
+  .sl-search { width: 100%; }
+  .sl-search input { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-drawer, .sl-drawer.is-dialog { animation: none; }
+}
+
+/* --- Tab badges + placeholder, used by SellerDashboard's sidebar and bottom nav --- */
+.sl-nav-badge { min-width: 20px; padding: 1px 7px; border-radius: 99px; background: #1d78eb; color: #fff; font-size: 11px; font-style: normal; font-weight: 800; line-height: 1.5; text-align: center; }
+.sl-nav-badge.is-inline { margin-left: auto; }
+.seller-dashboard-nav-item.is-active .sl-nav-badge { background: #fff; color: #0d5ec7; }
+.sl-nav-icon { position: relative; display: grid; place-items: center; }
+.sl-nav-icon .sl-nav-badge { position: absolute; top: -5px; right: -11px; min-width: 16px; padding: 0 4px; border: 2px solid #fff; font-size: 9px; line-height: 1.4; }
+.sl-soon { display: grid; justify-items: center; gap: 8px; padding: 64px 20px; border: 1px solid var(--sl-line); border-radius: var(--sl-radius); background: rgba(255, 255, 255, 0.76); color: var(--sl-muted); text-align: center; }
+.sl-soon .material-symbols-outlined { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; background: var(--sl-blue-100); color: var(--sl-blue-500); font-size: 28px; }
+.sl-soon h2 { margin: 6px 0 0; color: var(--sl-ink); font-family: var(--font-jakarta, "Plus Jakarta Sans", sans-serif); font-size: 1.15rem; font-weight: 800; }
+.sl-soon p { margin: 0; font-size: 14px; }

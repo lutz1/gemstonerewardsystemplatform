@@ -1,0 +1,50 @@
+/* Orders page — shared primitives live in components/SellerLayout.css */
+.ord-table { overflow: hidden; }
+.ord-row { display: grid; grid-template-columns: 1.1fr 1.2fr 1.6fr 1fr 1.1fr 190px; gap: 16px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--sl-line); font-size: 14px; }
+.ord-row:not(.ord-row--head):hover { background: #f8fbff; }
+.ord-row--head { border-top: 0; padding-block: 12px; background: #f6f9fe; color: var(--sl-muted); font-size: 13px; font-weight: 700; }
+.ord-sub { display: block; color: var(--sl-muted); font-size: 12.5px; font-weight: 500; }
+.ord-cell .ord-sub { display: inline; }
+.ord-total { font-weight: 800; }
+.ord-total .ord-sub { display: block; }
+.ord-warn { display: inline-grid; vertical-align: middle; margin-left: 6px; color: var(--sl-warn); }
+.ord-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Drawer detail */
+.ord-detail { display: grid; gap: 22px; }
+.ord-detail h3 { margin: 0 0 10px; font-size: 15px; }
+.ord-steps { display: grid; grid-template-columns: repeat(4, 1fr); margin: 0; padding: 0; list-style: none; }
+.ord-steps li { position: relative; display: grid; justify-items: center; gap: 4px; text-align: center; font-size: 13px; color: var(--sl-muted); }
+.ord-steps li:not(:last-child)::after { content: ""; position: absolute; top: 12px; left: 50%; width: 100%; height: 3px; background: var(--sl-line); }
+.ord-steps li.is-done:not(:last-child)::after { background: var(--sl-blue-600); }
+.ord-steps small { font-size: 12px; }
+.ord-dot { position: relative; z-index: 1; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 3px solid var(--sl-line); color: #fff; }
+.ord-steps li.is-done .ord-dot { background: var(--sl-blue-600); border-color: var(--sl-blue-600); }
+.ord-steps li.is-done b { color: var(--sl-ink); }
+
+.ord-banner { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 12px; font-size: 14px; font-weight: 600; }
+.ord-banner.is-bad { background: var(--sl-bad-bg); color: var(--sl-bad); }
+.ord-banner.is-warn { background: var(--sl-warn-bg); color: var(--sl-warn); }
+.ord-banner .material-symbols-outlined { flex: none; margin-top: 2px; }
+.ord-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
+
+.ord-form { display: grid; gap: 14px; padding: 16px; border-radius: 14px; background: #f6f9fe; border: 1px solid var(--sl-line); }
+.ord-note { margin: 0; color: var(--sl-muted); font-size: 13px; }
+
+.ord-items { margin: 0; padding: 0; list-style: none; border: 1px solid var(--sl-line); border-radius: 14px; overflow: hidden; }
+.ord-items li { display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px; font-size: 14px; }
+.ord-items li + li { border-top: 1px solid var(--sl-line); }
+.ord-items small { color: var(--sl-muted); }
+.ord-items .is-muted { color: var(--sl-muted); }
+.ord-items .is-total { background: #f6f9fe; font-size: 16px; }
+.ord-buyer, .ord-addr, .ord-pay { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; font-size: 14px; }
+.ord-addr { align-items: flex-start; color: var(--sl-muted); }
+.ord-addr .material-symbols-outlined { flex: none; margin-top: 2px; color: var(--sl-blue-500); }
+
+@media (max-width: 860px) {
+  .ord-row--head { display: none; }
+  .ord-row { display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 16px; }
+  .ord-row > div:first-child { flex: 1 0 100%; }
+  .ord-cell::before { content: attr(data-label); display: block; margin-bottom: 4px; color: var(--sl-muted); font-size: 12px; font-weight: 700; }
+  .ord-actions { flex: 1 0 100%; justify-content: flex-start; padding-top: 10px; border-top: 1px dashed var(--sl-line); }
+}
