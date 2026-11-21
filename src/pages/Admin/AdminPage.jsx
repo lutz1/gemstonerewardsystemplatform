@@ -52,6 +52,7 @@ export default function AdminPage() {
   const [gemValueRefreshKey, setGemValueRefreshKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [pendingSellerApplications, setPendingSellerApplications] = useState(null);
+  const [pendingProductApprovals, setPendingProductApprovals] = useState(0);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -71,6 +72,20 @@ export default function AdminPage() {
     };
 
     void loadDashboard();
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    httpsCallable(getFunctions(app, "asia-southeast1"), "getAdminSellerProducts")()
+      .then(({ data }) => {
+        if (!active) return;
+        const count = Array.isArray(data?.products)
+          ? data.products.filter((product) => product.approvalStatus === "pending").length
+          : 0;
+        setPendingProductApprovals(count);
+      })
+      .catch((error) => console.error("Failed to load pending product approvals:", error));
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -226,6 +241,25 @@ export default function AdminPage() {
                 {pendingSellerApplications > 99
                   ? "99+"
                   : pendingSellerApplications}
+              </span>
+            )}
+          </Link>
+          <Link
+            className="admin-summary-card admin-withdrawal-summary-card admin-seller-applications-summary-card"
+            to="/admin/product-approvals"
+            aria-label={`Review ${pendingProductApprovals} pending seller products`}
+          >
+            <div className="admin-summary-icon">
+              <MdPendingActions />
+            </div>
+            <div className="admin-seller-applications-summary-copy">
+              <p>Product Approvals</p>
+              <strong>{pendingProductApprovals}</strong>
+              <span>Awaiting review <MdArrowForward /></span>
+            </div>
+            {pendingProductApprovals > 0 && (
+              <span className="admin-seller-applications-badge" aria-hidden="true">
+                {pendingProductApprovals > 99 ? "99+" : pendingProductApprovals}
               </span>
             )}
           </Link>

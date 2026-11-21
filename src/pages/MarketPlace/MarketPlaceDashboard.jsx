@@ -132,6 +132,7 @@ export default function MarketPlaceDashboard() {
     getMarketplaceSelectedLocationAddress,
   );
   const [showAll, setShowAll] = useState(false);
+  const [approvedSellerProducts, setApprovedSellerProducts] = useState([]);
   const [activeBanner, setActiveBanner] = useState(0);
   const [shortcutNotice, setShortcutNotice] = useState("");
   const [sellerApplication, setSellerApplication] = useState(null);
@@ -310,9 +311,42 @@ export default function MarketPlaceDashboard() {
     };
   }, [refreshUnreadMessageCount, view]);
 
+  useEffect(() => {
+    let active = true;
+    const refreshApprovedProducts = async () => {
+      try {
+        const getPublicSellerProducts = httpsCallable(getFunctions(app, "asia-southeast1"), "getPublicSellerProducts");
+        const { data } = await getPublicSellerProducts();
+        if (active) setApprovedSellerProducts(Array.isArray(data?.products) ? data.products : []);
+      } catch (error) {
+        console.error("Failed to load public seller products:", error);
+        if (active) setApprovedSellerProducts([]);
+      }
+    };
+    void refreshApprovedProducts();
+    window.addEventListener("focus", refreshApprovedProducts);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", refreshApprovedProducts);
+    };
+  }, []);
+
   const visibleGemstones = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    const filtered = gemstones.filter((gemstone) => {
+    const sellerGemstones = approvedSellerProducts.map((product) => ({
+      id: product.id,
+      name: product.name,
+      category: product.category || product.type || "Gemstone",
+      carat: product.carat ? `${product.carat} ct` : "",
+      origin: product.origin || "Seller listing",
+      price: product.price,
+      rating: 5,
+      sold: 0,
+      image: product.images?.[0] || "",
+      featured: true,
+      color: "sapphire",
+    }));
+    const filtered = [...gemstones, ...sellerGemstones].filter((gemstone) => {
       const matchesQuery =
         !normalizedQuery ||
         `${gemstone.name} ${gemstone.category} ${gemstone.origin}`
@@ -325,7 +359,7 @@ export default function MarketPlaceDashboard() {
     });
 
     return filtered;
-  }, [favorites, query, showAll, showFavorites]);
+  }, [approvedSellerProducts, favorites, query, showAll, showFavorites]);
 
   const toggleFavorite = (gemstoneId) => {
     setFavorites((currentFavorites) => {

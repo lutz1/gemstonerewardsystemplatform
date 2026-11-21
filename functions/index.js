@@ -186,6 +186,245 @@ exports.healthCheck = onRequest({ region: 'asia-southeast1' }, (_request, respon
   response.status(200).json({ status: 'ok' });
 });
 
+function serializeSellerProduct(document) {
+  const record = document.data();
+  const submittedAt = record.submittedAt?.toDate?.();
+  const reviewedAt = record.reviewedAt?.toDate?.();
+  const updatedAt = record.updatedAt?.toDate?.();
+  return {
+    id: document.id,
+    sellerId: typeof record.sellerId === 'string' ? record.sellerId : '',
+    sellerName: typeof record.sellerName === 'string' ? record.sellerName : '',
+    sellerEmail: typeof record.sellerEmail === 'string' ? record.sellerEmail : '',
+    sku: typeof record.sku === 'string' ? record.sku : '',
+    name: typeof record.name === 'string' ? record.name : '',
+    category: typeof record.category === 'string' ? record.category : '',
+    description: typeof record.description === 'string' ? record.description : '',
+    basePrice: Number(record.basePrice || 0),
+    price: Number(record.price || 0),
+    stock: Number(record.stock || 0),
+    status: typeof record.status === 'string' ? record.status : 'active',
+    approvalStatus: typeof record.approvalStatus === 'string' ? record.approvalStatus : 'pending',
+    rejectionReason: typeof record.rejectionReason === 'string' ? record.rejectionReason : '',
+    images: Array.isArray(record.images) ? record.images : [],
+    submittedAt: submittedAt instanceof Date ? submittedAt.toISOString() : null,
+    reviewedAt: reviewedAt instanceof Date ? reviewedAt.toISOString() : null,
+    updatedAt: updatedAt instanceof Date ? updatedAt.toISOString() : null,
+  };
+}
+
+exports.submitSellerProduct = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Sign in to publish a product.');
+  }
+
+  const userSnapshot = await db().collection('users').doc(request.auth.uid).get();
+  const userData = userSnapshot.data() || {};
+  if (!userSnapshot.exists || userData.seller !== true) {
+    throw new HttpsError('permission-denied', 'Only active sellers can publish products.');
+  }
+  if (['suspended', 'inactive'].includes(userData.status)) {
+    throw new HttpsError('permission-denied', 'Your seller account is not active.');
+  }
+
+  const data = request.data || {};
+  const name = requireNonEmptyString(data.name, 'Product name');
+  if (name.length > 160) {
+    throw new HttpsError('invalid-argument', 'Product name is too long.');
+  }
+  const basePrice = Number(data.basePrice);
+  const price = Number(data.price);
+  const stock = Number(data.stock);
+  if (!Number.isFinite(basePrice) || basePrice <= 0
+    || !Number.isFinite(price) || price <= 0) {
+    throw new HttpsError('invalid-argument', 'Enter a valid product price.');
+  }
+  if (!Number.isInteger(stock) || stock < 0) {
+    throw new HttpsError('invalid-argument', 'Stock must be a whole number.');
+  }
+  if (data.status === 'active' && (!Array.isArray(data.images) || data.images.length === 0)) {
+    throw new HttpsError('invalid-argument', 'Add at least one photo before publishing.');
+  }
+  if (Array.isArray(data.images) && data.images.length > 4) {
+    throw new HttpsError('invalid-argument', 'A product can have up to 4 photos.');
+  }
+
+  const productId = typeof data.id === 'string' && data.id.trim()
+    ? data.id.trim().slice(0, 128)
+    : db().collection('sellerProducts').doc().id;
+  const productRef = db().collection('sellerProducts').doc(productId);
+  const existing = await productRef.get();
+  if (existing.exists && existing.data()?.sellerId !== request.auth.uid) {
+    throw new HttpsError('permission-denied', 'This product belongs to another seller.');
+  }
+
+  const nextStatus = 'active';
+  const nextApprovalStatus = 'pending';
+  const sellerName = typeof userData.name === 'string' && userData.name.trim()
+    ? userData.name.trim()
+    : [userData.firstName, userData.middleName, userData.lastName]
+      .filter((part) => typeof part === 'string' && part.trim())
+      .join(' ');
+  await productRef.set({
+    sellerId: request.auth.uid,
+    sellerName,
+    sellerEmail: typeof userData.email === 'string' ? userData.email : request.auth.token.email || '',
+    sku: typeof data.sku === 'string' ? data.sku.trim().slice(0, 80) : '',
+    name,
+    category: typeof data.category === 'string' ? data.category.trim().slice(0, 80) : '',
+    description: typeof data.description === 'string' ? data.description.trim().slice(0, 2000) : '',
+    basePrice,
+    price,
+    stock,
+    status: nextStatus,
+    approvalStatus: nextApprovalStatus,
+    images: Array.isArray(data.images)
+      ? data.images.filter((image) => typeof image === 'string').slice(0, 4)
+      : [],
+    submittedAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+  }, { merge: true });
+
+  return { success: true, product: serializeSellerProduct(await productRef.get()) };
+});
+
+exports.getSellerProducts = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+  const snapshot = await db().collection('sellerProducts')
+    .where('sellerId', '==', request.auth.uid)
+    .get();
+  const products = snapshot.docs.map(serializeSellerProduct);
+  products.sort((first, second) => (second.submittedAt || '').localeCompare(first.submittedAt || ''));
+  return { products };
+});
+
+exports.getAdminSellerProducts = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+  await assertIsAdmin(request.auth.uid);
+  const snapshot = await db().collection('sellerProducts').orderBy('submittedAt', 'desc').get();
+  const sellerIds = [...new Set(snapshot.docs
+    .map((document) => document.data()?.sellerId)
+    .filter((sellerId) => typeof sellerId === 'string' && sellerId))];
+  const sellerSnapshots = await Promise.all(
+    sellerIds.map((sellerId) => db().collection('users').doc(sellerId).get()),
+  );
+  const sellers = new Map(sellerSnapshots.map((sellerSnapshot) => {
+    const userData = sellerSnapshot.data() || {};
+    const name = typeof userData.name === 'string' && userData.name.trim()
+      ? userData.name.trim()
+      : [userData.firstName, userData.middleName, userData.lastName]
+        .filter((part) => typeof part === 'string' && part.trim())
+        .join(' ');
+    return [sellerSnapshot.id, {
+      name,
+      email: typeof userData.email === 'string' ? userData.email : '',
+    }];
+  }));
+  return {
+    products: snapshot.docs.map((document) => {
+      const product = serializeSellerProduct(document);
+      const seller = sellers.get(product.sellerId);
+      return {
+        ...product,
+        sellerName: product.sellerName || seller?.name || '',
+        sellerEmail: product.sellerEmail || seller?.email || '',
+      };
+    }),
+  };
+});
+
+exports.getPublicSellerProducts = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+  const snapshot = await db().collection('sellerProducts')
+    .where('approvalStatus', '==', 'approved')
+    .get();
+  return {
+    products: snapshot.docs
+      .map(serializeSellerProduct)
+      .filter((product) => product.status === 'active'),
+  };
+});
+
+exports.reviewSellerProduct = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+  await assertIsAdmin(request.auth.uid);
+
+  const productId = requireNonEmptyString(request.data?.productId, 'Product ID');
+  const approvalStatus = request.data?.approvalStatus;
+  if (!['approved', 'rejected'].includes(approvalStatus)) {
+    throw new HttpsError('invalid-argument', 'Choose approved or rejected.');
+  }
+  const rejectionReason = typeof request.data?.rejectionReason === 'string'
+    ? request.data.rejectionReason.trim()
+    : '';
+  if (approvalStatus === 'rejected' && !rejectionReason) {
+    throw new HttpsError('invalid-argument', 'A rejection reason is required.');
+  }
+  if (rejectionReason.length > 500) {
+    throw new HttpsError('invalid-argument', 'The rejection reason must be 500 characters or fewer.');
+  }
+  const productRef = db().collection('sellerProducts').doc(productId);
+  const snapshot = await productRef.get();
+  if (!snapshot.exists) {
+    throw new HttpsError('not-found', 'Product was not found.');
+  }
+
+  await productRef.update({
+    approvalStatus,
+    status: approvalStatus === 'approved' ? 'active' : 'rejected',
+    rejectionReason: approvalStatus === 'rejected' ? rejectionReason : '',
+    reviewedAt: FieldValue.serverTimestamp(),
+    reviewedBy: request.auth.uid,
+  });
+  return { success: true, product: serializeSellerProduct(await productRef.get()) };
+});
+
+exports.updateSellerProductStock = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+  const productId = requireNonEmptyString(request.data?.productId, 'Product ID');
+  const stock = Number(request.data?.stock);
+  if (!Number.isInteger(stock) || stock < 0) {
+    throw new HttpsError('invalid-argument', 'Stock must be a whole number.');
+  }
+  const productRef = db().collection('sellerProducts').doc(productId);
+  const snapshot = await productRef.get();
+  if (!snapshot.exists || snapshot.data()?.sellerId !== request.auth.uid) {
+    throw new HttpsError('permission-denied', 'This product cannot be updated.');
+  }
+  await productRef.update({ stock, updatedAt: FieldValue.serverTimestamp() });
+  return { success: true };
+});
+
+exports.deleteSellerProduct = onCall({ region: 'asia-southeast1' }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Authentication is required.');
+  }
+  const productId = requireNonEmptyString(request.data?.productId, 'Product ID');
+  if (productId.length > 128 || productId.includes('/')) {
+    throw new HttpsError('invalid-argument', 'Product ID is invalid.');
+  }
+  const productRef = db().collection('sellerProducts').doc(productId);
+  const snapshot = await productRef.get();
+  if (!snapshot.exists || snapshot.data()?.sellerId !== request.auth.uid) {
+    throw new HttpsError('permission-denied', 'This product cannot be deleted.');
+  }
+  await getStorage().bucket().deleteFiles({
+    prefix: `seller-products/${request.auth.uid}/${productId}/`,
+  });
+  await productRef.delete();
+  return { success: true };
+});
+
 exports.submitSellerApplication = onCall({ region: 'asia-southeast1' }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'Sign in to submit a seller application.');

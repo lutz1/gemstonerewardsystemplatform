@@ -3,16 +3,41 @@ import Drawer from "./components/Drawer";
 import Icon from "./components/Icon";
 import PhotoUploader from "./components/PhotoUploader";
 import { useSeller } from "./SellerContext";
-import { CERTS, GEM_COLORS, GEM_TYPES, peso, stockState } from "./sellerData";
+import { peso, stockState } from "./sellerData";
 import "./SellerInventory.css";
 
 const FILTERS = [
-  ["all", "All"], ["active", "In stock"], ["low", "Low stock"], ["out", "Out of stock"], ["draft", "Drafts"],
+  ["all", "All"], ["active", "In stock"], ["pending", "Pending approval"], ["rejected", "Rejected"], ["low", "Low stock"], ["out", "Out of stock"],
+];
+const CATEGORIES = [
+  "Apparel",
+  "Classifieds",
+  "Electronics",
+  "Entertainment",
+  "Family",
+  "Free Stuff",
+  "Garden & Outdoor",
+  "Hobbies",
+  "Home Goods",
+  "Home Improvement Supplies",
+  "Home Sales",
+  "Musical Instruments",
+  "Office Supplies",
+  "Pet Supplies",
+  "Property Rentals",
+  "Sporting Goods",
+  "Toys & Games",
+  "Vehicles",
 ];
 const STATE = {
-  active: ["In stock", ""], low: ["Low stock", "sl-badge--warn"], out: ["Out of stock", "sl-badge--bad"], draft: ["Draft", "sl-badge--mute"],
+  active: ["In stock", ""], pending: ["Pending approval", "sl-badge--warn"], rejected: ["Rejected", "sl-badge--bad"], low: ["Low stock", "sl-badge--warn"], out: ["Out of stock", "sl-badge--bad"],
 };
-const EMPTY = { id: null, name: "", type: "Ruby", carat: "", origin: "", cert: "GIA", price: "", stock: "1", description: "", status: "active", images: [] };
+const EMPTY = { id: null, name: "", category: "", sku: "", price: "", stock: "0", description: "", status: "active", images: [] };
+const createSku = () => `PRD-${Date.now()}`;
+const createEmptyProduct = () => ({ ...EMPTY, sku: createSku() });
+const SELLER_MARKUP = 0.15;
+const withSellerMarkup = (basePrice) =>
+  Math.round((Number(basePrice) * (1 + SELLER_MARKUP) + Number.EPSILON) * 100) / 100;
 
 // Defined outside the page component so inputs keep focus while typing.
 function Field({ label, error, wide, children }) {
@@ -31,12 +56,14 @@ export default function SellerInventory({ autoOpenAdd = false }) {
   const [filter, setFilter] = useState("all");
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("newest");
-  const [form, setForm] = useState(() => (autoOpenAdd ? { ...EMPTY } : null));
+  const [form, setForm] = useState(() => (autoOpenAdd ? createEmptyProduct() : null));
   const [errors, setErrors] = useState({});
   const [toDelete, setToDelete] = useState(null);
+  const [publishConfirm, setPublishConfirm] = useState(null);
+  const [publishPhase, setPublishPhase] = useState(null);
 
   const counts = useMemo(() => {
-    const c = { all: products.length, active: 0, low: 0, out: 0, draft: 0 };
+    const c = { all: products.length, active: 0, pending: 0, rejected: 0, low: 0, out: 0 };
     products.forEach((p) => c[stockState(p)]++);
     return c;
   }, [products]);
@@ -46,7 +73,7 @@ export default function SellerInventory({ autoOpenAdd = false }) {
     const list = products.filter(
       (p) =>
         (filter === "all" || stockState(p) === filter) &&
-        (!term || [p.name, p.sku, p.type, p.origin].some((v) => v.toLowerCase().includes(term)))
+        (!term || [p.name, p.sku, p.category, p.type].some((v) => typeof v === "string" && v.toLowerCase().includes(term)))
     );
     const by = {
       "price-high": (a, b) => b.price - a.price,
@@ -58,51 +85,86 @@ export default function SellerInventory({ autoOpenAdd = false }) {
   }, [products, filter, q, sort]);
 
   const openForm = (p) => {
+    if (["pending", "rejected"].includes(p?.approvalStatus)) return;
     setErrors({});
-    setForm(p ? { ...p, carat: String(p.carat), price: String(p.price), stock: String(p.stock), images: p.images || [] } : { ...EMPTY });
+    setForm(p ? {
+      ...p,
+      category: CATEGORIES.includes(p.category) ? p.category : "",
+      sku: p.sku || createSku(),
+      price: String(p.basePrice ?? p.price),
+      stock: String(p.stock),
+      images: p.images || [],
+    } : createEmptyProduct());
   };
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const submit = (status) => {
+  const validateSubmission = () => {
     const err = {};
     if (!form.name.trim()) err.name = "Enter a product name.";
-    if (!(Number(form.carat) > 0)) err.carat = "Enter the carat weight.";
     if (!(Number(form.price) > 0)) err.price = "Enter a price above ₱0.";
-    if (!Number.isInteger(Number(form.stock)) || Number(form.stock) < 0) err.stock = "Enter a whole number, 0 or more.";
-    const wasLive = form.id && form.status !== "draft";
-    if (status === "active" && !wasLive && form.images.length === 0) err.images = "Add at least one photo to publish, or save as a draft.";
+    if (form.images.length === 0) err.images = "Add at least one photo to submit this product for approval.";
     setErrors(err);
-    if (Object.keys(err).length) return;
-
-    const isNew = !form.id;
-    saveProduct({
-      ...form,
-      id: form.id || `p${Date.now()}`,
-      sku: form.sku || `GM-${form.type.slice(0, 2).toUpperCase()}-${String(products.length + 1).padStart(3, "0")}`,
-      name: form.name.trim(),
-      carat: Number(form.carat),
-      price: Number(form.price),
-      stock: Number(form.stock),
-      status,
-    });
-    notify(status === "draft" ? "Saved as draft" : isNew ? "Product published" : "Changes saved");
-    setForm(null);
+    return Object.keys(err).length === 0;
   };
 
-  const togglePublish = (p) => {
-    if (p.status === "draft" && !(p.images || []).length) {
-      openForm(p);
-      setErrors({ images: "Add at least one photo to publish this product." });
+  const submit = async () => {
+    if (!validateSubmission()) return false;
+    const isNew = !form.id;
+    const basePrice = Number(form.price);
+    const displayPrice = withSellerMarkup(basePrice);
+    try {
+      await saveProduct({
+        ...form,
+        id: form.id || `p${Date.now()}`,
+        sku: form.sku.trim() || createSku(),
+        name: form.name.trim(),
+        category: form.category.trim(),
+        basePrice,
+        price: displayPrice,
+        stock: form.id ? Number(form.stock) : 0,
+        status: "active",
+        approvalStatus: "pending",
+      });
+      notify(isNew
+        ? "Product submitted for admin approval"
+        : "Changes submitted for admin approval");
+      setForm(null);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const openPublishConfirm = () => {
+    if (validateSubmission()) setPublishConfirm({ type: "form" });
+  };
+
+  const confirmPublish = async () => {
+    const action = publishConfirm;
+    setPublishConfirm(null);
+    setPublishPhase("loading");
+    const saved = action?.type === "form" && await submit();
+
+    if (!saved) {
+      setPublishPhase(null);
+      notify("Could not publish product");
       return;
     }
-    saveProduct({ ...p, status: p.status === "draft" ? "active" : "draft" });
-    notify(p.status === "draft" ? "Product published" : "Moved to drafts");
+
+    setPublishPhase("success");
+    window.setTimeout(() => setPublishPhase(null), 1800);
   };
 
-  const confirmDelete = () => {
-    removeProduct(toDelete.id);
-    notify("Product deleted");
-    setToDelete(null);
+  const confirmDelete = async () => {
+    if (toDelete?.approvalStatus === "pending") return;
+    try {
+      await removeProduct(toDelete.id);
+      notify("Product and images deleted");
+      setToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete seller product:", error);
+      notify(error?.message || "Could not delete product.");
+    }
   };
 
   const text = (k, extra) => <input className="sl-input" value={form[k]} onChange={set(k)} {...extra} />;
@@ -131,7 +193,7 @@ export default function SellerInventory({ autoOpenAdd = false }) {
         <div className="inv-tools">
           <div className="sl-search">
             <Icon name="search" size={16} />
-            <input className="sl-input" placeholder="Search name, SKU or origin" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search inventory" />
+            <input className="sl-input" placeholder="Search name, SKU or category" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search inventory" />
           </div>
           <select className="sl-select inv-sort" value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Sort products">
             <option value="newest">Newest first</option>
@@ -145,36 +207,38 @@ export default function SellerInventory({ autoOpenAdd = false }) {
 
       <div className="sl-card inv-table">
         <div className="inv-row inv-row--head">
-          <span>Product</span><span>Details</span><span>Price</span><span>Stock</span><span>Status</span><span />
+          <span>Product</span><span>Category</span><span>Price</span><span>Stock</span><span>Status</span><span />
         </div>
 
         {visible.map((p) => {
           const [label, tone] = STATE[stockState(p)];
+          const isPendingApproval = p.approvalStatus === "pending";
+          const isRejected = p.approvalStatus === "rejected";
+          const isReadOnly = isPendingApproval || isRejected;
           return (
             <div className="inv-row" key={p.id}>
               <div className="inv-product">
-                <span className="inv-gem" style={{ "--gem": GEM_COLORS[p.type] }}>{p.images?.[0] && <img src={p.images[0]} alt="" />}</span>
+                <span className="inv-product-image">
+                  {p.images?.[0] ? <img src={p.images[0]} alt="" /> : <Icon name="inventory_2" size={20} />}
+                </span>
                 <div>
                   <strong>{p.name}</strong>
-                  <small>{p.sku} · {p.origin}</small>
+                  <small>{p.sku}</small>
                 </div>
               </div>
-              <div className="inv-cell" data-label="Details">{p.carat} ct · {p.cert === "None" ? "Uncertified" : p.cert}</div>
+              <div className="inv-cell" data-label="Category">{p.category || p.type || "Uncategorized"}</div>
               <div className="inv-cell inv-price" data-label="Price">{peso(p.price)}</div>
               <div className="inv-cell" data-label="Stock">
                 <div className="inv-stepper">
-                  <button onClick={() => adjustStock(p.id, -1)} disabled={p.stock === 0} aria-label={`Decrease stock of ${p.name}`}><Icon name="remove" size={14} /></button>
+                  <button onClick={() => adjustStock(p.id, -1)} disabled={isReadOnly || p.stock === 0} aria-label={`Decrease stock of ${p.name}`}><Icon name="remove" size={14} /></button>
                   <b>{p.stock}</b>
-                  <button onClick={() => adjustStock(p.id, 1)} aria-label={`Increase stock of ${p.name}`}><Icon name="add" size={14} /></button>
+                  <button onClick={() => adjustStock(p.id, 1)} disabled={isReadOnly} aria-label={`Increase stock of ${p.name}`}><Icon name="add" size={14} /></button>
                 </div>
               </div>
               <div className="inv-cell" data-label="Status"><span className={`sl-badge ${tone}`}>{label}</span></div>
               <div className="inv-actions">
-                <button className="sl-icon-btn" onClick={() => openForm(p)} aria-label={`Edit ${p.name}`} title="Edit"><Icon name="edit" size={17} /></button>
-                <button className="sl-icon-btn" onClick={() => togglePublish(p)} aria-label={p.status === "draft" ? "Publish" : "Move to drafts"} title={p.status === "draft" ? "Publish" : "Move to drafts"}>
-                  {p.status === "draft" ? <Icon name="visibility" size={17} /> : <Icon name="visibility_off" size={17} />}
-                </button>
-                <button className="sl-icon-btn is-danger" onClick={() => setToDelete(p)} aria-label={`Delete ${p.name}`} title="Delete"><Icon name="delete" size={17} /></button>
+                <button className="sl-icon-btn" onClick={() => openForm(p)} disabled={isReadOnly} aria-label={`Edit ${p.name}`} title={isPendingApproval ? "Waiting for admin approval" : isRejected ? "Rejected products are read-only" : "Edit"}><Icon name="edit" size={17} /></button>
+                <button className="sl-icon-btn is-danger" onClick={() => setToDelete(p)} disabled={isPendingApproval} aria-label={`Delete ${p.name}`} title={isPendingApproval ? "Waiting for admin approval" : "Delete"}><Icon name="delete" size={17} /></button>
               </div>
             </div>
           );
@@ -184,7 +248,7 @@ export default function SellerInventory({ autoOpenAdd = false }) {
           <div className="sl-empty">
             <Icon name="inventory_2" size={36} />
             <strong>{products.length ? "No products match" : "No products yet"}</strong>
-            <span>{products.length ? "Try another filter or search term." : "Add your first gemstone to start selling."}</span>
+            <span>{products.length ? "Try another filter or search term." : "Add your first product to start selling."}</span>
             {!products.length && <button className="sl-btn sl-btn--primary" onClick={() => openForm()}>Add product</button>}
           </div>
         )}
@@ -196,12 +260,9 @@ export default function SellerInventory({ autoOpenAdd = false }) {
         title={form?.id ? "Edit product" : "Add product"}
         subtitle="Buyers see these details on your listing."
         footer={
-          <>
-            <button className="sl-btn sl-btn--ghost" onClick={() => submit("draft")}>Save as draft</button>
-            <button className="sl-btn sl-btn--primary" onClick={() => submit("active")}>
-              {form?.id && form.status !== "draft" ? "Save changes" : "Publish product"}
-            </button>
-          </>
+          <button className="sl-btn sl-btn--primary" onClick={openPublishConfirm}>
+            {form?.id ? "Submit for approval" : "Publish product"}
+          </button>
         }
       >
         {form && (
@@ -211,22 +272,27 @@ export default function SellerInventory({ autoOpenAdd = false }) {
               <PhotoUploader images={form.images} onChange={(images) => { setForm((f) => ({ ...f, images })); setErrors((e) => ({ ...e, images: undefined })); }} error={errors.images} />
             </div>
             <Field label="Product name" error={errors.name} wide>
-              {text("name", { placeholder: "e.g. Burmese Ruby, Pigeon Blood" })}
+              {text("name", { placeholder: "e.g. Cotton T-shirt, Ceramic mug" })}
             </Field>
-            <Field label="Gemstone type">
-              <select className="sl-select" value={form.type} onChange={set("type")}>{GEM_TYPES.map((t) => <option key={t}>{t}</option>)}</select>
+            <Field label="Category">
+              <select className="sl-select" value={form.category} onChange={set("category")}>
+                <option value="">Select a category</option>
+                {CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
+              </select>
             </Field>
-            <Field label="Carat weight" error={errors.carat}>
-              {text("carat", { type: "number", min: "0", step: "0.01", placeholder: "0.00" })}
+            <Field label="SKU (auto-generated)">
+              {text("sku", { readOnly: true })}
             </Field>
-            <Field label="Origin">{text("origin", { placeholder: "e.g. Mogok, Myanmar" })}</Field>
-            <Field label="Certification">
-              <select className="sl-select" value={form.cert} onChange={set("cert")}>{CERTS.map((c) => <option key={c}>{c}</option>)}</select>
+            <Field label="Price (₱)" error={errors.price}>
+              {text("price", { type: "number", min: "0", placeholder: "0", step: "0.01" })}
+              {Number(form.price) > 0 && (
+                <span className="sl-price-preview">
+                  Display price: {peso(withSellerMarkup(form.price))} <small>(includes 15% system markup)</small>
+                </span>
+              )}
             </Field>
-            <Field label="Price (₱)" error={errors.price}>{text("price", { type: "number", min: "0", placeholder: "0" })}</Field>
-            <Field label="Stock on hand" error={errors.stock}>{text("stock", { type: "number", min: "0" })}</Field>
             <Field label="Description" wide>
-              <textarea className="sl-textarea" value={form.description} onChange={set("description")} placeholder="Color, clarity, cut, treatments…" />
+              <textarea className="sl-textarea" value={form.description} onChange={set("description")} placeholder="Add product details, materials, sizing, or care instructions…" />
             </Field>
           </div>
         )}
@@ -234,6 +300,8 @@ export default function SellerInventory({ autoOpenAdd = false }) {
 
       <Drawer
         variant="dialog"
+        className="sl-publish-confirm"
+        hideClose
         open={!!toDelete}
         onClose={() => setToDelete(null)}
         title="Delete this product?"
@@ -245,6 +313,44 @@ export default function SellerInventory({ autoOpenAdd = false }) {
           </>
         }
       />
+
+      <Drawer
+        variant="dialog"
+        className="sl-publish-confirm"
+        hideClose
+        open={!!publishConfirm}
+        onClose={() => setPublishConfirm(null)}
+        title="Publish this product?"
+        subtitle="Your product will be sent to the admin for approval before it appears in the marketplace."
+        footer={
+          <>
+            <button className="sl-btn sl-btn--ghost" onClick={() => setPublishConfirm(null)}>Cancel</button>
+            <button className="sl-btn sl-btn--primary" onClick={confirmPublish}>Publish product</button>
+          </>
+        }
+      />
+
+      {publishPhase && (
+        <div className="sl-publish-screen" role="status" aria-live="polite">
+          <div className="sl-publish-card">
+            {publishPhase === "loading" ? (
+              <>
+                <span className="sl-publish-spinner" aria-hidden="true" />
+                <strong>Publishing product...</strong>
+                <p>Submitting your product for admin approval</p>
+              </>
+            ) : (
+              <>
+                <span className="sl-publish-check" aria-hidden="true">
+                  <Icon name="check" size={38} />
+                </span>
+                <strong>Product submitted</strong>
+                <p>Waiting for admin approval</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

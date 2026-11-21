@@ -21,6 +21,7 @@ import SellerManagementList from "./pages/Admin/SellerApplications/SellerManagem
 import SellerApplicationDetailsPage from "./pages/Admin/SellerApplications/components/SellerApplicationDetailsPage";
 import UserManagementPage from "./pages/Admin/UserManagement/UserManagementPage";
 import WithdrawalRequestsPage from "./pages/Admin/Withdrawals/WithdrawalRequestsPage";
+import AdminProductApprovalsPage from "./pages/Admin/Products/AdminProductApprovalsPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import DirectReferralsPage from "./pages/DirectReferrals/DirectReferralsPage";
 import ExchangePage from "./pages/Exchange/ExchangePage";
@@ -92,6 +93,7 @@ export default function App() {
             <Route path="/admin/packages" element={<AdminPackagesPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
             <Route path="/admin/withdrawals" element={<WithdrawalRequestsPage />} />
+            <Route path="/admin/product-approvals" element={<AdminProductApprovalsPage />} />
             <Route
               path="/admin/seller-applications"
               element={<SellerApplicationDashboard />}

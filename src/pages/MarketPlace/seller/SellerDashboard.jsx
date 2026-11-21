@@ -1,8 +1,8 @@
 import { useState } from "react";
-import logo from "../../../assets/app_logo_final.png";
 import { SellerProvider, useSeller } from "./SellerContext";
 import "./SellerDashboard.css";
-import { initialPromotions, initialSettings } from "./sellerData";
+import SellerTopbar from "./components/SellerTopbar";
+import { initialSettings, orderSubtotal } from "./sellerData";
 import SellerInventory from "./SellerInventory";
 import SellerOrders from "./SellerOrders";
 import SellerPayouts from "./SellerPayouts";
@@ -22,13 +22,6 @@ const sellerTabs = [
 // The phone bottom bar has room for five; Promotions stays reachable from Quick actions.
 const bottomTabKeys = ["dashboard", "inventory", "orders", "payouts", "settings"];
 
-const stats = [
-  { label: "Today sales", value: "₱28,420", change: "+12.4%", tone: "positive" },
-  { label: "Orders", value: "184", change: "+8.1%", tone: "positive" },
-  { label: "Visitors", value: "5,482", change: "+21.7%", tone: "positive" },
-  { label: "Pending payouts", value: "₱96,540", change: "2 due", tone: "neutral" },
-];
-
 const quickActions = [
   { label: "Add product", icon: "add_circle", tab: "inventory", add: true },
   { label: "Inventory", icon: "inventory_2", tab: "inventory" },
@@ -36,35 +29,60 @@ const quickActions = [
   { label: "Promotions", icon: "campaign", tab: "promotions" },
 ];
 
-const orderRows = [
-  { id: "#ORD-2041", customer: "Mia Reyes", item: "Emerald Cut", total: "₱6,200", status: "Packed" },
-  { id: "#ORD-2042", customer: "Theo Cruz", item: "Sapphire Ring", total: "₱9,140", status: "Shipped" },
-  { id: "#ORD-2043", customer: "Ava Santos", item: "Diamond Pair", total: "₱12,680", status: "Processing" },
-  { id: "#ORD-2044", customer: "Liam Garcia", item: "Pearl Pendant", total: "₱4,330", status: "Review" },
-];
-
-const topProducts = [
-  { name: "Emerald Cut", stock: "18 left", revenue: "₱38,900", color: "emerald" },
-  { name: "Sapphire Ring", stock: "11 left", revenue: "₱29,470", color: "sapphire" },
-  { name: "Diamond Pair", stock: "7 left", revenue: "₱42,100", color: "diamond" },
-];
-
-const activityFeed = [
-  "New order received from Mia Reyes",
-  "3 items are running low in inventory",
-  "Your store is trending with 14% more visits",
-  "Payment for order #ORD-2037 has been released",
-];
-
 function SellerDashboardContent() {
-  const { counts } = useSeller();
+  const { counts, products, orders, payouts } = useSeller();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [openAddProduct, setOpenAddProduct] = useState(false);
   // Held here (not inside the pages) so edits survive switching tabs.
-  const [promotions, setPromotions] = useState(initialPromotions);
+  const [promotions, setPromotions] = useState([]);
   const [settings, setSettings] = useState(initialSettings);
 
   const badges = { inventory: counts.lowStock, orders: counts.newOrders };
+
+  const totalSales = orders
+    .filter((order) => order.status === "completed")
+    .reduce((sum, order) =>
+      sum + (order.items || []).reduce((itemSum, item) => itemSum + Number(item.price || 0) * Number(item.qty || 0), 0),
+    0);
+  const pendingPayouts = payouts
+    .filter((payout) => payout.status === "processing")
+    .reduce((sum, payout) => sum + Number(payout.amount || 0), 0);
+  const stats = [
+    { label: "Total sales", value: `₱${totalSales.toLocaleString("en-PH")}`, change: "Completed sales", tone: "positive" },
+    { label: "Orders", value: String(orders.length), change: `${counts.newOrders} new`, tone: "positive" },
+    { label: "Listings", value: String(products.length), change: `${counts.lowStock} low stock`, tone: "neutral" },
+    { label: "Pending payouts", value: `₱${pendingPayouts.toLocaleString("en-PH")}`, change: "Processing", tone: "neutral" },
+  ];
+  const orderRows = [...orders]
+    .sort((a, b) => new Date(b.placedAt || 0) - new Date(a.placedAt || 0))
+    .slice(0, 4)
+    .map((order) => ({
+      id: order.id,
+      customer: order.buyer || "Unknown buyer",
+      item: order.items?.map((item) => item.name).filter(Boolean).join(", ") || "No items",
+      total: `₱${Number(orderSubtotal(order)).toLocaleString("en-PH")}`,
+      status: order.status || "New",
+    }));
+  const topProducts = [...products]
+    .sort((a, b) => Number(b.stock || 0) - Number(a.stock || 0))
+    .slice(0, 3)
+    .map((product) => ({
+      name: product.name,
+      stock: `${product.stock || 0} left`,
+      revenue: `₱${Number(product.price || 0).toLocaleString("en-PH")}`,
+      color: "emerald",
+    }));
+  const monthlySales = Array.from({ length: 12 }, (_, month) =>
+    orders
+      .filter((order) => order.status === "completed"
+        && new Date(order.placedAt || 0).getMonth() === month)
+      .reduce((sum, order) => sum + orderSubtotal(order), 0)
+  );
+  const activityFeed = [
+    counts.newOrders ? `${counts.newOrders} new ${counts.newOrders === 1 ? "order" : "orders"} received` : "",
+    counts.lowStock ? `${counts.lowStock} ${counts.lowStock === 1 ? "listing needs" : "listings need"} restocking` : "",
+    pendingPayouts ? `₱${pendingPayouts.toLocaleString("en-PH")} in processing payouts` : "",
+  ].filter(Boolean);
 
   const sellerName = settings.account.displayName;
   const firstName = sellerName.trim().split(/\s+/)[0];
@@ -78,31 +96,12 @@ function SellerDashboardContent() {
 
   return (
     <div className="seller-dashboard">
-      <header className="seller-dashboard-header">
-        <div className="seller-dashboard-brand">
-          <img src={logo} alt="Gemstone Marketplace" />
-          <div>
-            <span className="seller-dashboard-brand-label">Seller Center</span>
-            <strong>{settings.store.name}</strong>
-          </div>
-        </div>
-
-        <div className="seller-dashboard-header-actions">
-          <button type="button" className="seller-dashboard-header-button" aria-label="Search">
-            <span className="material-symbols-outlined" aria-hidden="true">search</span>
-          </button>
-          <button type="button" className="seller-dashboard-header-button" aria-label="Notifications">
-            <span className="material-symbols-outlined" aria-hidden="true">notifications</span>
-          </button>
-          <button type="button" className="seller-dashboard-profile" onClick={() => goTo("settings")}>
-            <span className="seller-dashboard-avatar">{initials}</span>
-            <span className="seller-dashboard-profile-copy">
-              <strong>{sellerName}</strong>
-              <small>Premium seller</small>
-            </span>
-          </button>
-        </div>
-      </header>
+      <SellerTopbar
+        storeName={settings.store.name}
+        sellerName={sellerName}
+        initials={initials}
+        onProfileClick={() => goTo("settings")}
+      />
 
       <main className="seller-dashboard-main">
         <aside className="seller-dashboard-sidebar">
@@ -181,11 +180,11 @@ function SellerDashboardContent() {
                   </div>
 
                   <div className="seller-dashboard-chart" aria-label="Sales chart">
-                    {[48, 66, 54, 82, 76, 90, 112, 94, 128, 110, 142, 138].map((value, index) => (
+                    {monthlySales.map((value, index) => (
                       <span
                         key={index}
                         className="seller-dashboard-bar"
-                        style={{ height: `${value}%` }}
+                        style={{ height: `${value ? Math.max(8, Math.min(100, (value / Math.max(...monthlySales, 1)) * 100)) : 2}%` }}
                         aria-label={`Week ${index + 1} value ${value}`}
                       />
                     ))}
@@ -243,7 +242,7 @@ function SellerDashboardContent() {
                       <span>Status</span>
                     </div>
 
-                    {orderRows.map((row) => (
+                    {orderRows.length ? orderRows.map((row) => (
                       <div className="seller-dashboard-table-row" key={row.id}>
                         <span>{row.id}</span>
                         <span>{row.customer}</span>
@@ -255,7 +254,11 @@ function SellerDashboardContent() {
                           </em>
                         </span>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="seller-dashboard-table-row">
+                        <span>No orders yet</span>
+                      </div>
+                    )}
                   </div>
                 </section>
 
@@ -268,7 +271,7 @@ function SellerDashboardContent() {
                   </div>
 
                   <div className="seller-dashboard-product-list">
-                    {topProducts.map((product) => (
+                    {topProducts.length ? topProducts.map((product) => (
                       <article className="seller-dashboard-product-item" key={product.name}>
                         <div className={`seller-dashboard-product-icon seller-dashboard-product-icon-${product.color}`} aria-hidden="true" />
                         <div className="seller-dashboard-product-copy">
@@ -277,16 +280,22 @@ function SellerDashboardContent() {
                         </div>
                         <b>{product.revenue}</b>
                       </article>
-                    ))}
+                    )) : (
+                      <p>No listings yet</p>
+                    )}
                   </div>
 
                   <div className="seller-dashboard-activity">
                     <p className="seller-dashboard-kicker">Activity</p>
-                    <ul>
-                      {activityFeed.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
+                    {activityFeed.length ? (
+                      <ul>
+                        {activityFeed.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No recent activity</p>
+                    )}
                   </div>
                 </section>
               </div>

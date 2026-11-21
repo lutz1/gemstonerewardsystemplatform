@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Icon from "./Icon";
 
 // Reusable slide-over (default) or centered dialog (variant="dialog").
-export default function Drawer({ open, title, subtitle, onClose, footer, variant = "drawer", children }) {
+export default function Drawer({ open, title, subtitle, onClose, footer, variant = "drawer", className = "", hideClose = false, children }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -14,7 +14,7 @@ export default function Drawer({ open, title, subtitle, onClose, footer, variant
   return (
     <div className={`sl-overlay ${variant === "dialog" ? "is-dialog" : ""}`} onMouseDown={onClose}>
       <aside
-        className={`sl-drawer ${variant === "dialog" ? "is-dialog" : ""}`}
+        className={`sl-drawer ${variant === "dialog" ? "is-dialog" : ""} ${className}`}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -25,9 +25,11 @@ export default function Drawer({ open, title, subtitle, onClose, footer, variant
             <h2>{title}</h2>
             {subtitle && <p>{subtitle}</p>}
           </div>
-          <button className="sl-icon-btn" onClick={onClose} aria-label="Close">
-            <Icon name="close" size={18} />
-          </button>
+          {!hideClose && (
+            <button className="sl-icon-btn" onClick={onClose} aria-label="Close">
+              <Icon name="close" size={18} />
+            </button>
+          )}
         </header>
         <div className="sl-drawer__body">{children}</div>
         {footer && <footer className="sl-drawer__foot">{footer}</footer>}

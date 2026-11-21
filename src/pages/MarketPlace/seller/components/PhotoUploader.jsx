@@ -71,7 +71,6 @@ export default function PhotoUploader({ images, onChange, max = 4, error }) {
         {images.map((src, i) => (
           <div className="photo-tile" key={i}>
             <img src={src} alt={`Product photo ${i + 1}`} />
-            {i === 0 && <span className="photo-cover">Cover</span>}
             <button
               type="button"
               className="photo-remove"
@@ -100,7 +99,7 @@ export default function PhotoUploader({ images, onChange, max = 4, error }) {
       </div>
 
       <input ref={inputRef} type="file" accept={ACCEPTED.join(",")} multiple hidden onChange={(e) => addFiles(e.target.files)} />
-      <p className="photo-hint">Up to {max} photos · JPG, PNG or WebP · the first photo is the cover.</p>
+      <p className="photo-hint">Up to {max} photos · JPG, PNG or WebP.</p>
       {(note || error) && <p className="photo-error" role="alert">{note || error}</p>}
     </div>
   );

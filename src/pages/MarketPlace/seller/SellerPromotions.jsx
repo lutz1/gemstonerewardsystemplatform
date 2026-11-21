@@ -5,7 +5,6 @@ import {
     PROMO_TYPES,
     dayStr,
     fmtDate,
-    initialProducts,
     peso,
     promoStatus,
     promoValueLabel,
@@ -76,8 +75,9 @@ function Field({ label, hint, error, group = false, children }) {
 
 export default function SellerPromotions({ promotions, setPromotions }) {
   const seller = useSeller();
-  // Uses live inventory if SellerContext exposes `products`, otherwise the mock list.
-  const products = (seller.products ?? initialProducts).filter((p) => p.status !== "draft");
+  const products = (seller.products ?? []).filter(
+    (p) => !p.approvalStatus || p.approvalStatus === "approved"
+  );
 
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
