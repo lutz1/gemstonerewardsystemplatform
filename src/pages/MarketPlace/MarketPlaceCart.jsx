@@ -1,23 +1,23 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "./MarketPlaceCart.css";
+import "./MarketPlaceDashboard.css";
 import {
   formatMarketplacePrice,
-  gemstones,
-  getMarketplaceCartIds,
+  getMarketplaceCartItems,
   getMarketplaceCartQuantities,
+  getMarketplaceCategory,
   getMarketplaceSelectedLocationAddress,
-  saveMarketplaceCartIds,
+  saveMarketplaceCartItems,
   saveMarketplaceCartQuantities,
 } from "./marketplaceData";
 import MarketplaceSavedLocations from "./MarketplaceSavedLocations";
-import "./MarketPlaceCart.css";
-import "./MarketPlaceDashboard.css";
 
 export default function MarketPlaceCart() {
   const navigate = useNavigate();
-  const [cartIds, setCartIds] = useState(getMarketplaceCartIds);
+  const [cartItems, setCartItems] = useState(getMarketplaceCartItems);
   const [selectedIds, setSelectedIds] = useState(
-    () => new Set(getMarketplaceCartIds()),
+    () => new Set(getMarketplaceCartItems().map((item) => item.id)),
   );
   const [quantities, setQuantities] = useState(getMarketplaceCartQuantities);
   const [isEditing, setIsEditing] = useState(false);
@@ -25,9 +25,6 @@ export default function MarketPlaceCart() {
   const [deliveryLocation, setDeliveryLocation] = useState(
     getMarketplaceSelectedLocationAddress,
   );
-  const cartItems = cartIds
-    .map((id) => gemstones.find((gemstone) => gemstone.id === id))
-    .filter(Boolean);
   const selectedItems = cartItems.filter((item) => selectedIds.has(item.id));
   const subtotal = selectedItems.reduce(
     (total, item) => total + item.price * (quantities[item.id] || 1),
@@ -36,11 +33,11 @@ export default function MarketPlaceCart() {
   const allItemsSelected =
     cartItems.length > 0 && selectedItems.length === cartItems.length;
 
-  const toggleItemSelection = (gemstoneId) => {
+  const toggleItemSelection = (productId) => {
     setSelectedIds((currentIds) => {
       const nextIds = new Set(currentIds);
-      if (nextIds.has(gemstoneId)) nextIds.delete(gemstoneId);
-      else nextIds.add(gemstoneId);
+      if (nextIds.has(productId)) nextIds.delete(productId);
+      else nextIds.add(productId);
       return nextIds;
     });
   };
@@ -51,24 +48,24 @@ export default function MarketPlaceCart() {
     );
   };
 
-  const updateQuantity = (gemstoneId, amount) => {
+  const updateQuantity = (productId, amount) => {
     const updatedQuantities = {
       ...quantities,
-      [gemstoneId]: Math.max(1, (quantities[gemstoneId] || 1) + amount),
+      [productId]: Math.max(1, (quantities[productId] || 1) + amount),
     };
     saveMarketplaceCartQuantities(updatedQuantities);
     setQuantities(updatedQuantities);
   };
 
-  const removeFromCart = (gemstoneId) => {
-    const updatedCartIds = cartIds.filter((id) => id !== gemstoneId);
+  const removeFromCart = (productId) => {
+    const updatedCartItems = cartItems.filter((item) => item.id !== productId);
     const updatedSelectedIds = new Set(selectedIds);
-    updatedSelectedIds.delete(gemstoneId);
+    updatedSelectedIds.delete(productId);
     const updatedQuantities = { ...quantities };
-    delete updatedQuantities[gemstoneId];
-    saveMarketplaceCartIds(updatedCartIds);
+    delete updatedQuantities[productId];
+    saveMarketplaceCartItems(updatedCartItems);
     saveMarketplaceCartQuantities(updatedQuantities);
-    setCartIds(updatedCartIds);
+    setCartItems(updatedCartItems);
     setSelectedIds(updatedSelectedIds);
     setQuantities(updatedQuantities);
   };
@@ -120,10 +117,10 @@ export default function MarketPlaceCart() {
             <span className="material-symbols-outlined" aria-hidden="true">
               shopping_bag
             </span>
-            <h3>Your cart is waiting for something special</h3>
-            <p>Explore the collection and add a gemstone you love.</p>
-            <Link className="marketplace-cart-continue" to="/store">
-              Explore gemstones
+            <h3>Your cart is empty</h3>
+            <p>Browse the categories and add something you like.</p>
+            <Link className="marketplace-cart-continue" to="/store" state={{ openDashboard: true }}>
+              Start shopping
             </Link>
           </section>
         ) : (
@@ -138,13 +135,11 @@ export default function MarketPlaceCart() {
                     type="checkbox"
                     checked={allItemsSelected}
                     onChange={toggleSelectAll}
-                    aria-label="Select all gemstones"
+                    aria-label="Select all products"
                   />
                   <span aria-hidden="true" />
                 </label>
-                <span className="marketplace-cart-shop-name">
-                  Gemstone Marketplace
-                </span>
+                <span className="marketplace-cart-shop-name">Market Place</span>
                 <span className="material-symbols-outlined" aria-hidden="true">
                   chevron_right
                 </span>
@@ -161,13 +156,13 @@ export default function MarketPlaceCart() {
                     />
                     <span aria-hidden="true" />
                   </label>
-                  <div className={`marketplace-cart-item-image marketplace-gem-${item.color}`}>
-                    <img src={item.image} alt={item.name} />
+                  <div className="marketplace-cart-item-image">
+                    {item.image && <img src={item.image} alt={item.name} />}
                   </div>
                   <div className="marketplace-cart-item-details">
-                    <p>{item.category}</p>
+                    <p>{getMarketplaceCategory(item.category).label}</p>
                     <h3>{item.name}</h3>
-                    <span>{item.carat} · {item.origin}</span>
+                    {item.shopName && <span>{item.shopName}</span>}
                     <div className="marketplace-cart-item-actions">
                       <strong>{formatMarketplacePrice(item.price)}</strong>
                       <div
@@ -188,6 +183,10 @@ export default function MarketPlaceCart() {
                         <button
                           type="button"
                           aria-label={`Increase ${item.name} quantity`}
+                          disabled={
+                            Number.isFinite(item.stock) &&
+                            (quantities[item.id] || 1) >= item.stock
+                          }
                           onClick={() => updateQuantity(item.id, 1)}
                         >
                           <span className="material-symbols-outlined" aria-hidden="true">
@@ -196,12 +195,20 @@ export default function MarketPlaceCart() {
                         </button>
                       </div>
                     </div>
-                    <span className="marketplace-cart-item-rating">
-                      <span className="material-symbols-outlined" aria-hidden="true">
-                        star
+                    {(item.rating || item.sold > 0) && (
+                      <span className="marketplace-cart-item-rating">
+                        {item.rating ? (
+                          <>
+                            <span className="material-symbols-outlined" aria-hidden="true">
+                              star
+                            </span>
+                            {item.rating.toFixed(1)}
+                            {item.sold > 0 && " · "}
+                          </>
+                        ) : null}
+                        {item.sold > 0 && `${item.sold} sold`}
                       </span>
-                      {item.rating.toFixed(1)} · {item.sold} sold
-                    </span>
+                    )}
                   </div>
                   {isEditing && (
                     <button
@@ -217,7 +224,7 @@ export default function MarketPlaceCart() {
                   )}
                 </article>
               ))}
-              <Link className="marketplace-cart-keep-shopping" to="/store">
+              <Link className="marketplace-cart-keep-shopping" to="/store" state={{ openDashboard: true }}>
                 <span className="material-symbols-outlined" aria-hidden="true">
                   arrow_back
                 </span>
@@ -241,7 +248,7 @@ export default function MarketPlaceCart() {
                   type="checkbox"
                   checked={allItemsSelected}
                   onChange={toggleSelectAll}
-                  aria-label="Select all gemstones"
+                  aria-label="Select all products"
                 />
                 <span aria-hidden="true" />
               </span>
