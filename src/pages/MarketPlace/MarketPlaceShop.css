@@ -1,0 +1,97 @@
+/* Seller shop page + clickable product cards (imported by MarketPlaceDashboard.jsx) */
+
+/* Product title acts as the card's open button */
+.marketplace-card-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.marketplace-card {
+  cursor: pointer;
+}
+
+/* Seller header block */
+.marketplace-shop-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 12px 0 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(17, 40, 74, 0.08);
+}
+
+.marketplace-shop-avatar {
+  display: grid;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e9f2fe;
+  color: #0b5bc1;
+}
+
+.marketplace-shop-avatar .material-symbols-outlined {
+  font-size: 28px;
+}
+
+.marketplace-shop-info {
+  min-width: 0;
+}
+
+.marketplace-shop-info h2 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.marketplace-shop-info p {
+  margin: 4px 0 0;
+  color: #61738d;
+  font-size: 13px;
+}
+
+/* Search inside the shop */
+.marketplace-shop-search {
+  display: flex;
+  width: 100%;
+  margin: 0 0 14px;
+}
+
+.marketplace-shop-listing {
+  margin-top: 4px;
+}
+
+/* "Visit shop" row on the product detail page */
+.marketplace-detail-shop-link {
+  box-sizing: border-box;
+  color: inherit;
+  cursor: pointer;
+}
+
+.marketplace-detail-shop-link:focus-visible {
+  outline: 2px solid #1762d5;
+  outline-offset: 2px;
+}
+
+.marketplace-detail-shop-link > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.marketplace-detail-shop-chevron {
+  flex: none;
+  color: #8a9ab0;
+}
