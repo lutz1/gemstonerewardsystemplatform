@@ -4,7 +4,7 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
   color: #152341;
   background: #f2f5fb;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
 }
 
 .seller-application-header {
@@ -25,7 +25,7 @@
 }
 
 .seller-application-header h1 {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 15px;
   font-weight: 700;
   text-align: center;
@@ -157,7 +157,7 @@
 .seller-application-success h2 {
   margin-top: 7px;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 21px;
   font-weight: 800;
 }
@@ -261,7 +261,7 @@
   padding-bottom: 10px;
   border-bottom: 1px solid #e9eef5;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 800;
 }
@@ -396,7 +396,7 @@
   border-radius: 9px;
   color: #fff;
   background: #1762d5;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -492,7 +492,7 @@
   border-radius: 9px;
   color: #425675;
   background: #fff;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -547,7 +547,7 @@
 .seller-application-review h3 {
   margin-bottom: 12px;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 800;
 }
@@ -619,7 +619,7 @@
 
 .seller-application-success-view h2 {
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 24px;
   font-weight: 800;
 }
@@ -764,7 +764,7 @@
 .seller-application-status-heading h2 {
   margin-top: 6px;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 18px;
   font-weight: 800;
 }
@@ -822,7 +822,7 @@
 
 .seller-application-status-title-row h3 {
   color: #23395f;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   font-weight: 800;
 }

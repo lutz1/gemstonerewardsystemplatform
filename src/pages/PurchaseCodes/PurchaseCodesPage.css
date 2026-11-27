@@ -12,7 +12,7 @@
   background-color: var(--background);
   color: var(--on-surface);
   font-family:
-    "Hanken Grotesk",
+    "Ubuntu",
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
@@ -136,7 +136,7 @@
 
 .pc-referral-label {
   display: block;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.07em;
@@ -178,7 +178,7 @@
   background: transparent;
   border: none;
   outline: none;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   color: var(--on-surface);
   width: 100%;
@@ -199,7 +199,7 @@
   border: none;
   padding: 10px 32px;
   border-radius: 8px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -255,7 +255,7 @@
 .pc-referral-summary-label,
 .pc-referral-history-heading h3 {
   color: var(--on-surface);
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 20px;
   font-weight: 600;
 }
@@ -282,7 +282,7 @@
 
 .pc-referral-gems-row strong {
   color: var(--on-surface);
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 38px;
 }
 
@@ -329,7 +329,7 @@
 
 .pc-referral-stats strong {
   color: var(--on-surface);
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 26px;
 }
 
@@ -679,7 +679,7 @@
 }
 
 .pc-balance-title {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 24px;
   font-weight: 600;
   color: var(--primary);
@@ -701,7 +701,7 @@
 }
 
 .pc-gems-label {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -723,7 +723,7 @@
 }
 
 .pc-gems-value {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 32px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -744,7 +744,7 @@
     var(--primary)
   );
   color: var(--on-primary-container);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -907,7 +907,7 @@
 }
 
 .pc-stat-mini-label {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -917,7 +917,7 @@
 }
 
 .pc-stat-mini-value {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 24px;
   font-weight: 600;
   color: var(--on-surface);
@@ -943,7 +943,7 @@
 }
 
 .pc-table-title {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 18px;
   font-weight: 600;
   color: var(--on-surface);
@@ -980,7 +980,7 @@
   background: transparent;
   border: none;
   outline: none;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   color: var(--on-surface);
   width: 160px;
@@ -1040,7 +1040,7 @@
 
 .pc-th {
   padding: 12px 24px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -1076,7 +1076,7 @@
 }
 
 .pc-td-id {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -1088,7 +1088,7 @@
 }
 
 .pc-td-date {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   color: var(--on-surface-variant);
   white-space: nowrap;
@@ -1123,7 +1123,7 @@
 }
 
 .pc-tier-name {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 15px;
   font-weight: 700;
   color: var(--on-surface);
@@ -1138,7 +1138,7 @@
   display: inline-block;
   padding: 4px 10px;
   border-radius: 4px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -1192,7 +1192,7 @@
 }
 
 .pc-pagination-count {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--secondary);
 }
@@ -1208,7 +1208,7 @@
   border: 1px solid rgba(61, 74, 65, 0.35);
   background: none;
   color: var(--on-surface-variant);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   cursor: pointer;
   transition:
@@ -1259,7 +1259,7 @@
 }
 
 .pcl-section-title {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 22px;
   font-weight: 600;
   color: var(--on-surface);
@@ -1287,7 +1287,7 @@
   border: 1px solid rgba(61, 74, 65, 0.4);
   background: rgba(47, 54, 49, 0.4);
   color: var(--on-surface);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   cursor: pointer;
   transition: background 0.15s;
@@ -1314,7 +1314,7 @@
     var(--primary)
   );
   color: var(--on-primary-container);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -1361,7 +1361,7 @@
 }
 
 .pcl-stat-label {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -1372,7 +1372,7 @@
 }
 
 .pcl-stat-value {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 17px;
   font-weight: 600;
   color: var(--on-surface);
@@ -1381,7 +1381,7 @@
 }
 
 .pcl-stat-caption {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 10px;
   position: relative;
   z-index: 1;
@@ -1451,7 +1451,7 @@
 
 .pcl-th {
   padding: 12px 24px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -1486,7 +1486,7 @@
 }
 
 .pcl-td-date {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: var(--on-surface-variant);
@@ -1497,7 +1497,7 @@
   text-align: center;
   padding: 48px 24px;
   color: var(--on-surface-variant);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
 }
 
@@ -1538,21 +1538,21 @@
 }
 
 .pcl-tx-label {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .pcl-tx-sub {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
 }
 
 .pcl-tx-amount {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--primary);
@@ -1564,7 +1564,7 @@
 }
 
 .pcl-tx-amount-sub {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
@@ -1577,7 +1577,7 @@
   align-items: center;
   padding: 4px 10px;
   border-radius: 9999px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -1643,7 +1643,7 @@
 }
 
 .pcl-tx-card-date {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: var(--on-surface-variant);
@@ -1661,7 +1661,7 @@
 }
 
 .pcl-pagination-count {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
 }
@@ -1681,7 +1681,7 @@
   border: 1px solid rgba(61, 74, 65, 0.35);
   background: none;
   color: var(--on-surface-variant);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -1732,7 +1732,7 @@
 }
 
 .pc-footer-copy {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
 }
@@ -1743,7 +1743,7 @@
 }
 
 .pc-footer-link {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--secondary);
   text-decoration: none;

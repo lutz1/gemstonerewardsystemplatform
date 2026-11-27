@@ -4,7 +4,7 @@
   padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
   background: #f3f5fb;
   color: #172541;
-  font-family: var(--font-hanken, Arial, sans-serif);
+  font-family: var(--font-hanken, "Ubuntu", sans-serif);
 }
 
 .seller-application-details-header {
@@ -45,7 +45,7 @@
 
 .seller-application-details-header h1 {
   margin: 0;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 15px;
   font-weight: 700;
   text-align: center;
@@ -113,7 +113,7 @@
   overflow: hidden;
   margin: 0;
   color: #172541;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -164,7 +164,7 @@
 .seller-application-details-card > h2 {
   margin: 0 0 5px;
   color: #1d2b45;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 12px;
   font-weight: 700;
 }
@@ -278,7 +278,7 @@
 .seller-application-details-section-heading h2 {
   margin: 0;
   color: #1d2b45;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 11px;
   font-weight: 800;
 }
@@ -556,7 +556,7 @@
 .seller-application-request-info-dialog > header h2 {
   margin: 0;
   color: #172541;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 15px;
 }
 
@@ -739,7 +739,7 @@
 .seller-application-reject-dialog > header h2 {
   margin: 0;
   color: #172541;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 15px;
 }
 
@@ -910,7 +910,7 @@
 .seller-application-approve-dialog h2 {
   margin: 0;
   color: #172541;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 16px;
 }
 

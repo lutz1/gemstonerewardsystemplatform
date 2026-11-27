@@ -709,7 +709,7 @@
   padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   background: #f2f5fb;
   color: var(--admin-ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "Ubuntu", sans-serif;
 }
 
 .admin-root .tb-topbar {

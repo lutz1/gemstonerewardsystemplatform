@@ -2,7 +2,7 @@
   min-height: 100vh;
   background: #f2f5fb;
   color: #152341;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
 }
 
 .seller-landing-header {
@@ -47,7 +47,7 @@
   justify-self: center;
   gap: 8px;
   color: inherit;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 15px;
   font-weight: 500;
   text-decoration: none;
@@ -112,7 +112,7 @@
 .seller-landing-hero h1 {
   max-width: 610px;
   margin-top: 20px;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: clamp(36px, 5vw, 60px);
   font-weight: 800;
   letter-spacing: -0.045em;
@@ -268,7 +268,7 @@
 .seller-landing-section-heading h2 {
   margin-top: 9px;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: clamp(26px, 4vw, 36px);
   font-weight: 800;
   letter-spacing: -0.035em;
@@ -345,7 +345,7 @@
 .seller-landing-benefit-card h3 {
   margin-top: 18px;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 16px;
   font-weight: 750;
   line-height: 1.4;
@@ -477,7 +477,7 @@
 }
 
 .seller-landing-community p {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.5;
@@ -515,7 +515,7 @@
 }
 
 .seller-landing-footer-brand strong {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
 }
 
@@ -540,7 +540,7 @@
 .seller-landing-footer-links h2 {
   margin-bottom: 3px;
   color: #b6d2ff;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
 }
 

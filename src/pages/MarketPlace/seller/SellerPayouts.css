@@ -2,7 +2,7 @@
 .pay-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 22px; }
 .pay-stat { display: grid; gap: 8px; align-content: start; padding: 18px; border: 1px solid var(--sl-line); border-radius: 18px; background: rgba(255, 255, 255, 0.76); box-shadow: var(--sl-shadow); }
 .pay-stat p { margin: 0; color: var(--sl-muted); font-size: 13px; font-weight: 700; }
-.pay-stat h2 { margin: 0; font-family: var(--font-jakarta, "Plus Jakarta Sans", sans-serif); font-size: clamp(1.4rem, 2vw, 2rem); font-weight: 800; letter-spacing: -0.03em; }
+.pay-stat h2 { margin: 0; font-family: var(--font-jakarta, "Ubuntu", sans-serif); font-size: clamp(1.4rem, 2vw, 2rem); font-weight: 800; letter-spacing: -0.03em; }
 .pay-stat small { color: var(--sl-muted); font-size: 12.5px; line-height: 1.4; }
 .pay-stat.is-hero { border: 0; background: linear-gradient(135deg, var(--sl-navy-950), var(--sl-navy-800)); box-shadow: 0 14px 24px rgba(7, 27, 64, 0.22); }
 .pay-stat.is-hero p, .pay-stat.is-hero small { color: #bfd6ff; }

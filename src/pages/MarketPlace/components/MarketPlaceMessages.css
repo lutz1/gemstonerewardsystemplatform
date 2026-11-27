@@ -4,7 +4,7 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
   color: #152341;
   background: #f2f5fb;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
 }
 
 .marketplace-messages-header {
@@ -54,7 +54,7 @@
 
 .marketplace-messages-header h1 {
   margin: 0;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 15px;
   font-weight: 700;
   text-align: center;
@@ -185,7 +185,7 @@
 .marketplace-message-heading h2 {
   margin: 0;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
 }
 
@@ -267,7 +267,7 @@
 .marketplace-message-detail-heading h2 {
   margin: 0 0 4px;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 15px;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -345,7 +345,7 @@
 .marketplace-messages-state h2 {
   margin: 0;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
 }
 

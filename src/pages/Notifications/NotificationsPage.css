@@ -4,7 +4,7 @@
   padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px));
   background: #f2f5fb;
   color: #152341;
-  font-family: var(--font-hanken, Arial, sans-serif);
+  font-family: var(--font-hanken, "Ubuntu", sans-serif);
 }
 
 .notifications-root .tb-topbar {
@@ -91,7 +91,7 @@
 .notifications-header h1 {
   margin: 0;
   color: #172646;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: clamp(24px, 6vw, 30px);
   font-weight: 800;
   line-height: 1.2;
@@ -172,7 +172,7 @@
   min-width: 0;
   margin: 0;
   color: #172646;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 13px;
   font-weight: 700;
   line-height: 1.4;
@@ -232,7 +232,7 @@
 .notifications-empty-state h2 {
   margin: 0;
   color: #172646;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 17px;
 }
 

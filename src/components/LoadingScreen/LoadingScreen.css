@@ -11,8 +11,8 @@
     max(20px, env(safe-area-inset-bottom, 0px))
     max(20px, env(safe-area-inset-left, 0px));
   background:
-    radial-gradient(ellipse at 50% 42%, rgba(35, 91, 177, 0.12), transparent 44%),
-    #f4f7fb;
+    radial-gradient(ellipse at 50% 42%, rgba(63, 120, 76, 0.12), transparent 46%),
+    linear-gradient(135deg, #f8f8f3, #eeeee6);
 }
 
 .loading-card {
@@ -21,14 +21,14 @@
   gap: 18px;
   width: min(100%, 300px);
   padding: 32px 24px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(139, 101, 65, 0.2);
+  border-radius: 20px;
+  background: rgba(251, 251, 247, 0.94);
   box-shadow:
-    0 16px 40px rgba(27, 47, 74, 0.08),
-    0 2px 8px rgba(27, 47, 74, 0.04);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+    0 18px 44px rgba(43, 54, 39, 0.1),
+    0 3px 10px rgba(139, 101, 65, 0.07);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .loading-spinner {
@@ -38,7 +38,14 @@
   height: 68px;
   place-items: center;
   border-radius: 50%;
-  background: conic-gradient(from 25deg, #123b77, #3978e3 70%, #dbe8ff 72%, #dbe8ff);
+  background: conic-gradient(
+    from 25deg,
+    #8b6541,
+    #3f784c 52%,
+    #68966d 70%,
+    #e0e6d5 72%,
+    #e0e6d5
+  );
   animation: loading-spin 1.15s linear infinite;
 }
 
@@ -46,7 +53,7 @@
   position: absolute;
   inset: 4px;
   border-radius: inherit;
-  background: #fff;
+  background: #fbfbf7;
   content: "";
 }
 
@@ -56,13 +63,13 @@
   width: 42px;
   height: 42px;
   object-fit: contain;
-  filter: drop-shadow(0 3px 6px rgba(18, 59, 119, 0.14));
+  filter: drop-shadow(0 3px 6px rgba(63, 120, 76, 0.14));
 }
 
 .loading-label {
   margin: 0;
-  color: #23395f;
-  font-family: var(--font-hanken, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  color: #2b3029;
+  font-family: var(--font-hanken, "Ubuntu", sans-serif);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.005em;

@@ -2,7 +2,7 @@
   min-height: 100vh;
   color: #17273f;
   background: #eef2f8;
-  font-family: var(--font-hanken, Arial, sans-serif);
+  font-family: var(--font-hanken, "Ubuntu", sans-serif);
 }
 
 .seller-dashboard-main {
@@ -130,7 +130,7 @@
 
 .seller-dashboard-topbar h1 {
   margin: 6px 0 0;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: clamp(1.9rem, 3vw, 2.7rem);
   font-weight: 800;
   letter-spacing: -0.05em;
@@ -186,7 +186,7 @@
 
 .seller-dashboard-stat-card h2 {
   margin: 0;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: clamp(1.4rem, 2vw, 2.1rem);
   font-weight: 800;
 }

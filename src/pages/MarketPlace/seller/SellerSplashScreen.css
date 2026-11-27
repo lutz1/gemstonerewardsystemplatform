@@ -9,7 +9,7 @@
   background:
     radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.9), transparent 38%),
     linear-gradient(180deg, #dceafa 0%, #edf5ff 54%, #e4efff 100%);
-  font-family: var(--font-hanken, Arial, sans-serif);
+  font-family: var(--font-hanken, "Ubuntu", sans-serif);
 }
 
 .seller-splash-back {
@@ -97,7 +97,7 @@
 .seller-splash-card h1 {
   margin: 0;
   color: #101f35;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: clamp(28px, 7.7vw, 36px);
   font-weight: 800;
   letter-spacing: -0.045em;
@@ -149,7 +149,7 @@
 }
 
 .seller-splash-feature strong {
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: clamp(10px, 2.8vw, 12px);
   font-weight: 700;
   line-height: 1.25;

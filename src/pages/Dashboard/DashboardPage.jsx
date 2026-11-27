@@ -2,6 +2,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import {
   MdAccountBalanceWallet,
+  MdAddCard,
   MdArrowForward,
   MdCampaign,
   MdChevronRight,
@@ -9,11 +10,11 @@ import {
   MdDiamond,
   MdHub,
   MdPersonAdd,
+  MdPayments,
   MdReceiptLong,
   MdSwapHoriz,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import bgImage from "../../assets/bg_dashboard.jpg";
 import emeraldIcon from "../../assets/emerald_icon.png";
 import gemVideo from "../../assets/gemvideo.mp4";
 import BottomNav from "../../components/BottomNavigationBar/BottomNav.jsx";
@@ -21,9 +22,8 @@ import GemValueChart from "../../components/GemValueChart/GemValueChart.jsx";
 import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import TopBar from "../../components/TopBar/TopBar.jsx";
 import { app } from "../../firebase";
+import DashboardBannerCarousel from "./components/DashboardBannerCarousel.jsx";
 import "./DashboardPage.css";
-
-const BG_IMAGE = bgImage;
 
 function displayNumber(value) {
   return value == null ? "—" : Number(value).toLocaleString();
@@ -118,12 +118,6 @@ export default function Dashboard() {
 
   return (
     <div className="dash-root">
-      <div className="dash-bg" aria-hidden="true">
-        <img src={BG_IMAGE} alt="" className="dash-bg-img" />
-        <div className="dash-bg-gradient" />
-        <div className="dash-bg-grid" />
-      </div>
-
       <TopBar
         userName={dashboard?.name || "Member"}
         userRole="Member"
@@ -140,14 +134,16 @@ export default function Dashboard() {
           )
         ) : (
           <>
+            <DashboardBannerCarousel />
+
             {/* Welcome */}
             <div className="dash-welcome">
-              <p className="dash-eyebrow">Member Overview</p>
+              <p className="dash-eyebrow">Dashboard</p>
               <h1 className="dash-hello">
                 Hello, {dashboard.name || "Member"}
               </h1>
               <p className="dash-welcome-sub">
-                Welcome back to your member portal. Here’s a quick look at your latest activities and benefits.
+                Here’s a quick look at your latest activities and benefits.
               </p>
             </div>
 
@@ -227,22 +223,39 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Exchange: converts Gem Points into wallet balance -- also
-              where top-up and withdraw live once those are built out. */}
-              <button
-                className="dash-exchange-btn"
-                onClick={() => navigate("/exchange")}
+              <div
+                className="dash-wallet-actions"
+                role="group"
+                aria-label="Wallet actions"
               >
-                <MdSwapHoriz
-                  size={18}
-                  color="var(--color-on-primary-container)"
-                />
-                <span>Exchange</span>
-                <MdArrowForward
-                  size={17}
-                  color="var(--color-on-primary-container)"
-                />
-              </button>
+                <button
+                  type="button"
+                  className="dash-wallet-action"
+                  onClick={() => navigate("/exchange/gems-to-wallet")}
+                  aria-label="Exchange Gems to wallet"
+                >
+                  <MdSwapHoriz size={22} aria-hidden="true" />
+                  <span>Exchange Gems to Wallet</span>
+                </button>
+                <button
+                  type="button"
+                  className="dash-wallet-action"
+                  onClick={() => navigate("/exchange/withdraw")}
+                  aria-label="Request Referral Commissions"
+                >
+                  <MdPayments size={22} aria-hidden="true" />
+                  <span>Request Referral Commissions</span>
+                </button>
+                <button
+                  type="button"
+                  className="dash-wallet-action"
+                  onClick={() => navigate("/exchange/deposit")}
+                  aria-label="Top up Wallet Balance"
+                >
+                  <MdAddCard size={22} aria-hidden="true" />
+                  <span>Top Up Wallet Balance</span>
+                </button>
+              </div>
             </div>
 
             {/* Quick stats */}

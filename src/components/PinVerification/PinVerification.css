@@ -13,7 +13,7 @@
   background:
     linear-gradient(135deg, rgba(0, 168, 107, 0.14), transparent 42%),
     var(--background);
-  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .pin-root::before {
@@ -139,7 +139,7 @@
 .pin-panel h1 {
   margin-top: 10px;
   color: var(--on-surface);
-  font-family: 'Plus Jakarta Sans', 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 28px;
   line-height: 1.2;
 }
@@ -197,7 +197,7 @@
   color: var(--on-surface);
   background: rgba(37, 44, 39, 0.76);
   cursor: pointer;
-  font-family: 'Plus Jakarta Sans', 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 22px;
   font-weight: 600;
   transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;

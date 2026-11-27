@@ -17,12 +17,12 @@ export default function ComingSoonPage({ title }) {
         gap: "16px",
         background: "var(--background)",
         color: "var(--on-surface)",
-        fontFamily: "'Hanken Grotesk', sans-serif",
+        fontFamily: "'Ubuntu', sans-serif",
         textAlign: "center",
         padding: "24px",
       }}
     >
-      <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "28px" }}>
+      <h1 style={{ fontFamily: "'Ubuntu', sans-serif", fontSize: "28px" }}>
         {title}
       </h1>
       <p style={{ color: "var(--on-surface-variant)" }}>

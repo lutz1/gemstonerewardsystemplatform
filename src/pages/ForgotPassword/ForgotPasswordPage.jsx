@@ -2,6 +2,8 @@ import { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { Link } from "react-router-dom";
 import { auth } from "../../firebase";
+import bgImage from "../../assets/login_bg.png";
+import bgImageLandscape from "../../assets/login_bg_landscape.jpeg";
 import "./ForgotPasswordPage.css";
 
 export default function ForgotPasswordPage() {
@@ -35,7 +37,13 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className="forgot-password">
-      <div className="forgot-password__background" aria-hidden="true" />
+      <div className="forgot-password__background" aria-hidden="true">
+        <picture>
+          <source media="(min-width: 768px)" srcSet={bgImageLandscape} />
+          <img src={bgImage} alt="" className="forgot-password__background-image" />
+        </picture>
+        <div className="forgot-password__background-grid" />
+      </div>
       <section className="forgot-password__card" aria-labelledby="forgot-password-title">
         <Link className="forgot-password__back" to="/login">
           <span className="material-symbols-outlined" aria-hidden="true">arrow_back</span>
@@ -82,6 +90,7 @@ export default function ForgotPasswordPage() {
                 type="submit"
                 disabled={isSending || !email.trim()}
               >
+                <span className="material-symbols-outlined" aria-hidden="true">send</span>
                 {isSending ? "Sending..." : "Send reset link"}
               </button>
             </form>

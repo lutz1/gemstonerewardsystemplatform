@@ -4,7 +4,7 @@
   padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
   background: #f3f5fb;
   color: #172541;
-  font-family: var(--font-hanken, Arial, sans-serif);
+  font-family: var(--font-hanken, "Ubuntu", sans-serif);
 }
 
 .seller-management-header {
@@ -40,7 +40,7 @@
 
 .seller-management-header h1 {
   margin: 0;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 15px;
   font-weight: 700;
   text-align: center;
@@ -107,7 +107,7 @@
 
 .seller-management-summary-card > strong {
   color: #172541;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 18px;
   line-height: 1.1;
 }
@@ -510,7 +510,7 @@
   overflow: hidden;
   margin: 0;
   color: #1c2639;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 13px;
   font-weight: 700;
   text-overflow: ellipsis;

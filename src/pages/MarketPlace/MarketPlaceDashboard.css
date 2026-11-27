@@ -3,7 +3,7 @@
   padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(145deg, #edf3fb 0%, #f5f7fb 52%, #e6edf8 100%);
   color: #152341;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
 }
 
 .marketplace-header {
@@ -138,7 +138,7 @@
   border-radius: 10px;
   color: #fff;
   background: #f04452;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 9px;
   font-weight: 800;
   line-height: 1;
@@ -172,7 +172,7 @@
 
 .marketplace-header h1 {
   overflow: hidden;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 15px;
   font-weight: 700;
   text-align: center;
@@ -225,7 +225,7 @@
   border-radius: 12px;
   color: #fff;
   background: #d99316;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 10px;
   font-weight: 800;
   line-height: 1;
@@ -580,7 +580,7 @@
 .marketplace-orders-empty h2 {
   margin: 4px 0 0;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 17px;
 }
 
@@ -645,7 +645,7 @@
 
 .marketplace-banner-copy h2 {
   margin-top: 5px;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 17px;
   font-weight: 800;
   line-height: 1.2;
@@ -777,7 +777,7 @@
 
 .marketplace-live-coming-soon h3 {
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   font-weight: 800;
 }
@@ -803,7 +803,7 @@
 }
 
 .marketplace-section-heading h2 {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 700;
 }
@@ -912,7 +912,7 @@
 .marketplace-card-details h3 {
   overflow: hidden;
   color: #172646;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -933,7 +933,7 @@
   display: block;
   margin-top: 3px;
   color: #152341;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   font-weight: 800;
 }

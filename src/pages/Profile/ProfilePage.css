@@ -12,7 +12,7 @@
   background-color: var(--background);
   color: var(--on-surface);
   font-family:
-    "Hanken Grotesk",
+    "Ubuntu",
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
@@ -169,7 +169,7 @@
   justify-content: center;
   background: linear-gradient(135deg, var(--primary-container), var(--primary));
   color: var(--on-primary-container);
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 20px;
   font-weight: 700;
   box-shadow: 0 0 20px rgba(0, 168, 107, 0.35);
@@ -285,7 +285,7 @@
 }
 
 .prof-name {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--on-surface);
@@ -296,7 +296,7 @@
   display: inline-block;
   padding: 3px 10px;
   border-radius: 9999px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -307,7 +307,7 @@
 }
 
 .prof-handle {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   color: var(--secondary);
   margin-top: 2px;
@@ -317,7 +317,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   color: var(--on-surface-variant);
   margin-top: 6px;
@@ -340,7 +340,7 @@
   border: 1px solid rgba(61, 74, 65, 0.4);
   background: rgba(47, 54, 49, 0.4);
   color: var(--on-surface);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -370,7 +370,7 @@
   border-radius: 8px;
   background: rgba(89, 222, 155, 0.12);
   color: var(--color-primary);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -439,7 +439,7 @@
 }
 
 .prof-progress-label {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -452,7 +452,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--on-surface);
@@ -467,7 +467,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   font-weight: 600;
   color: var(--primary);
@@ -497,7 +497,7 @@
 }
 
 .prof-progress-caption {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   color: var(--on-surface-variant);
 }
@@ -534,7 +534,7 @@
 }
 
 .prof-stat-label {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -544,7 +544,7 @@
 }
 
 .prof-stat-value {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 17px;
   font-weight: 600;
   color: var(--on-surface);
@@ -566,14 +566,14 @@
 }
 
 .prof-panel-title {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .prof-panel-sub {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
 }
@@ -599,7 +599,7 @@
 }
 
 .prof-field-label {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.07em;
@@ -612,7 +612,7 @@
   border-radius: 8px;
   background: rgba(26, 33, 28, 0.5);
   border: 1px solid rgba(61, 74, 65, 0.3);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   color: var(--on-surface);
 }
@@ -649,14 +649,14 @@
 }
 
 .prof-security-label {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .prof-security-caption {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
@@ -668,7 +668,7 @@
   border: 1px solid rgba(61, 74, 65, 0.4);
   background: none;
   color: var(--on-surface);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -686,7 +686,7 @@
 .prof-status-pill {
   padding: 4px 12px;
   border-radius: 9999px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -721,14 +721,14 @@
 }
 
 .prof-toggle-label {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .prof-toggle-caption {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
@@ -789,14 +789,14 @@
 }
 
 .prof-danger-title {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--on-surface);
 }
 
 .prof-danger-caption {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
   margin-top: 2px;
@@ -811,7 +811,7 @@
   border: 1px solid rgba(61, 74, 65, 0.4);
   background: none;
   color: var(--on-surface);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -875,7 +875,7 @@
 }
 
 .prof-modal-title {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 22px;
   font-weight: 600;
   color: var(--on-surface);
@@ -884,7 +884,7 @@
 .prof-modal-copy {
   margin-top: 8px;
   color: var(--on-surface-variant);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   line-height: 1.5;
 }
@@ -901,7 +901,7 @@
   min-width: 104px;
   padding: 10px 18px;
   border-radius: 8px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -974,7 +974,7 @@
 }
 
 .prof-footer-copy {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
 }
@@ -985,7 +985,7 @@
 }
 
 .prof-footer-link {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 12px;
   color: var(--secondary);
   text-decoration: none;

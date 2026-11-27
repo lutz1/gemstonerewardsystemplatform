@@ -4,7 +4,7 @@
   min-height: 100vh;
   background-color: var(--background);
   color: var(--on-surface);
-  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
   position: relative;
 }
@@ -68,7 +68,7 @@
   gap: 6px;
   width: fit-content;
   color: var(--on-surface-variant);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 14px;
   text-decoration: none;
   transition: color 0.15s;
@@ -136,7 +136,7 @@
   right: 0;
   text-align: center;
   color: #fff;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 13px;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
@@ -185,7 +185,7 @@
 }
 
 .qr-done-text {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 18px;
   font-weight: 600;
   color: var(--on-surface);
@@ -219,7 +219,7 @@
 .qr-review-heading h2 {
   margin: 0;
   color: var(--on-surface);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 21px;
 }
 
@@ -335,7 +335,7 @@
 
 .qr-delivery-review h3 {
   color: var(--on-surface);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 15px;
 }
 
@@ -375,7 +375,7 @@
 }
 
 .qr-receipt-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 20px;
   font-weight: 700;
   color: var(--on-surface);
@@ -512,7 +512,7 @@
 }
 
 .qr-detail-label {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 13px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -520,7 +520,7 @@
 }
 
 .qr-detail-value {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--on-surface);
@@ -573,7 +573,7 @@
 .qr-confirmation-modal h2 {
   margin: 0;
   color: var(--on-surface);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 20px;
 }
 
@@ -643,7 +643,7 @@
 .qr-payment-status-modal h2 {
   margin: 18px 0 6px;
   color: var(--on-surface);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 19px;
 }
 
@@ -700,7 +700,7 @@
   border: none;
   background: linear-gradient(to right, var(--primary-container), var(--primary));
   color: var(--on-primary-container);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
@@ -736,7 +736,7 @@
   border: 1px solid rgba(61, 74, 65, 0.4);
   background: rgba(47, 54, 49, 0.3);
   color: var(--on-surface);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -753,7 +753,7 @@
 .qr-redirect-note {
   text-align: center;
   color: var(--on-surface-variant);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 12px;
 }
 

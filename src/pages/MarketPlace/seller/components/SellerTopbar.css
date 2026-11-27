@@ -43,7 +43,7 @@
   display: block;
   overflow: hidden;
   margin-top: 2px;
-  font-family: var(--font-jakarta, Arial, sans-serif);
+  font-family: var(--font-jakarta, "Ubuntu", sans-serif);
   font-size: 17px;
   text-overflow: ellipsis;
   white-space: nowrap;

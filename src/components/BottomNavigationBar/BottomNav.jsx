@@ -177,7 +177,9 @@ export default function BottomNav({ activeItem, variant = "member" }) {
 
   return (
     <nav
-      className={`bn-bar${isKeyboardOpen ? " is-hidden" : ""}`}
+      className={`bn-bar${variant === "admin" ? " bn-bar-admin" : " bn-bar-member"}${
+        isKeyboardOpen ? " is-hidden" : ""
+      }`}
       aria-label="Main navigation"
       aria-hidden={isKeyboardOpen}
     >

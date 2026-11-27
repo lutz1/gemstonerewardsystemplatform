@@ -55,7 +55,7 @@
   box-shadow:
     0 8px 28px rgba(0, 0, 0, 0.4),
     0 0 22px rgba(255, 207, 89, 0.3);
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
@@ -96,7 +96,7 @@
   color: #fff4cf;
   background: rgba(3, 25, 14, 0.86);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 700;
 }

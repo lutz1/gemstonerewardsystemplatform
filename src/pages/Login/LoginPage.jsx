@@ -111,7 +111,6 @@ export default function LoginPage() {
           <source media="(min-width: 768px)" srcSet={BG_IMAGE_LANDSCAPE} />
           <img src={BG_IMAGE} alt="" className="lp-bg-img" />
         </picture>
-        <div className="lp-bg-gradient" />
         <div className="lp-bg-grid" />
       </div>
 
@@ -145,7 +144,7 @@ export default function LoginPage() {
                   id="login-identifier"
                   type="text"
                   className="lp-input"
-                  placeholder="e.g. name@company.com or USERNAME"
+                  placeholder="Email or username"
                   autoComplete="username"
                   value={loginIdentifier}
                   onChange={(e) => setLoginIdentifier(e.target.value)}

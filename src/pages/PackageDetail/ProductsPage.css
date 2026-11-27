@@ -6,7 +6,7 @@
   min-height: 100vh;
   background-color: var(--background);
   color: var(--on-surface);
-  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
   background-image:
     radial-gradient(at 0% 0%, rgba(0, 168, 107, 0.05) 0px, transparent 50%),
@@ -89,7 +89,7 @@
 }
 
 .prod-page-title {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 28px;
   font-weight: 600;
   color: var(--on-surface);
@@ -147,7 +147,7 @@
 .prod-tier-dot.muted    { background: var(--outline); }
 
 .prod-package-tier {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -156,7 +156,7 @@
 }
 
 .prod-package-name {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 22px;
   font-weight: 700;
   color: var(--on-surface);
@@ -174,7 +174,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 13px;
   color: var(--on-surface-variant);
 }
@@ -200,7 +200,7 @@
   align-items: center;
   gap: 6px;
   color: var(--primary);
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 13px;
   font-weight: 700;
   margin-top: 4px;
@@ -732,7 +732,7 @@
 }
 
 .prod-footer-copy {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 12px;
   color: var(--on-surface-variant);
 }
@@ -743,7 +743,7 @@
 }
 
 .prod-footer-link {
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 12px;
   color: var(--secondary);
   text-decoration: none;

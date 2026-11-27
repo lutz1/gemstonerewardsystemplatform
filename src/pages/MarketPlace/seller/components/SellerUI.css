@@ -7,13 +7,13 @@
   --sl-ok: #0c7a4a; --sl-ok-bg: #dff5ea; --sl-warn: #8b5a00; --sl-warn-bg: #fdf0d6; --sl-bad: #b92034; --sl-bad-bg: #fde7ea;
   --sl-radius: 20px; --sl-shadow: 0 10px 20px rgba(17, 40, 74, 0.04);
   display: contents;
-  font-family: var(--font-hanken, "Hanken Grotesk", sans-serif);
+  font-family: var(--font-hanken, "Ubuntu", sans-serif);
 }
 .sl-page, .sl-page *, .sl-page *::before, .sl-page *::after { box-sizing: border-box; }
 .sl-page { min-width: 0; color: var(--sl-ink); }
 .sl-page button { font-family: inherit; cursor: pointer; }
 .sl-page :focus-visible, .sl-overlay :focus-visible { outline: 3px solid var(--sl-blue-500); outline-offset: 2px; }
-.sl-page h1, .sl-page h2, .sl-page h3, .sl-drawer__head h2 { font-family: var(--font-jakarta, "Plus Jakarta Sans", sans-serif); }
+.sl-page h1, .sl-page h2, .sl-page h3, .sl-drawer__head h2 { font-family: var(--font-jakarta, "Ubuntu", sans-serif); }
 .sl-overlay, .sl-overlay * { box-sizing: border-box; }
 
 /* --- Page head --- */
@@ -102,5 +102,5 @@
 .sl-nav-icon .sl-nav-badge { position: absolute; top: -5px; right: -11px; min-width: 16px; padding: 0 4px; border: 2px solid #fff; font-size: 9px; line-height: 1.4; }
 .sl-soon { display: grid; justify-items: center; gap: 8px; padding: 64px 20px; border: 1px solid var(--sl-line); border-radius: var(--sl-radius); background: rgba(255, 255, 255, 0.76); color: var(--sl-muted); text-align: center; }
 .sl-soon .material-symbols-outlined { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; background: var(--sl-blue-100); color: var(--sl-blue-500); font-size: 28px; }
-.sl-soon h2 { margin: 6px 0 0; color: var(--sl-ink); font-family: var(--font-jakarta, "Plus Jakarta Sans", sans-serif); font-size: 1.15rem; font-weight: 800; }
+.sl-soon h2 { margin: 6px 0 0; color: var(--sl-ink); font-family: var(--font-jakarta, "Ubuntu", sans-serif); font-size: 1.15rem; font-weight: 800; }
 .sl-soon p { margin: 0; font-size: 14px; }

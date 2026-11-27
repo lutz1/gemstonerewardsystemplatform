@@ -49,8 +49,8 @@
   --color-danger: var(--tertiary);
   --color-border-faint: rgba(198, 198, 198, 0.15);
   --color-hero-card: var(--surface-container);
-  --font-hanken: "Hanken Grotesk", sans-serif;
-  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-hanken: "Ubuntu", sans-serif;
+  --font-jakarta: "Ubuntu", sans-serif;
 }
 
 /* ─── Global reset ───────────────────────────────────────────── */
@@ -68,6 +68,7 @@ body {
   height: 100%;
   background: var(--background);
   color: var(--on-surface);
+  font-family: "Ubuntu", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

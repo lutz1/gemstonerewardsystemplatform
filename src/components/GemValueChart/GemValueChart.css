@@ -5,6 +5,8 @@
 }
 
 .gem-chart__header {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -16,6 +18,91 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.gem-chart__settings {
+  position: relative;
+}
+
+.gem-chart__settings-button {
+  display: grid;
+  width: 34px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+}
+
+.gem-chart__settings-button:hover,
+.gem-chart__settings-button[aria-expanded="true"] {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.gem-chart__settings-button:focus-visible {
+  outline: 2px solid #59de9b;
+  outline-offset: 2px;
+}
+
+.gem-chart__settings-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  width: 270px;
+  max-width: calc(100vw - 32px);
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: #233127;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.gem-chart__settings-panel[hidden] {
+  display: none;
+}
+
+.gem-chart__settings-panel .gem-chart__range-controls,
+.gem-chart__settings-panel .gem-chart__candle-controls {
+  display: block;
+  min-width: 0;
+  padding: 0;
+}
+
+.gem-chart__settings-panel .gem-chart__settings-section + .gem-chart__settings-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.gem-chart__settings-panel .gem-chart__settings-section > .gem-chart__control-label {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.gem-chart__settings-panel .gem-chart__settings-section .gem-chart__type-controls {
+  width: max-content;
+}
+
+.gem-chart__settings-panel .gem-chart__tab-row,
+.gem-chart__settings-panel .gem-chart__interval-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  overflow: visible;
+}
+
+.gem-chart__settings-panel .gem-chart__tab {
+  min-width: 0;
+  padding: 6px 3px;
+  font-size: 11px;
+  text-align: center;
 }
 
 .gem-chart__type-controls {
@@ -82,7 +169,47 @@
   height: 160px;
   margin: 0 8px;
   position: relative;
-  touch-action: none; /* let pointer events drive scrubbing instead of the browser's scroll/zoom gestures */
+}
+
+.gem-chart__chart-wrap--history {
+  height: 176px;
+}
+
+.gem-chart__scroll {
+  height: 160px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+  touch-action: none;
+}
+
+.gem-chart__scroll--history {
+  height: 176px;
+  cursor: grab;
+  touch-action: pan-x;
+}
+
+.gem-chart__scroll--history:active {
+  cursor: grabbing;
+}
+
+.gem-chart__scroll--history:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.gem-chart--admin .gem-chart__scroll {
+  scrollbar-color: #b6c4d6 transparent;
+}
+
+.gem-chart--admin .gem-chart__scroll--history:focus-visible {
+  outline-color: var(--gem-chart-positive);
+}
+
+.gem-chart__scroll-content {
+  position: relative;
+  height: 160px;
 }
 
 .gem-chart__message {
@@ -105,6 +232,7 @@
   position: absolute;
   top: 0;
   right: 0;
+  z-index: 1;
   width: 56px;
   height: 160px;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
@@ -344,6 +472,32 @@
   border-color: #e5eaf2;
   border-radius: 10px;
   background: #f8faff;
+}
+
+.gem-chart--admin .gem-chart__settings-button {
+  border-color: #e5eaf2;
+  background: #f8faff;
+  color: #68758d;
+}
+
+.gem-chart--admin .gem-chart__settings-button:hover,
+.gem-chart--admin .gem-chart__settings-button[aria-expanded="true"] {
+  background: #eaf2ff;
+  color: #152341;
+}
+
+.gem-chart--admin .gem-chart__settings-button:focus-visible {
+  outline-color: var(--gem-chart-positive);
+}
+
+.gem-chart--admin .gem-chart__settings-panel {
+  border-color: #e5eaf2;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(19, 42, 78, 0.16);
+}
+
+.gem-chart--admin .gem-chart__settings-panel .gem-chart__candle-controls {
+  border-top-color: #e5eaf2;
 }
 
 .gem-chart--admin .gem-chart__type-button {

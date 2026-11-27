@@ -1,6 +1,11 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { useEffect, useRef, useState } from "react";
-import { MdDiamond, MdNorthEast, MdSouthEast } from "react-icons/md";
+import { useEffect, useId, useRef, useState } from "react";
+import {
+  MdDiamond,
+  MdNorthEast,
+  MdSettings,
+  MdSouthEast,
+} from "react-icons/md";
 import { app } from "../../firebase";
 import "./GemValueChart.css";
 
@@ -173,17 +178,24 @@ export default function GemValueChart({
   refreshKey = 0,
   variant = "default",
 }) {
+  const settingsPanelId = useId();
   const [range, setRange] = useState("1M");
   const [chartType, setChartType] = useState("line");
   const [candleInterval, setCandleInterval] = useState("1H");
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [data, setData] = useState(null);
   const [timestamps, setTimestamps] = useState([]);
   const [currency, setCurrency] = useState("PHP");
   const [error, setError] = useState("");
   const [chartW, setChartW] = useState(0);
   const [touchIndex, setTouchIndex] = useState(null); // scrub state, null when not touching
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   const chartWrapRef = useRef(null);
+  const chartScrollRef = useRef(null);
+  const settingsRef = useRef(null);
+  const settingsButtonRef = useRef(null);
+  const panStartRef = useRef(null);
   const geometryRef = useRef(null); // lets the pointer handlers read fresh geometry without re-subscribing
 
   // Measure the chart wrap's width -- the web equivalent of RN's onLayout.
@@ -201,8 +213,32 @@ export default function GemValueChart({
   }, []);
 
   useEffect(() => {
+    if (!settingsOpen) return undefined;
+
+    const closeOnOutsideClick = (event) => {
+      if (!settingsRef.current?.contains(event.target)) {
+        setSettingsOpen(false);
+      }
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setSettingsOpen(false);
+        settingsButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [settingsOpen]);
+
+  useEffect(() => {
     let cancelled = false;
     setTouchIndex(null); // clear any scrub state when the range changes
+    setScrollLeft(0);
     setError("");
     setData(null);
     setTimestamps([]);
@@ -233,15 +269,26 @@ export default function GemValueChart({
   }, [range, refreshKey]);
 
   const showChart = data?.length > 0 && chartW > 0;
+  const chartContentW = showChart
+    ? Math.max(chartW, data.length * 4)
+    : chartW;
+  const isScrollable = chartContentW > chartW;
   const selectedCandleInterval = CANDLE_INTERVALS.find(
     (interval) => interval.label === candleInterval,
   );
   const geometry = showChart
     ? chartType === "candle"
-      ? buildCandleGeometry(data, timestamps, selectedCandleInterval.milliseconds, chartW)
-      : buildChartGeometry(data, chartW)
+      ? buildCandleGeometry(data, timestamps, selectedCandleInterval.milliseconds, chartContentW)
+      : buildChartGeometry(data, chartContentW)
     : null;
   geometryRef.current = geometry;
+
+  useEffect(() => {
+    const scrollElement = chartScrollRef.current;
+    if (!scrollElement || !showChart) return;
+    scrollElement.scrollLeft = scrollElement.scrollWidth;
+    setScrollLeft(scrollElement.scrollLeft);
+  }, [chartContentW, showChart]);
   const sameValue =
     geometry && geometry.maxPoint.value === geometry.minPoint.value;
   const priceTicks = geometry
@@ -256,12 +303,12 @@ export default function GemValueChart({
     })
     : [];
 
-  // Converts a raw pointer X position (relative to the chart wrap) into
+  // Converts a raw pointer X position (relative to the chart content) into
   // the nearest data point index.
   const indexFromTouchX = (x) => {
     const g = geometryRef.current;
     if (!g || !data) return null;
-    const clampedX = Math.max(0, Math.min(chartW, x));
+    const clampedX = Math.max(0, Math.min(chartContentW, x));
     const idx = g.stepX === 0
       ? 0
       : chartType === "candle"
@@ -271,8 +318,9 @@ export default function GemValueChart({
   };
 
   const pointerXFromEvent = (e) => {
-    const rect = chartWrapRef.current.getBoundingClientRect();
-    return e.clientX - rect.left;
+    const scrollElement = chartScrollRef.current;
+    const rect = scrollElement.getBoundingClientRect();
+    return e.clientX - rect.left + scrollElement.scrollLeft;
   };
 
   // Pointer events are the web equivalent of PanResponder here: they fire
@@ -282,23 +330,62 @@ export default function GemValueChart({
   // nothing takes it back" behavior the RN version got from
   // onPanResponderTerminationRequest returning false.
   const handlePointerDown = (e) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
+    if (isScrollable) {
+      panStartRef.current = {
+        clientX: e.clientX,
+        scrollLeft: chartScrollRef.current.scrollLeft,
+        moved: false,
+      };
+      if (e.pointerType !== "touch") {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      }
+    } else {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    }
     onScrubbingChange?.(true);
     setTouchIndex(indexFromTouchX(pointerXFromEvent(e)));
   };
 
   const handlePointerMove = (e) => {
+    if (isScrollable && panStartRef.current && e.pointerType !== "touch") {
+      const panStart = panStartRef.current;
+      const deltaX = e.clientX - panStart.clientX;
+      if (e.buttons !== 0 && Math.abs(deltaX) > 4) {
+        panStart.moved = true;
+      }
+      if (panStart.moved) {
+        const scrollElement = chartScrollRef.current;
+        scrollElement.scrollLeft = panStart.scrollLeft - deltaX;
+        setScrollLeft(scrollElement.scrollLeft);
+        setTouchIndex(null);
+        return;
+      }
+    }
     if (e.buttons === 0 && e.pointerType !== "touch") return; // not dragging
     setTouchIndex(indexFromTouchX(pointerXFromEvent(e)));
   };
 
   const endScrub = () => {
+    panStartRef.current = null;
     onScrubbingChange?.(false);
     setTouchIndex(null);
   };
 
+  const handleChartScroll = (e) => {
+    setScrollLeft(e.currentTarget.scrollLeft);
+  };
+
+  const isViewingHistory = isScrollable
+    && scrollLeft < chartContentW - chartW - 1;
+  const historyIndex = isViewingHistory
+    ? indexFromTouchX(scrollLeft + chartW - PRICE_SCALE_W)
+    : null;
   const touchPoint =
-    touchIndex !== null && geometry ? geometry.points[touchIndex] : null;
+    touchIndex !== null && geometry
+      ? geometry.points[touchIndex]
+      : historyIndex !== null && geometry
+        ? geometry.points[historyIndex]
+        : null;
   const touchDateTime = touchPoint
     ? formatPointDateTime(timestamps[touchPoint.sourceIndex])
     : null;
@@ -313,7 +400,9 @@ export default function GemValueChart({
   const changeColorVar = positive
     ? (isAdminVariant ? "var(--gem-chart-positive)" : "var(--color-primary)")
     : (isAdminVariant ? "var(--gem-chart-negative)" : "var(--color-danger)");
-  const lineColor = isAdminVariant ? "var(--gem-chart-positive)" : "#59DE9B";
+  const lineColor = isAdminVariant
+    ? "var(--gem-chart-positive)"
+    : "var(--color-primary)";
 
   // While scrubbing, the big value swaps to whatever point is being
   // touched, same as most stock/price apps -- reverts once released.
@@ -326,58 +415,125 @@ export default function GemValueChart({
           <h3 className="gem-chart__title">GEM value</h3>
         </div>
         <div className="gem-chart__header-actions">
-          <div className="gem-chart__type-controls" role="group" aria-label="Chart type">
+          <div className="gem-chart__settings" ref={settingsRef}>
             <button
+              ref={settingsButtonRef}
               type="button"
-              className={`gem-chart__type-button${chartType === "line" ? " gem-chart__type-button--active" : ""}`}
-              onClick={() => {
-                setChartType("line");
-                setTouchIndex(null);
-              }}
-              aria-label="Line chart"
-              aria-pressed={chartType === "line"}
-              title="Line chart"
+              className="gem-chart__settings-button"
+              aria-label="Chart settings"
+              aria-expanded={settingsOpen}
+              aria-controls={settingsPanelId}
+              title="Chart settings"
+              onClick={() => setSettingsOpen((open) => !open)}
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M3 17l6-6 4 3 8-9" />
-                <path d="M15 5h6v6" />
-              </svg>
+              <MdSettings size={19} aria-hidden="true" />
             </button>
-            <button
-              type="button"
-              className={`gem-chart__type-button${chartType === "candle" ? " gem-chart__type-button--active" : ""}`}
-              onClick={() => {
-                setChartType("candle");
-                setTouchIndex(null);
-              }}
-              aria-label="Candlestick chart"
-              aria-pressed={chartType === "candle"}
-              title="Candlestick chart"
+            <div
+              className="gem-chart__settings-panel"
+              id={settingsPanelId}
+              hidden={!settingsOpen}
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 3v4m0 6v8M12 2v3m0 10v7M18 4v5m0 6v5" />
-                <rect x="4" y="7" width="4" height="6" rx="0.5" />
-                <rect x="10" y="5" width="4" height="10" rx="0.5" />
-                <rect x="16" y="9" width="4" height="6" rx="0.5" />
-              </svg>
-            </button>
+              <div className="gem-chart__settings-section">
+                <span className="gem-chart__control-label">Chart type:</span>
+                <div
+                  className="gem-chart__type-controls"
+                  role="group"
+                  aria-label="Chart type"
+                >
+                  <button
+                    type="button"
+                    className={`gem-chart__type-button${chartType === "line" ? " gem-chart__type-button--active" : ""}`}
+                    onClick={() => {
+                      setChartType("line");
+                      setTouchIndex(null);
+                    }}
+                    aria-label="Line chart"
+                    aria-pressed={chartType === "line"}
+                    title="Line chart"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M3 17l6-6 4 3 8-9" />
+                      <path d="M15 5h6v6" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    className={`gem-chart__type-button${chartType === "candle" ? " gem-chart__type-button--active" : ""}`}
+                    onClick={() => {
+                      setChartType("candle");
+                      setTouchIndex(null);
+                    }}
+                    aria-label="Candlestick chart"
+                    aria-pressed={chartType === "candle"}
+                    title="Candlestick chart"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M6 3v4m0 6v8M12 2v3m0 10v7M18 4v5m0 6v5" />
+                      <rect x="4" y="7" width="4" height="6" rx="0.5" />
+                      <rect x="10" y="5" width="4" height="10" rx="0.5" />
+                      <rect x="16" y="9" width="4" height="6" rx="0.5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className="gem-chart__range-controls gem-chart__settings-section">
+                <span className="gem-chart__control-label">Range:</span>
+                <div
+                  className="gem-chart__tab-row"
+                  role="group"
+                  aria-label="Chart range"
+                >
+                  {RANGES.map((r) => (
+                    <button
+                      type="button"
+                      key={r}
+                      onClick={() => setRange(r)}
+                      className={`gem-chart__tab${r === range ? " gem-chart__tab--active" : ""}`}
+                      aria-pressed={r === range}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {chartType === "candle" && (
+                <div className="gem-chart__candle-controls gem-chart__settings-section">
+                  <span className="gem-chart__control-label">Candles:</span>
+                  <div
+                    className="gem-chart__interval-row"
+                    role="group"
+                    aria-label="Candle interval"
+                  >
+                    {CANDLE_INTERVALS.map(({ label }) => (
+                      <button
+                        type="button"
+                        key={label}
+                        onClick={() => {
+                          setCandleInterval(label);
+                          setTouchIndex(null);
+                        }}
+                        className={`gem-chart__tab${label === candleInterval ? " gem-chart__tab--active" : ""}`}
+                        aria-pressed={label === candleInterval}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <MdDiamond
             size={22}
-            color={isAdminVariant ? "var(--gem-chart-positive)" : "#fff"}
+            color={isAdminVariant ? "var(--gem-chart-positive)" : "var(--color-primary)"}
             aria-hidden="true"
           />
         </div>
       </div>
 
       <div
-        className="gem-chart__chart-wrap"
+        className={`gem-chart__chart-wrap${isScrollable ? " gem-chart__chart-wrap--history" : ""}`}
         ref={chartWrapRef}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={endScrub}
-        onPointerCancel={endScrub}
-        onPointerLeave={endScrub}
       >
         {error && <p className="gem-chart__message">{error}</p>}
         {!error && data === null && (
@@ -385,16 +541,35 @@ export default function GemValueChart({
         )}
         {showChart && (
           <>
-            <svg width={chartW} height={CHART_H} className="gem-chart__svg">
+            <div
+              className={`gem-chart__scroll${isScrollable ? " gem-chart__scroll--history" : ""}`}
+              ref={chartScrollRef}
+              role="region"
+              aria-label={isScrollable
+                ? `GEM value chart for ${range}. Drag or scroll horizontally to explore past values.`
+                : `GEM value chart for ${range}`}
+              tabIndex={isScrollable ? 0 : undefined}
+              onScroll={handleChartScroll}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={endScrub}
+              onPointerCancel={endScrub}
+              onPointerLeave={isScrollable ? undefined : endScrub}
+            >
+            <div
+              className="gem-chart__scroll-content"
+              style={{ width: chartContentW }}
+            >
+            <svg width={chartContentW} height={CHART_H} className="gem-chart__svg">
               <g className="gem-chart__grid" aria-hidden="true">
                 {[0, 1, 2, 3, 4].map((index) => {
                   const y = CHART_PAD_TOP
                     + ((CHART_H - CHART_PAD_TOP - CHART_PAD_BOTTOM) / 4) * index;
-                  const x = (chartW / 4) * index;
+                  const x = (chartContentW / 4) * index;
 
                   return (
                     <g key={index}>
-                      <line x1={0} y1={y} x2={chartW} y2={y} />
+                      <line x1={0} y1={y} x2={chartContentW} y2={y} />
                       <line
                         x1={x}
                         y1={CHART_PAD_TOP}
@@ -411,12 +586,12 @@ export default function GemValueChart({
                     <linearGradient id="gemAreaFill" x1="0" y1="0" x2="0" y2="1">
                       <stop
                         offset="0%"
-                        stopColor={isAdminVariant ? "var(--gem-chart-positive)" : "#ffffff"}
+                        stopColor={isAdminVariant ? "var(--gem-chart-positive)" : "var(--color-primary)"}
                         stopOpacity={isAdminVariant ? 0.22 : 0.18}
                       />
                       <stop
                         offset="100%"
-                        stopColor={isAdminVariant ? "var(--gem-chart-positive)" : "#ffffff"}
+                        stopColor={isAdminVariant ? "var(--gem-chart-positive)" : "var(--color-primary)"}
                         stopOpacity={0}
                       />
                     </linearGradient>
@@ -491,7 +666,8 @@ export default function GemValueChart({
                     y2={CHART_H}
                     stroke={isAdminVariant
                       ? "rgba(191, 205, 198, 0.5)"
-                      : "rgba(255,255,255,0.35)"}
+                      : "var(--color-primary)"}
+                    strokeOpacity={isAdminVariant ? 1 : 0.35}
                     strokeWidth={1}
                     strokeDasharray="3,4"
                   />
@@ -499,27 +675,11 @@ export default function GemValueChart({
                     cx={touchPoint.x}
                     cy={touchPoint.y}
                     r={4.5}
-                    fill={isAdminVariant ? "var(--gem-chart-positive)" : "#fff"}
+                    fill={lineColor}
                   />
                 </>
               )}
             </svg>
-            <div
-              className="gem-chart__price-scale"
-              role="group"
-              aria-label={`Price scale in ${currency}`}
-            >
-              {priceTicks.map((tick, index) => (
-                <span
-                  className="gem-chart__price-tick"
-                  key={index}
-                  style={{ top: tick.y }}
-                >
-                  {formatCurrency(tick.value, currency)}
-                </span>
-              ))}
-            </div>
-
             {/* High/low labels -- hidden while scrubbing so they don't
                 collide visually with the touch tooltip below. pointer-events
                 none so they never intercept the scrub touch. */}
@@ -529,7 +689,7 @@ export default function GemValueChart({
                   className="gem-chart__point-label-wrap"
                   style={{
                     top: geometry.maxPoint.y - 24,
-                    ...labelAlignStyle(geometry.maxPoint.x, chartW),
+                    ...labelAlignStyle(geometry.maxPoint.x, chartContentW),
                   }}
                 >
                   <div className="gem-chart__point-label-chip">
@@ -544,7 +704,7 @@ export default function GemValueChart({
                     className="gem-chart__point-label-wrap"
                     style={{
                       top: geometry.minPoint.y + 6,
-                      ...labelAlignStyle(geometry.minPoint.x, chartW),
+                      ...labelAlignStyle(geometry.minPoint.x, chartContentW),
                     }}
                   >
                     <div className="gem-chart__point-label-chip">
@@ -563,7 +723,7 @@ export default function GemValueChart({
                 className="gem-chart__point-label-wrap"
                 style={{
                   top: Math.max(0, touchPoint.y - 26),
-                  ...labelAlignStyle(touchPoint.x, chartW),
+                  ...labelAlignStyle(touchPoint.x, chartContentW),
                 }}
               >
                 <div className="gem-chart__point-label-chip gem-chart__touch-chip">
@@ -579,48 +739,26 @@ export default function GemValueChart({
                 </div>
               </div>
             )}
+            </div>
+            </div>
+            <div
+              className="gem-chart__price-scale"
+              role="group"
+              aria-label={`Price scale in ${currency}`}
+            >
+              {priceTicks.map((tick, index) => (
+                <span
+                  className="gem-chart__price-tick"
+                  key={index}
+                  style={{ top: tick.y }}
+                >
+                  {formatCurrency(tick.value, currency)}
+                </span>
+              ))}
+            </div>
           </>
         )}
       </div>
-
-      <div className="gem-chart__range-controls">
-        <span className="gem-chart__control-label">Range:</span>
-        <div className="gem-chart__tab-row" role="group" aria-label="Chart range">
-        {RANGES.map((r) => (
-          <button
-            type="button"
-            key={r}
-            onClick={() => setRange(r)}
-            className={`gem-chart__tab${r === range ? " gem-chart__tab--active" : ""}`}
-            aria-pressed={r === range}
-          >
-            {r}
-          </button>
-        ))}
-        </div>
-      </div>
-
-      {chartType === "candle" && (
-        <div className="gem-chart__candle-controls">
-          <span className="gem-chart__control-label">Candles:</span>
-          <div className="gem-chart__interval-row" role="group" aria-label="Candle interval">
-            {CANDLE_INTERVALS.map(({ label }) => (
-              <button
-                type="button"
-                key={label}
-                onClick={() => {
-                  setCandleInterval(label);
-                  setTouchIndex(null);
-                }}
-                className={`gem-chart__tab${label === candleInterval ? " gem-chart__tab--active" : ""}`}
-                aria-pressed={label === candleInterval}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="gem-chart__stat-panel">
         <p className="gem-chart__big-value">

@@ -12,6 +12,11 @@
   box-shadow: 0 4px 20px rgba(0, 168, 107, 0.15);
 }
 
+.tb-topbar-user {
+  border-bottom-width: 3px;
+  border-bottom-color: #8b6541;
+}
+
 .tb-topbar-inner {
   display: flex;
   justify-content: space-between;
@@ -25,21 +30,75 @@
 .tb-topbar-left {
   display: flex;
   align-items: center;
+  min-width: 0;
   gap: 16px;
 }
 
 .tb-logo {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  min-width: 0;
+  font-family: "Ubuntu", sans-serif;
   font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--primary);
 }
 
+.tb-topbar-user .tb-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.tb-logo-main {
+  font-size: 22px;
+  line-height: 1.05;
+}
+
+.tb-logo-subtitle {
+  color: var(--on-surface-variant, var(--primary));
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .tb-topbar-right {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 16px;
+}
+
+.tb-header-action {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--primary);
+  text-decoration: none;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.tb-header-action .material-symbols-outlined,
+.tb-topbar-user .tb-notif-btn .material-symbols-outlined {
+  font-size: 26px;
+}
+
+.tb-header-action:hover {
+  color: var(--primary-container);
+}
+
+.tb-header-action:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
 }
 
 .tb-user-info {
@@ -63,13 +122,35 @@
     font-size: 20px;
   }
 
+  .tb-topbar-user .tb-logo-main {
+    font-size: 16px;
+  }
+
+  .tb-topbar-user .tb-logo-subtitle {
+    font-size: 10px;
+  }
+
+  .tb-header-action {
+    width: 32px;
+    height: 32px;
+  }
+
+  .tb-topbar-user .tb-header-action .material-symbols-outlined,
+  .tb-topbar-user .tb-notif-btn .material-symbols-outlined {
+    font-size: 24px;
+  }
+
   .tb-topbar-right {
-    gap: 10px;
+    gap: 7px;
   }
 
   .tb-user-info {
     display: block;
     min-width: 0;
+  }
+
+  .tb-topbar-user .tb-user-info {
+    display: none;
   }
 
   .tb-user-role {
@@ -85,13 +166,13 @@
   }
 
   .tb-topbar-avatar {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
   }
 }
 
 .tb-user-role {
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 10px;
   color: var(--primary);
   text-transform: uppercase;
@@ -99,24 +180,43 @@
 }
 
 .tb-user-name {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   font-size: 14px;
   font-weight: 600;
 }
 
+.tb-topbar-user .tb-user-name {
+  display: none;
+}
+
 .tb-notif-btn {
   position: relative;
+  display: flex;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 11px;
   background: none;
   border: none;
   cursor: pointer;
   color: var(--primary);
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  transition: opacity 0.15s;
+  transition:
+    background-color 140ms ease,
+    opacity 140ms ease;
+}
+
+@media (max-width: 639px) {
+  .tb-notif-btn {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .tb-notif-btn:hover {
+  background: rgba(89, 222, 155, 0.08);
   opacity: 0.8;
 }
 
@@ -139,6 +239,10 @@
   overflow: hidden;
   cursor: pointer;
   transition: opacity 0.15s;
+}
+
+.tb-topbar-user .tb-topbar-avatar {
+  border-color: #8b6541;
 }
 
 .tb-topbar-avatar:active {

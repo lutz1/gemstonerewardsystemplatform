@@ -1,6 +1,6 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import { app } from "../../firebase";
 import NotificationDrawer from "./notification/NotificationDrawer";
@@ -21,7 +21,8 @@ function formatNotificationDate(value) {
  * Shared top app bar used across pages.
  *
  * Props:
- * - logoText:   brand text shown top-left            (default "Gemstone Code")
+ * - logoText:   brand text shown on admin top bars    (default "Gemstone Code")
+ *               member top bars show the product title and support actions
  * - userName:   member's display name                (optional)
  * - userRole:   member tier/role label                (optional)
  * - avatarUrl:  avatar image src                      (optional)
@@ -76,6 +77,7 @@ export default function TopBar({
   const resolvedUserName = userName || auth?.username || "";
   const resolvedUserRole = userRole || auth?.role || "";
   const resolvedAvatarUrl = avatarUrl || auth?.avatarUrl || "";
+  const isAdminTopBar = resolvedUserRole === "Administrator";
   const displayedNotifications = (notifications ?? loadedNotifications)
     .filter((notification) => !hiddenNotificationIds.has(notification.id))
     .map(
@@ -153,10 +155,23 @@ export default function TopBar({
 
   return (
     <>
-      <header className="tb-topbar">
+      <header
+        className={`tb-topbar${isAdminTopBar ? " tb-topbar-admin" : " tb-topbar-user"}`}
+      >
         <div className="tb-topbar-inner">
           <div className="tb-topbar-left">
-            <span className="tb-logo">{logoText}</span>
+            <span className="tb-logo">
+              {isAdminTopBar ? (
+                logoText
+              ) : (
+                <>
+                  <span className="tb-logo-main">Gemstone</span>
+                  <span className="tb-logo-subtitle">
+                    Advertisement Marketing
+                  </span>
+                </>
+              )}
+            </span>
           </div>
 
           <div className="tb-topbar-right">
@@ -164,6 +179,30 @@ export default function TopBar({
               <p className="tb-user-role">{resolvedUserRole}</p>
               <p className="tb-user-name">{resolvedUserName}</p>
             </div>
+            {!isAdminTopBar && (
+              <Link
+                className="tb-header-action"
+                to="/help"
+                aria-label="Help Center"
+                title="Help Center"
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  help
+                </span>
+              </Link>
+            )}
+            {!isAdminTopBar && (
+              <a
+                className="tb-header-action"
+                href="mailto:support@gemstonecode.com"
+                aria-label="Contact customer service"
+                title="Contact customer service"
+              >
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  support_agent
+                </span>
+              </a>
+            )}
             <button
               className="tb-notif-btn"
               aria-label="Notifications"
